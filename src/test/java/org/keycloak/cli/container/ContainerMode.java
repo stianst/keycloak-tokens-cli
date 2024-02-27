@@ -1,9 +1,9 @@
-package org.keycloak.cli;
+package org.keycloak.cli.container;
 
 public enum ContainerMode {
 
     MANUAL,
     DEFAULT,
-    FAST_DEV
+    FAST
 
 }

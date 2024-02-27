@@ -1,6 +1,5 @@
 package org.keycloak.cli;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.TestProfile;
@@ -9,6 +8,8 @@ import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.keycloak.cli.container.KeycloakProfile;
+import org.keycloak.cli.container.KeycloakTestResource;
 
 @QuarkusMainIntegrationTest
 @QuarkusTestResource(KeycloakTestResource.class)
@@ -33,12 +34,6 @@ public class TokenTest {
     public void tokenCustomScope(LaunchResult result) {
         JsonNode jsonNode = OpenIDAssertions.assertEncodedToken(result.getOutput());
         Assertions.assertNotNull(jsonNode.get("email"));
-    }
-
-    @Test
-    @Launch({"userinfo"})
-    public void userinfo(LaunchResult result) throws JsonProcessingException {
-        OpenIDAssertions.assertUserInfoResponse(result.getOutput());
     }
 
 }

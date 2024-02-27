@@ -4,7 +4,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.keycloak.cli.enums.Flow;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 

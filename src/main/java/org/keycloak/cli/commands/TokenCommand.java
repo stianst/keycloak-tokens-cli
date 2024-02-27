@@ -2,10 +2,10 @@ package org.keycloak.cli.commands;
 
 import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
+import org.keycloak.cli.commands.converter.TokenTypeConverter;
+import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.tokens.TokenDecoder;
 import org.keycloak.cli.tokens.Tokens;
-import org.keycloak.cli.enums.TokenType;
-import org.keycloak.cli.commands.converter.TokenTypeConverter;
 import picocli.CommandLine;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class TokenCommand implements Runnable {
 
     @Override
     public void run() {
-        String token  = tokens.getToken(tokenType, scope);
+        String token = tokens.getToken(tokenType, scope);
 
         if (decode) {
             token = tokenDecoder.decode(token);

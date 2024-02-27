@@ -15,7 +15,12 @@ public class TokenDecoder {
 
     public String decode(String token) {
         try {
-            JwtClaims claims = (new JwtConsumerBuilder()).setSkipSignatureVerification().setSkipAllValidators().build().processToClaims(token);
+            JwtClaims claims = new JwtConsumerBuilder()
+                    .setSkipSignatureVerification()
+                    .setSkipAllValidators()
+                    .build()
+                    .processToClaims(token);
+
             return prettyPrinter.prettyPrint(claims.getClaimsMap());
         } catch (InvalidJwtException e) {
             throw new RuntimeException(e);
