@@ -2,10 +2,7 @@ package org.keycloak.cli;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.eclipse.microprofile.config.ConfigProvider;
-import org.keycloak.admin.client.Keycloak;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.utility.DockerImageName;
 
@@ -15,9 +12,6 @@ import java.util.Map;
 public class KeycloakTestResource implements QuarkusTestResourceLifecycleManager {
 
     static GenericContainer container;
-
-    String keycloakUrl;
-    private Keycloak adminClient;
 
     @Override
     public Map<String, String> start() {
@@ -42,17 +36,17 @@ public class KeycloakTestResource implements QuarkusTestResourceLifecycleManager
                 throw new RuntimeException(e);
             }
 
-            this.container = new GenericContainer<>(DockerImageName.parse(fullImageName))
+            container = new GenericContainer<>(DockerImageName.parse(fullImageName))
                     .withExposedPorts(8080)
                     .withAccessToHost(true)
                     .withCommand(commandParts)
                     .withCopyToContainer(Transferable.of(testrealm), "/opt/keycloak/data/import/testrealm.json");
 
-            this.container.start();
+            container.start();
 //            this.container.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(KeycloakTestResource.class)));
         }
 
-        String url = "http://" + this.container.getHost() + ":" + this.container.getMappedPort(8080);
+        String url = "http://" + container.getHost() + ":" + container.getMappedPort(8080);
 
         return Map.of(
                 "keycloak.url", url,
