@@ -8,12 +8,12 @@ import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.keycloak.cli.container.KeycloakProfile;
+import org.keycloak.cli.container.PasswordProfile;
 import org.keycloak.cli.container.KeycloakTestResource;
 
 @QuarkusMainIntegrationTest
 @QuarkusTestResource(KeycloakTestResource.class)
-@TestProfile(KeycloakProfile.class)
+@TestProfile(PasswordProfile.class)
 public class TokenTest {
 
     @Test

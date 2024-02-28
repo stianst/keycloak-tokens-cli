@@ -4,15 +4,14 @@ import io.quarkus.test.junit.QuarkusTestProfile;
 
 import java.util.Map;
 
-public class KeycloakProfile implements QuarkusTestProfile {
+public class PasswordProfile implements QuarkusTestProfile {
 
     @Override
     public Map<String, String> getConfigOverrides() {
         return Map.of(
                 "kct.issuer", "${keycloak.issuer}",
                 "kct.flow", "password",
-                "kct.client", "test-password",
-                "kct.client-secret", "",
+                "kct.client", "test-device",
                 "kct.user", "test-user",
                 "kct.user-password", "test-user-password",
                 "kct.scopes", "openid"

@@ -9,11 +9,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class PrettyPrinter {
+public class PrettyPrinterService {
 
     ObjectWriter writer;
 
-    public PrettyPrinter() {
+    public PrettyPrinterService() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 

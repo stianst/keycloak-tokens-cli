@@ -4,8 +4,9 @@ import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.commands.converter.TokenTypeConverter;
 import org.keycloak.cli.enums.TokenType;
+import org.keycloak.cli.interact.InteractService;
 import org.keycloak.cli.tokens.TokenDecoder;
-import org.keycloak.cli.tokens.Tokens;
+import org.keycloak.cli.tokens.TokenService;
 import picocli.CommandLine;
 
 import java.util.List;
@@ -23,10 +24,13 @@ public class TokenCommand implements Runnable {
     List<String> scope;
 
     @Inject
-    Tokens tokens;
+    TokenService tokens;
 
     @Inject
     TokenDecoder tokenDecoder;
+
+    @Inject
+    InteractService interact;
 
     @Override
     public void run() {
@@ -36,7 +40,7 @@ public class TokenCommand implements Runnable {
             token = tokenDecoder.decode(token);
         }
 
-        System.out.println(token);
+        interact.println(token);
     }
 
 }

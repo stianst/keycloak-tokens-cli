@@ -5,13 +5,13 @@ import jakarta.inject.Inject;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
-import org.keycloak.cli.utils.PrettyPrinter;
+import org.keycloak.cli.utils.PrettyPrinterService;
 
 @ApplicationScoped
 public class TokenDecoder {
 
     @Inject
-    PrettyPrinter prettyPrinter;
+    PrettyPrinterService prettyPrinter;
 
     public String decode(String token) {
         try {

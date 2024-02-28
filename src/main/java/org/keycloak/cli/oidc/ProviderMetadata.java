@@ -13,6 +13,9 @@ public class ProviderMetadata {
     @JsonProperty("userinfo_endpoint")
     private String userinfoEndpoint;
 
+    @JsonProperty("device_authorization_endpoint")
+    private String deviceAuthorizationEndpoint;
+
     public String getAuthorizationEndpoint() {
         return authorizationEndpoint;
     }
@@ -35,5 +38,13 @@ public class ProviderMetadata {
 
     public void setUserinfoEndpoint(String userinfoEndpoint) {
         this.userinfoEndpoint = userinfoEndpoint;
+    }
+
+    public String getDeviceAuthorizationEndpoint() {
+        return deviceAuthorizationEndpoint;
+    }
+
+    public void setDeviceAuthorizationEndpoint(String deviceAuthorizationEndpoint) {
+        this.deviceAuthorizationEndpoint = deviceAuthorizationEndpoint;
     }
 }
