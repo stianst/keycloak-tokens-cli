@@ -1,4 +1,4 @@
-package org.keycloak.cli;
+package org.keycloak.cli.assertion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

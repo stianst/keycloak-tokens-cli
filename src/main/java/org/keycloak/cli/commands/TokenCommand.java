@@ -3,10 +3,11 @@ package org.keycloak.cli.commands;
 import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.commands.converter.TokenTypeConverter;
+import org.keycloak.cli.config.Config;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
-import org.keycloak.cli.tokens.TokenDecoder;
-import org.keycloak.cli.tokens.TokenService;
+import org.keycloak.cli.oidc.TokenService;
+import org.keycloak.cli.tokens.TokenDecoderService;
 import picocli.CommandLine;
 
 import java.util.List;
@@ -14,26 +15,36 @@ import java.util.List;
 @CommandLine.Command(name = "token", description = "Retrieve tokens")
 public class TokenCommand implements Runnable {
 
-    @CommandLine.Option(names = "--decode", description = "Decode the token", defaultValue = "false")
+    @CommandLine.Option(names = { "-c", "--context" }, description = "Context to use")
+    String context;
+
+    @CommandLine.Option(names = { "-d", "--decode" }, description = "Decode the token", defaultValue = "false")
     boolean decode;
 
-    @CommandLine.Option(names = "--type", description = "Token type to get", defaultValue = "access", converter = TokenTypeConverter.class)
+    @CommandLine.Option(names = { "-t", "--type" }, description = "Token type to get", defaultValue = "access", converter = TokenTypeConverter.class)
     TokenType tokenType;
 
-    @CommandLine.Option(names = "--scope", description = "Scope to request", converter = CommaSeparatedListConverter.class)
+    @CommandLine.Option(names = { "-s", "--scope" }, description = "Scope to request", converter = CommaSeparatedListConverter.class)
     List<String> scope;
+
+    @Inject
+    Config config;
 
     @Inject
     TokenService tokens;
 
     @Inject
-    TokenDecoder tokenDecoder;
+    TokenDecoderService tokenDecoder;
 
     @Inject
     InteractService interact;
 
     @Override
     public void run() {
+        if (context != null) {
+            config.setContext(context);
+        }
+
         String token = tokens.getToken(tokenType, scope);
 
         if (decode) {

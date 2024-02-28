@@ -99,6 +99,27 @@
           </systemPropertyVariables>
         </configuration>
       </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>3.2.5</version>
+          <configuration>
+            <systemPropertyVariables>
+              <native.image.path>${project.build.directory}/${project.build.finalName}</native.image.path>
+            </systemPropertyVariables>
+            <includes>**/*IT.java</includes>
+            <skipITs>false</skipITs>
+          </configuration>
+
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
     </plugins>
   </build>
   <profiles>

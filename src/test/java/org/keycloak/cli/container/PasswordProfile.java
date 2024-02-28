@@ -11,7 +11,7 @@ public class PasswordProfile implements QuarkusTestProfile {
         return Map.of(
                 "kct.issuer", "${keycloak.issuer}",
                 "kct.flow", "password",
-                "kct.client", "test-device",
+                "kct.client", "test-password",
                 "kct.user", "test-user",
                 "kct.user-password", "test-user-password",
                 "kct.scopes", "openid"

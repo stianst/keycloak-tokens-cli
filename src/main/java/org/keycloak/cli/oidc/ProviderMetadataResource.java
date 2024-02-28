@@ -6,7 +6,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/.well-known/openid-configuration")
-public interface OpenIDConfigurationResource {
+public interface ProviderMetadataResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

@@ -1,4 +1,4 @@
-package org.keycloak.cli;
+package org.keycloak.cli.mock;
 
 import io.quarkus.test.Mock;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,7 +19,7 @@ public class MockInteractService extends InteractService {
 
     @Override
     public void println(String message) {
-        System.out.println("mock: " + message);
+        System.out.println(message);
         this.messages.add(message);
     }
 

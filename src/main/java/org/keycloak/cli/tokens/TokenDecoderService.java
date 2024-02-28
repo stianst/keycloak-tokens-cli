@@ -8,7 +8,7 @@ import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.keycloak.cli.utils.PrettyPrinterService;
 
 @ApplicationScoped
-public class TokenDecoder {
+public class TokenDecoderService {
 
     @Inject
     PrettyPrinterService prettyPrinter;

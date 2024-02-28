@@ -3,9 +3,9 @@ package org.keycloak.cli.commands;
 import jakarta.inject.Inject;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
-import org.keycloak.cli.oidc.OpenIDClientService;
+import org.keycloak.cli.oidc.TokenService;
 import org.keycloak.cli.oidc.UserInfo;
-import org.keycloak.cli.tokens.TokenService;
+import org.keycloak.cli.oidc.UserInfoService;
 import org.keycloak.cli.utils.PrettyPrinterService;
 import picocli.CommandLine;
 
@@ -16,7 +16,7 @@ public class UserInfoCommand implements Runnable {
     TokenService tokens;
 
     @Inject
-    OpenIDClientService openIDClient;
+    UserInfoService userInfoService;
 
     @Inject
     PrettyPrinterService prettyPrinter;
@@ -27,7 +27,7 @@ public class UserInfoCommand implements Runnable {
     @Override
     public void run() {
         String accessToken = tokens.getToken(TokenType.ACCESS);
-        UserInfo userInfo = openIDClient.getUserInfo(accessToken);
+        UserInfo userInfo = userInfoService.getUserInfo(accessToken);
 
         interact.println(prettyPrinter.prettyPrint(userInfo));
     }

@@ -1,14 +1,21 @@
 package org.keycloak.cli.config;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.keycloak.cli.enums.Flow;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class Config {
+
+    @ConfigProperty(name = "kct.context", defaultValue = "default")
+    String context;
 
     @ConfigProperty(name = "kct.issuer")
     String issuer;
@@ -31,32 +38,45 @@ public class Config {
     @ConfigProperty(name = "kct.scopes")
     List<String> scope;
 
+    public String getContext() {
+        return context;
+    }
+
+    public void setContext(String context) {
+        this.context = context;
+    }
+
     public String getIssuer() {
-        return issuer;
+        return get("issuer", String.class);
     }
 
     public String getClientId() {
-        return clientId;
+        return get("client", String.class);
     }
 
     public String getClientSecret() {
-        return clientSecret.orElse(null);
+        return get("client-secret", String.class);
     }
 
     public String getUsername() {
-        return username;
+        return get("user", String.class);
     }
 
     public String getUserPassword() {
-        return userPassword;
+        return get("user-password", String.class);
     }
 
     public Flow getFlow() {
-        return flow;
+        return get("flow", Flow.class);
     }
 
     public List<String> getScope() {
-        return scope;
+        return Arrays.stream(get("scopes", String.class).split(",")).map(String::trim).collect(Collectors.toList());
+    }
+
+    private <T> T get(String key, Class<T> clazz) {
+        String k = context.equals("default") ? "kct." + key : "kct." + context + "." + key;
+        return ConfigProvider.getConfig().getValue(k, clazz);
     }
 
 }

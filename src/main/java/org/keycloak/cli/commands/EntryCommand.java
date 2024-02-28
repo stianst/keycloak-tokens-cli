@@ -6,7 +6,8 @@ import picocli.CommandLine;
 @TopCommand
 @CommandLine.Command(subcommands = {
         TokenCommand.class,
-        UserInfoCommand.class
+        UserInfoCommand.class,
+        ShowConfigCommand.class
 })
 public class EntryCommand {
 }
