@@ -51,8 +51,8 @@ public class TokenStoreServiceTest {
         Assertions.assertEquals("refresh", current.getRefreshToken());
         Assertions.assertEquals("access", current.getAccessToken());
         Assertions.assertEquals("id", current.getIdToken());
-        Assertions.assertEquals(List.of("refresh"), current.getRefreshScope());
-        Assertions.assertEquals(List.of("token"), current.getTokenScope());
+        Assertions.assertEquals(Set.of("refresh"), current.getRefreshScope());
+        Assertions.assertEquals(Set.of("token"), current.getTokenScope());
         Assertions.assertEquals(123456L, current.getExpiresAt());
 
         tokens.clearCurrent();
