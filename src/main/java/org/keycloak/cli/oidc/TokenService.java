@@ -6,7 +6,7 @@ import io.quarkus.oidc.client.OidcClients;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.keycloak.cli.config.Config;
+import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.Flow;
 import org.keycloak.cli.enums.TokenType;
 
@@ -20,7 +20,7 @@ public class TokenService {
     private static final Duration DEFAULT_WAIT = Duration.ofMinutes(1);
 
     @Inject
-    Config config;
+    ConfigService config;
 
     @Inject
     OidcClients quarkusClients;
@@ -54,7 +54,7 @@ public class TokenService {
         clientConfig.setTokenPath(providerMetadata.getTokenEndpoint());
         clientConfig.setId(config.getIssuer());
         clientConfig.setAuthServerUrl(config.getIssuer());
-        clientConfig.setClientId(config.getClientId());
+        clientConfig.setClientId(config.getClient());
 
         if (scope != null) {
             clientConfig.setScopes(scope);
@@ -69,7 +69,7 @@ public class TokenService {
         if (Flow.PASSWORD.equals(config.getFlow())) {
             clientConfig.getGrant().setType(OidcClientConfig.Grant.Type.PASSWORD);
 
-            Map<String, Map<String, String>> grantOptions = Map.of("password", Map.of("username", config.getUsername(), "password", config.getUserPassword()));
+            Map<String, Map<String, String>> grantOptions = Map.of("password", Map.of("username", config.getUser(), "password", config.getUserPassword()));
             clientConfig.setGrantOptions(grantOptions);
         } else {
             throw new IllegalArgumentException("Unknown flow");

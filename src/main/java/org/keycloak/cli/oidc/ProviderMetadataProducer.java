@@ -3,7 +3,7 @@ package org.keycloak.cli.oidc;
 import io.quarkus.rest.client.reactive.QuarkusRestClientBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
-import org.keycloak.cli.config.Config;
+import org.keycloak.cli.config.ConfigService;
 
 import java.net.URI;
 
@@ -13,7 +13,7 @@ public class ProviderMetadataProducer {
     private ProviderMetadata providerMetadata;
 
     @Produces
-    ProviderMetadata providerMetadata(Config config) {
+    ProviderMetadata providerMetadata(ConfigService config) {
         if (providerMetadata == null) {
             providerMetadata = QuarkusRestClientBuilder.newBuilder().baseUri(URI.create(config.getIssuer()))
                     .build(ProviderMetadataResource.class).getProviderMetadata();

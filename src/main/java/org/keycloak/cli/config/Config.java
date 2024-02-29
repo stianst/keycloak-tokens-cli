@@ -1,82 +1,110 @@
 package org.keycloak.cli.config;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import org.eclipse.microprofile.config.ConfigProvider;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.keycloak.cli.enums.Flow;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Map;
 
-@ApplicationScoped
+@JsonPropertyOrder({ "default", "contexts" })
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Config {
 
-    @ConfigProperty(name = "kct.context", defaultValue = "default")
-    String context;
+    @JsonProperty("default")
+    private String defaultContext;
 
-    @ConfigProperty(name = "kct.issuer")
-    String issuer;
+    private Map<String, Context> contexts;
 
-    @ConfigProperty(name = "kct.client")
-    String clientId;
-
-    @ConfigProperty(name = "kct.client-secret")
-    Optional<String> clientSecret;
-
-    @ConfigProperty(name = "kct.user")
-    String username;
-
-    @ConfigProperty(name = "kct.user-password")
-    String userPassword;
-
-    @ConfigProperty(name = "kct.flow")
-    Flow flow;
-
-    @ConfigProperty(name = "kct.scopes")
-    List<String> scope;
-
-    public String getContext() {
-        return context;
+    public String getDefaultContext() {
+        return defaultContext;
     }
 
-    public void setContext(String context) {
-        this.context = context;
+    public void setDefaultContext(String defaultContext) {
+        this.defaultContext = defaultContext;
     }
 
-    public String getIssuer() {
-        return get("issuer", String.class);
+    public Map<String, Context> getContexts() {
+        return contexts;
     }
 
-    public String getClientId() {
-        return get("client", String.class);
+    public void setContexts(Map<String, Context> contexts) {
+        this.contexts = contexts;
     }
 
-    public String getClientSecret() {
-        return get("client-secret", String.class);
-    }
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Context {
 
-    public String getUsername() {
-        return get("user", String.class);
-    }
+        private String issuer;
+        private Flow flow;
 
-    public String getUserPassword() {
-        return get("user-password", String.class);
-    }
+        private String client;
 
-    public Flow getFlow() {
-        return get("flow", Flow.class);
-    }
+        @JsonProperty("client-secret")
+        private String clientSecret;
 
-    public List<String> getScope() {
-        return Arrays.stream(get("scopes", String.class).split(",")).map(String::trim).collect(Collectors.toList());
-    }
+        private String user;
 
-    private <T> T get(String key, Class<T> clazz) {
-        String k = context.equals("default") ? "kct." + key : "kct." + context + "." + key;
-        return ConfigProvider.getConfig().getValue(k, clazz);
+        @JsonProperty("user-password")
+        private String userPassword;
+
+        public String scope;
+
+        public Flow getFlow() {
+            return flow;
+        }
+
+        public void setFlow(Flow flow) {
+            this.flow = flow;
+        }
+
+        public String getIssuer() {
+            return issuer;
+        }
+
+        public void setIssuer(String issuer) {
+            this.issuer = issuer;
+        }
+
+        public String getClient() {
+            return client;
+        }
+
+        public void setClient(String client) {
+            this.client = client;
+        }
+
+        public String getClientSecret() {
+            return clientSecret;
+        }
+
+        public void setClientSecret(String clientSecret) {
+            this.clientSecret = clientSecret;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        public String getUserPassword() {
+            return userPassword;
+        }
+
+        public void setUserPassword(String userPassword) {
+            this.userPassword = userPassword;
+        }
+
+        public String getScope() {
+            return scope;
+        }
+
+        public void setScope(String scope) {
+            this.scope = scope;
+        }
     }
 
 }

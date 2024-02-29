@@ -4,7 +4,7 @@ import io.quarkus.rest.client.reactive.QuarkusRestClientBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
-import org.keycloak.cli.config.Config;
+import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
 
@@ -20,7 +20,7 @@ public class DeviceAuthorizationService {
     private static final long DEVICE_MAX_WAIT = TimeUnit.MINUTES.toMillis(5);
 
     @Inject
-    Config config;
+    ConfigService config;
 
     @Inject
     InteractService interact;
@@ -34,7 +34,7 @@ public class DeviceAuthorizationService {
         }
 
         DeviceAuthorizationResponse response = QuarkusRestClientBuilder.newBuilder().baseUri(URI.create(providerMetadata.getDeviceAuthorizationEndpoint()))
-                .build(DeviceAuthorizationResource.class).request(config.getClientId(), String.join(",", scope));
+                .build(DeviceAuthorizationResource.class).request(config.getClient(), scope != null ? String.join(",", scope) : null);
 
         if (response.getVerificationUriComplete() != null) {
             interact.println("Open the following URL to complete:");
@@ -58,7 +58,7 @@ public class DeviceAuthorizationService {
             }
 
             try {
-                TokenResponse tokenResponse = tokenResource.device("urn:ietf:params:oauth:grant-type:device_code", response.getDeviceCode(), config.getClientId());
+                TokenResponse tokenResponse = tokenResource.device("urn:ietf:params:oauth:grant-type:device_code", response.getDeviceCode(), config.getClient());
                 return new Tokens(tokenResponse).getToken(tokenType);
             } catch (WebApplicationException e) {
                 TokenResponse tokenResponse = e.getResponse().readEntity(TokenResponse.class);

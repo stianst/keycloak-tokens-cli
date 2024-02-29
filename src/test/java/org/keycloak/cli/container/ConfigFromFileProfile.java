@@ -4,16 +4,12 @@ import io.quarkus.test.junit.QuarkusTestProfile;
 
 import java.util.Map;
 
-public class DeviceProfile implements QuarkusTestProfile {
+public class ConfigFromFileProfile implements QuarkusTestProfile {
 
     @Override
     public Map<String, String> getConfigOverrides() {
         return Map.of(
-                "kct.issuer", "${keycloak.issuer}",
-                "kct.flow", "device",
-                "kct.client", "test-device",
-                "kct.client-secret", "",
-                "kct.scopes", "openid"
+                "kct.config.file", "${java.io.tmpdir}/test-kct.yaml"
         );
     }
 

@@ -1,0 +1,6 @@
+context: mycontext
+issuer: http://myissuer
+client: myclient
+user: myuser
+user-password: **************
+scope: openid,email

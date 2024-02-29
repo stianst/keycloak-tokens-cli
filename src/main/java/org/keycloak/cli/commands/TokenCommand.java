@@ -3,7 +3,7 @@ package org.keycloak.cli.commands;
 import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.commands.converter.TokenTypeConverter;
-import org.keycloak.cli.config.Config;
+import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
 import org.keycloak.cli.oidc.TokenService;
@@ -12,7 +12,7 @@ import picocli.CommandLine;
 
 import java.util.List;
 
-@CommandLine.Command(name = "token", description = "Retrieve tokens")
+@CommandLine.Command(name = "token", description = "Retrieve tokens", mixinStandardHelpOptions = true)
 public class TokenCommand implements Runnable {
 
     @CommandLine.Option(names = { "-c", "--context" }, description = "Context to use")
@@ -28,7 +28,7 @@ public class TokenCommand implements Runnable {
     List<String> scope;
 
     @Inject
-    Config config;
+    ConfigService config;
 
     @Inject
     TokenService tokens;

@@ -1,13 +1,27 @@
 package org.keycloak.cli.commands;
 
-import io.quarkus.picocli.runtime.annotations.TopCommand;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 
-@TopCommand
+@QuarkusMain
 @CommandLine.Command(subcommands = {
         TokenCommand.class,
         UserInfoCommand.class,
-        ShowConfigCommand.class
-})
-public class EntryCommand {
+        ConfigCommand.class
+}, mixinStandardHelpOptions = true,
+versionProvider = VersionProvider.class)
+public class EntryCommand implements QuarkusApplication {
+
+    @Inject
+    CommandLine.IFactory factory;
+
+    @Override
+    public int run(String... args) throws Exception {
+        CommandLine commandLine = new CommandLine(this, factory);
+        commandLine.setExecutionExceptionHandler(new CommandExceptionHandler());
+        return commandLine.execute(args);
+    }
+
 }

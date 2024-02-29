@@ -1,0 +1,77 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  release:
+    types:
+      - created
+
+concurrency: release
+
+jobs:
+  uber-jar:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
+    - run: ./mvnw package -DskipTests
+    - run:
+        gh release upload ${{ github.event.release.tag_name }} target/kct.jar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  linux-amd64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
+    - run: ./mvnw package -Pnative -DskipTests
+    - run: |
+        cp target/kct kct-linux-amd64
+        gh release upload ${{ github.event.release.tag_name }} kct-amd64
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  macos-amd64:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '17'
+          distribution: 'graalvm'
+      - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
+      - run: ./mvnw package -Pnative -DskipTests
+      - run: |
+          cp target/kct kct-macos-amd64
+          gh release upload ${{ github.event.release.tag_name }} kct-macos-amd64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  windows-amd64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '17'
+          distribution: 'graalvm'
+      - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
+      - run: ./mvnw package -Pnative -DskipTests
+      - run: |
+          cp target/kct.exe kct-windows-amd64.exe
+          gh release upload ${{ github.event.release.tag_name }} kct-windows-amd64.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
