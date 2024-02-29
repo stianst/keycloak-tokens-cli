@@ -10,6 +10,8 @@ Features include:
     * Password Grant
 * Decode tokens
 * UserInfo endpoint
+* Token store
+* Single sign-on through retrieving scoped tokens from a refresh token with a larger scope
 
 Additional features that are coming soon:
 
@@ -17,7 +19,6 @@ Additional features that are coming soon:
     * Authorization Code + PKCE
     * Client Credentials
 * Plugin mode for `kubectl`
-* Token store
 * Token Introspection Endpoint
 * Create config contexts with `kct config`
 
