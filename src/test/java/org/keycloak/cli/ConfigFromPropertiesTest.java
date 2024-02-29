@@ -6,11 +6,11 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.keycloak.cli.config.ConfigService;
-import org.keycloak.cli.container.PasswordProfile;
+import org.keycloak.cli.container.ConfigFromPropertiesProfile;
 import org.keycloak.cli.enums.Flow;
 
 @QuarkusTest
-@TestProfile(PasswordProfile.class)
+@TestProfile(ConfigFromPropertiesProfile.class)
 public class ConfigFromPropertiesTest {
 
     @Inject
@@ -20,7 +20,7 @@ public class ConfigFromPropertiesTest {
     public void getConfig() {
         Assertions.assertNull(config.getContext());
         Assertions.assertTrue(config.isConfiguredFromProperties());
-        Assertions.assertEquals("http://localhost:8080/realms/test", config.getIssuer());
+        Assertions.assertEquals("http://localhost:8080/something", config.getIssuer());
         Assertions.assertEquals(Flow.PASSWORD, config.getFlow());
         Assertions.assertEquals("test-password", config.getClient());
         Assertions.assertNull(config.getClientSecret());
