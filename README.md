@@ -19,6 +19,10 @@ Additional features that are coming soon:
 * Plugin mode for `kubectl`
 * Token store
 * Token Introspection Endpoint
+* Create config contexts with `kct config` 
+
+Tested with [Keycloak](https://www.keycloak.org/), but should work with any OpenID Connect provider or 
+OAuth Authorization Server.
 
 ## Installing
 
