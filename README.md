@@ -1,8 +1,36 @@
-# Installing
+# Keycloak Token CLI
 
-Grab the `kct` binary from `https://github.com/stianst/keycloak-tokens-cli/releases` and you are ready to go.
+Keycloak Token CLI (`kct`) provides a CLI interface to obtain tokens from an OpenID Connect provider.
 
-# Configuring
+Features include:
+
+* Multiple configuration contexts to easily switch between different issuers, flows, or clients
+* Several OAuth flows
+  * Device Code
+  * Password Grant
+* Decode tokens
+* UserInfo endpoint
+
+Additional features that are coming soon:
+
+* Additional OAuth flows
+  * Authorization Code + PKCE
+  * Client Credentials
+* Plugin mode for `kubectl`
+* Token store
+* Token Introspection Endpoint
+
+## Installing
+
+Grab the `kct-<architecture>` binary from `https://github.com/stianst/keycloak-tokens-cli/releases` and you are ready to go.
+
+### Linux:
+```
+curl -L $(curl --silent https://api.github.com/repos/stianst/keycloak-tokens-cli/releases/latest | grep 'browser_download_url.*kct-linux-amd64' | cut -d '"' -f 4) -o kct
+chmod +x kct
+```
+
+## Configuring
 
 `kct` provides a few different ways for configuration depending on the use-case, and supports multiple configuration
 contexts to make it easy to switch between different issuers, flows, or clients.
@@ -51,11 +79,11 @@ be set in `$PWD/.env`. The following environment variables are available:
 If the environment variable `KCT_ISSUER` is set the configuration file will be ignored (`~/.kct/config.yaml`).
 
 
-# Using
+## Using
 
-## Help
+### Help
 
-Run `kct `
+Run `kct --help` or `kct <command> --help`
 
 ## Grab a token
 
