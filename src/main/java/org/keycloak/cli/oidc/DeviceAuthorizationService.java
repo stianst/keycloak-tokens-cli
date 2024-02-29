@@ -5,7 +5,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
 import org.keycloak.cli.config.ConfigService;
-import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
 
 import java.net.URI;
@@ -28,7 +27,7 @@ public class DeviceAuthorizationService {
     @Inject
     ProviderMetadata providerMetadata;
 
-    public String getToken(TokenType tokenType, List<String> scope) {
+    public Tokens getToken(List<String> scope) {
         if (scope == null) {
             scope = config.getScope();
         }
@@ -59,7 +58,7 @@ public class DeviceAuthorizationService {
 
             try {
                 TokenResponse tokenResponse = tokenResource.device("urn:ietf:params:oauth:grant-type:device_code", response.getDeviceCode(), config.getClient());
-                return new Tokens(tokenResponse).getToken(tokenType);
+                return new Tokens(tokenResponse, scope, scope);
             } catch (WebApplicationException e) {
                 TokenResponse tokenResponse = e.getResponse().readEntity(TokenResponse.class);
                 if (!tokenResponse.getError().equals("authorization_pending")) {

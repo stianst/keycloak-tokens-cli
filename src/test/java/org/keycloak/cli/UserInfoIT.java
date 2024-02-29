@@ -8,8 +8,8 @@ import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.keycloak.cli.assertion.OpenIDAssertions;
-import org.keycloak.cli.container.PasswordProfile;
 import org.keycloak.cli.container.KeycloakTestResource;
+import org.keycloak.cli.container.PasswordProfile;
 
 @QuarkusMainIntegrationTest
 @QuarkusTestResource(KeycloakTestResource.class)

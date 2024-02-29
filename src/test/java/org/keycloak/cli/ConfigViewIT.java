@@ -5,17 +5,14 @@ import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
-import io.quarkus.test.junit.main.QuarkusMainTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.keycloak.cli.container.ConfigFromFileProfile;
 import org.keycloak.cli.container.KeycloakTestResource;
-import org.keycloak.cli.container.PasswordProfile;
 import org.keycloak.cli.mock.MockConfigFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 @QuarkusMainIntegrationTest
@@ -30,6 +27,7 @@ public class ConfigViewIT {
         LaunchResult result = launcher.launch("config", "view");
         assertOutput("ConfigViewIT.view.output", result);
     }
+
     @Test
     public void viewSpecificContext(QuarkusMainLauncher launcher) throws IOException {
         LaunchResult result = launcher.launch("config", "view", "-c=mycontext2");

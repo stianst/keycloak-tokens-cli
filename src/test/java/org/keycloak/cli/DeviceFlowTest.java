@@ -1,25 +1,20 @@
 package org.keycloak.cli;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.keycloak.cli.assertion.OpenIDAssertions;
 import org.keycloak.cli.container.DeviceProfile;
 import org.keycloak.cli.container.KeycloakTestResource;
-import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.mock.MockInteractService;
 import org.keycloak.cli.oidc.TokenService;
+import org.keycloak.cli.oidc.Tokens;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
-import java.util.Collections;
-import java.util.List;
 
 @QuarkusTest
 @QuarkusTestResource(KeycloakTestResource.class)
@@ -37,8 +32,8 @@ public class DeviceFlowTest {
         OpenLink openLink = new OpenLink();
         openLink.start();
 
-        String token = client.getToken(TokenType.ACCESS);
-        OpenIDAssertions.assertEncodedToken(token);
+        Tokens token = client.getToken(null);
+        OpenIDAssertions.assertEncodedToken(token.getAccessToken());
     }
 
 //    @Test

@@ -11,7 +11,7 @@ import picocli.CommandLine;
         UserInfoCommand.class,
         ConfigCommand.class
 }, mixinStandardHelpOptions = true,
-versionProvider = VersionProvider.class)
+        versionProvider = VersionProvider.class)
 public class EntryCommand implements QuarkusApplication {
 
     @Inject

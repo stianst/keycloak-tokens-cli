@@ -8,7 +8,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "view", description = "View config", mixinStandardHelpOptions = true)
 public class ConfigViewCommand implements Runnable {
 
-    @CommandLine.Option(names = { "-c", "--context" }, description = "Context to use")
+    @CommandLine.Option(names = {"-c", "--context"}, description = "Context to use")
     String context;
 
     @Inject

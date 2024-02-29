@@ -7,7 +7,7 @@ import org.keycloak.cli.enums.Flow;
 
 import java.util.Map;
 
-@JsonPropertyOrder({ "default", "contexts" })
+@JsonPropertyOrder({"default", "contexts"})
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Config {
 

@@ -4,9 +4,9 @@ import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
-import org.keycloak.cli.oidc.TokenService;
 import org.keycloak.cli.oidc.UserInfo;
 import org.keycloak.cli.oidc.UserInfoService;
+import org.keycloak.cli.tokens.TokenManagerService;
 import org.keycloak.cli.utils.PrettyPrinterService;
 import picocli.CommandLine;
 
@@ -16,11 +16,11 @@ import java.util.List;
 @CommandLine.Command(name = "userinfo", description = "Retrieve userinfo", mixinStandardHelpOptions = true)
 public class UserInfoCommand implements Runnable {
 
-    @CommandLine.Option(names = { "-s", "--scope" }, description = "Scope to request", converter = CommaSeparatedListConverter.class)
+    @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
     List<String> scope;
 
     @Inject
-    TokenService tokens;
+    TokenManagerService tokens;
 
     @Inject
     UserInfoService userInfoService;

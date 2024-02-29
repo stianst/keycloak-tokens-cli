@@ -8,7 +8,7 @@ public class VersionProvider implements CommandLine.IVersionProvider {
     @Override
     public String[] getVersion() {
         Config cf = ConfigProvider.getConfig(getClass().getClassLoader());
-        return new String[] {
+        return new String[]{
                 cf.getValue("quarkus.application.version", String.class)
         };
     }

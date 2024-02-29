@@ -8,7 +8,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.Flow;
-import org.keycloak.cli.enums.TokenType;
 
 import java.time.Duration;
 import java.util.List;
@@ -33,15 +32,15 @@ public class TokenService {
     @Inject
     ProviderMetadata providerMetadata;
 
-    public String getToken(TokenType tokenType) {
-        return getToken(tokenType, null);
+    public Tokens getToken(List<String> scope) {
+        return switch (config.getFlow()) {
+            case DEVICE -> deviceAuthorizationService.getToken(scope);
+            case PASSWORD -> new Tokens(getQuarkusClient(scope).getTokens().await().atMost(DEFAULT_WAIT), scope, scope);
+        };
     }
 
-    public String getToken(TokenType tokenType, List<String> scope) {
-        return switch (config.getFlow()) {
-            case DEVICE -> deviceAuthorizationService.getToken(tokenType, scope);
-            case PASSWORD -> new Tokens(getQuarkusClient(scope).getTokens().await().atMost(DEFAULT_WAIT)).getToken(tokenType);
-        };
+    public Tokens refresh(String refreshToken, List<String> refreshScope, List<String> requestScope) {
+        return new Tokens(getQuarkusClient(requestScope).refreshTokens(refreshToken).await().atMost(DEFAULT_WAIT), refreshScope, requestScope);
     }
 
     private OidcClient getQuarkusClient(List<String> scope) {

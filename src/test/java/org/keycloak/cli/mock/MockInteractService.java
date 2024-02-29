@@ -4,10 +4,7 @@ import io.quarkus.test.Mock;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.keycloak.cli.interact.InteractService;
 
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 

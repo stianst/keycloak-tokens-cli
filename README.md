@@ -6,29 +6,31 @@ Features include:
 
 * Multiple configuration contexts to easily switch between different issuers, flows, or clients
 * Several OAuth flows
-  * Device Code
-  * Password Grant
+    * Device Code
+    * Password Grant
 * Decode tokens
 * UserInfo endpoint
 
 Additional features that are coming soon:
 
 * Additional OAuth flows
-  * Authorization Code + PKCE
-  * Client Credentials
+    * Authorization Code + PKCE
+    * Client Credentials
 * Plugin mode for `kubectl`
 * Token store
 * Token Introspection Endpoint
-* Create config contexts with `kct config` 
+* Create config contexts with `kct config`
 
-Tested with [Keycloak](https://www.keycloak.org/), but should work with any OpenID Connect provider or 
+Tested with [Keycloak](https://www.keycloak.org/), but should work with any OpenID Connect provider or
 OAuth Authorization Server.
 
 ## Installing
 
-Grab the `kct-<architecture>` binary from `https://github.com/stianst/keycloak-tokens-cli/releases` and you are ready to go.
+Grab the `kct-<architecture>` binary from `https://github.com/stianst/keycloak-tokens-cli/releases` and you are ready to
+go.
 
 ### Linux:
+
 ```
 curl -L $(curl --silent https://api.github.com/repos/stianst/keycloak-tokens-cli/releases/latest | grep 'browser_download_url.*kct-linux-amd64' | cut -d '"' -f 4) -o kct
 chmod +x kct
@@ -41,7 +43,7 @@ contexts to make it easy to switch between different issuers, flows, or clients.
 
 ### Configuration file
 
-The standard way to configure `kct` is through `~/.kct/config.yaml`. This configuration approach supports multiple 
+The standard way to configure `kct` is through `~/.kct/config.yaml`. This configuration approach supports multiple
 configuration contexts. An example config file looks like:
 
 ```
@@ -59,7 +61,7 @@ contexts:
         flow: device
 ```
 
-The default context to use is specified with the `default` field, but can be overwritten in most commands with 
+The default context to use is specified with the `default` field, but can be overwritten in most commands with
 `--context=another-context` or using the environment variable `KC_CONTEXT=another-context`.
 
 It is also possible to specify an alternative location to the file with the `KCT_CONFIG_FILE` environment variable.
@@ -81,7 +83,6 @@ be set in `$PWD/.env`. The following environment variables are available:
 | KCT_USER_PASSWORD    |
 
 If the environment variable `KCT_ISSUER` is set the configuration file will be ignored (`~/.kct/config.yaml`).
-
 
 ## Using
 

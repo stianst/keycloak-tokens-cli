@@ -60,12 +60,12 @@ public class ConfigService {
                 .orElse(!fromProperties ? config.getDefaultContext() : null);
 
         issuer = new PropSupplier<>("issuer", () -> getCurrent().getIssuer(), String.class);
-        client = new PropSupplier<>( "client", () -> getCurrent().getClient(), String.class);
-        clientSecret = new PropSupplier<>( "client-secret", () -> getCurrent().getClientSecret(), String.class, true);
+        client = new PropSupplier<>("client", () -> getCurrent().getClient(), String.class);
+        clientSecret = new PropSupplier<>("client-secret", () -> getCurrent().getClientSecret(), String.class, true);
         user = new PropSupplier<>("user", () -> getCurrent().getUser(), String.class, true);
         userPassword = new PropSupplier<>("user-password", () -> getCurrent().getUserPassword(), String.class, true);
         flow = new PropSupplier<>("flow", () -> getCurrent().getFlow(), Flow.class);
-        scope = new PropSupplier<>( "scope", () -> getCurrent().getScope(), String.class, true);
+        scope = new PropSupplier<>("scope", () -> getCurrent().getScope(), String.class, true);
     }
 
     public Config getConfig() {

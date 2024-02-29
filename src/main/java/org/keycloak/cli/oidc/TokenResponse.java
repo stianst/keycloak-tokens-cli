@@ -12,6 +12,9 @@ public class TokenResponse {
     private String idToken;
     @JsonProperty("refresh_token")
     private String refreshToken;
+
+    @JsonProperty("expires_in")
+    private Long expiresIn;
     @JsonProperty("error")
     private String error;
     @JsonProperty("error_details")
@@ -39,6 +42,14 @@ public class TokenResponse {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public Long getExpiresIn() {
+        return expiresIn;
+    }
+
+    public void setExpiresIn(Long expiresIn) {
+        this.expiresIn = expiresIn;
     }
 
     public String getError() {

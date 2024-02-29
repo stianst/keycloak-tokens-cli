@@ -6,8 +6,8 @@ import org.keycloak.cli.commands.converter.TokenTypeConverter;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
-import org.keycloak.cli.oidc.TokenService;
 import org.keycloak.cli.tokens.TokenDecoderService;
+import org.keycloak.cli.tokens.TokenManagerService;
 import picocli.CommandLine;
 
 import java.util.List;
@@ -15,23 +15,23 @@ import java.util.List;
 @CommandLine.Command(name = "token", description = "Retrieve tokens", mixinStandardHelpOptions = true)
 public class TokenCommand implements Runnable {
 
-    @CommandLine.Option(names = { "-c", "--context" }, description = "Context to use")
+    @CommandLine.Option(names = {"-c", "--context"}, description = "Context to use")
     String context;
 
-    @CommandLine.Option(names = { "-d", "--decode" }, description = "Decode the token", defaultValue = "false")
+    @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token", defaultValue = "false")
     boolean decode;
 
-    @CommandLine.Option(names = { "-t", "--type" }, description = "Token type to get", defaultValue = "access", converter = TokenTypeConverter.class)
+    @CommandLine.Option(names = {"-t", "--type"}, description = "Token type to get", defaultValue = "access", converter = TokenTypeConverter.class)
     TokenType tokenType;
 
-    @CommandLine.Option(names = { "-s", "--scope" }, description = "Scope to request", converter = CommaSeparatedListConverter.class)
+    @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
     List<String> scope;
 
     @Inject
     ConfigService config;
 
     @Inject
-    TokenService tokens;
+    TokenManagerService tokens;
 
     @Inject
     TokenDecoderService tokenDecoder;

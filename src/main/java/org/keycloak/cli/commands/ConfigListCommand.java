@@ -8,7 +8,6 @@ import picocli.CommandLine;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "list", description = "List config contexts", mixinStandardHelpOptions = true)
 public class ConfigListCommand implements Runnable {

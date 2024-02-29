@@ -9,7 +9,7 @@ import org.keycloak.cli.assertion.OpenIDAssertions;
 import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.container.PasswordProfile;
 import org.keycloak.cli.enums.TokenType;
-import org.keycloak.cli.oidc.TokenService;
+import org.keycloak.cli.tokens.TokenManagerService;
 
 @QuarkusTest
 @QuarkusTestResource(KeycloakTestResource.class)
@@ -17,11 +17,11 @@ import org.keycloak.cli.oidc.TokenService;
 public class PasswordFlowTest {
 
     @Inject
-    TokenService client;
+    TokenManagerService tokens;
 
     @Test
     public void token() {
-        String token = client.getToken(TokenType.ACCESS);
+        String token = tokens.getToken(TokenType.ACCESS, null);
         OpenIDAssertions.assertEncodedToken(token);
     }
 

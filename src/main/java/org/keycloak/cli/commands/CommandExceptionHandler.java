@@ -1,6 +1,5 @@
 package org.keycloak.cli.commands;
 
-import io.quarkus.oidc.client.OidcClientException;
 import picocli.CommandLine;
 
 public class CommandExceptionHandler implements CommandLine.IExecutionExceptionHandler {
