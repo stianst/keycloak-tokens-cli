@@ -10,8 +10,8 @@ import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.Flow;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @ApplicationScoped
 public class TokenService {
@@ -32,18 +32,18 @@ public class TokenService {
     @Inject
     ProviderMetadata providerMetadata;
 
-    public Tokens getToken(List<String> scope) {
+    public Tokens getToken(Set<String> scope) {
         return switch (config.getFlow()) {
             case DEVICE -> deviceAuthorizationService.getToken(scope);
             case PASSWORD -> new Tokens(getQuarkusClient(scope).getTokens().await().atMost(DEFAULT_WAIT), scope, scope);
         };
     }
 
-    public Tokens refresh(String refreshToken, List<String> refreshScope, List<String> requestScope) {
+    public Tokens refresh(String refreshToken, Set<String> refreshScope, Set<String> requestScope) {
         return new Tokens(getQuarkusClient(requestScope).refreshTokens(refreshToken).await().atMost(DEFAULT_WAIT), refreshScope, requestScope);
     }
 
-    private OidcClient getQuarkusClient(List<String> scope) {
+    private OidcClient getQuarkusClient(Set<String> scope) {
         if (quarkusClient != null) {
             return quarkusClient;
         }
@@ -56,9 +56,9 @@ public class TokenService {
         clientConfig.setClientId(config.getClient());
 
         if (scope != null) {
-            clientConfig.setScopes(scope);
+            clientConfig.setScopes(scope.stream().toList());
         } else if (config.getScope() != null) {
-            clientConfig.setScopes(config.getScope());
+            clientConfig.setScopes(config.getScope().stream().toList());
         }
 
         if (config.getClientSecret() != null) {

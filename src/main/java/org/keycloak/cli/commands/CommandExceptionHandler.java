@@ -12,8 +12,6 @@ public class CommandExceptionHandler implements CommandLine.IExecutionExceptionH
 
     @Override
     public int handleExecutionException(Exception e, CommandLine commandLine, CommandLine.ParseResult parseResult) {
-        commandLine.getErr().println("error");
-
         if (verbose) {
             e.printStackTrace(commandLine.getErr());
         } else {

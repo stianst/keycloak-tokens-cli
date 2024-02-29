@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.oidc.Tokens;
 
@@ -18,6 +19,8 @@ import java.util.Map;
 
 @ApplicationScoped
 public class TokenStoreService {
+
+    private static final Logger logger = Logger.getLogger(TokenStoreService.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
@@ -36,6 +39,7 @@ public class TokenStoreService {
         tokensFile = new File(this.tokensFilePath);
         if (tokensFile.isFile()) {
             tokenStore = objectMapper.readValue(tokensFile, TokenStore.class);
+            logger.debug("Loading existing token store");
         } else {
             tokenStore = new TokenStore();
         }
@@ -50,32 +54,38 @@ public class TokenStoreService {
     }
 
     public void clearCurrent() throws IOException {
+        logger.debugv("Deleting stored tokens for {0}", config.getContext());
         tokenStore.getTokens().remove(config.getContext());
         save();
     }
 
-    public void clearAll() throws IOException {
+    public void clearAll() {
+        logger.debugv("Deleting stored tokens");
         tokenStore.setTokens(new HashMap<>());
         save();
     }
 
-    public void updateCurrent(Tokens tokens) throws IOException {
-        System.out.println("context: " + config.getContext());
+    public void updateCurrent(Tokens tokens) {
+        logger.debugv("Updating stored tokens for {0}", config.getContext());
         tokenStore.getTokens().put(config.getContext(), tokens);
         save();
     }
 
-    private void save() throws IOException {
+    private void save() {
         if (!tokenStore.getTokens().isEmpty()) {
-            boolean newFile = !tokensFile.isFile();
-            objectMapper.writeValue(tokensFile, tokenStore);
-            if (newFile) {
-                try {
-                    Files.setPosixFilePermissions(tokensFile.toPath(), PosixFilePermissions.fromString("rw-------"));
-                } catch (UnsupportedOperationException e) {
-                    tokensFile.setReadable(true, true);
-                    tokensFile.setWritable(true, true);
+            try {
+                boolean newFile = !tokensFile.isFile();
+                objectMapper.writeValue(tokensFile, tokenStore);
+                if (newFile) {
+                    try {
+                        Files.setPosixFilePermissions(tokensFile.toPath(), PosixFilePermissions.fromString("rw-------"));
+                    } catch (UnsupportedOperationException e) {
+                        tokensFile.setReadable(true, true);
+                        tokensFile.setWritable(true, true);
+                    }
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         } else {
             tokensFile.delete();

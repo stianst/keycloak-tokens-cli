@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 @QuarkusTest
 @QuarkusTestResource(KeycloakTestResource.class)
@@ -37,7 +38,7 @@ public class TokenStoreServiceTest {
 
         config.setContext("test-context");
 
-        Tokens token = new Tokens("refresh", List.of("refresh"), "access", "id", List.of("token"), 123456L);
+        Tokens token = new Tokens("refresh", Set.of("refresh"), "access", "id", Set.of("token"), 123456L);
 
         tokens.updateCurrent(token);
         Assertions.assertTrue(tokensFile.isFile());

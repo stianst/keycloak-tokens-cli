@@ -3,23 +3,23 @@ package org.keycloak.cli.oidc;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Tokens {
 
     private String refreshToken;
-    private List<String> refreshScope;
+    private Set<String> refreshScope;
     private String accessToken;
     private String idToken;
-    private List<String> tokenScope;
+    private Set<String> tokenScope;
 
     private Long expiresAt;
 
     public Tokens() {
     }
 
-    public Tokens(TokenResponse tokenResponse, List<String> refreshScope, List<String> tokenScope) {
+    public Tokens(TokenResponse tokenResponse, Set<String> refreshScope, Set<String> tokenScope) {
         this.refreshToken = tokenResponse.getRefreshToken();
         this.refreshScope = refreshScope;
         this.accessToken = tokenResponse.getAccessToken();
@@ -28,7 +28,7 @@ public class Tokens {
         this.expiresAt = Instant.now().getEpochSecond() + tokenResponse.getExpiresIn();
     }
 
-    public Tokens(io.quarkus.oidc.client.Tokens tokens, List<String> refreshScope, List<String> tokenScope) {
+    public Tokens(io.quarkus.oidc.client.Tokens tokens, Set<String> refreshScope, Set<String> tokenScope) {
         this.refreshToken = tokens.getRefreshToken();
         this.refreshScope = refreshScope;
         this.accessToken = tokens.getAccessToken();
@@ -37,7 +37,7 @@ public class Tokens {
         this.expiresAt = tokens.getAccessTokenExpiresAt();
     }
 
-    public Tokens(String refreshToken, List<String> refreshScope, String accessToken, String idToken, List<String> tokenScope, Long expiresAt) {
+    public Tokens(String refreshToken, Set<String> refreshScope, String accessToken, String idToken, Set<String> tokenScope, Long expiresAt) {
         this.refreshToken = refreshToken;
         this.refreshScope = refreshScope;
         this.accessToken = accessToken;
@@ -54,11 +54,11 @@ public class Tokens {
         this.refreshToken = refreshToken;
     }
 
-    public List<String> getRefreshScope() {
+    public Set<String> getRefreshScope() {
         return refreshScope;
     }
 
-    public void setRefreshScope(List<String> refreshScope) {
+    public void setRefreshScope(Set<String> refreshScope) {
         this.refreshScope = refreshScope;
     }
 
@@ -78,11 +78,11 @@ public class Tokens {
         this.idToken = idToken;
     }
 
-    public List<String> getTokenScope() {
+    public Set<String> getTokenScope() {
         return tokenScope;
     }
 
-    public void setTokenScope(List<String> tokenScope) {
+    public void setTokenScope(Set<String> tokenScope) {
         this.tokenScope = tokenScope;
     }
 

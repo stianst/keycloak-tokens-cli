@@ -6,8 +6,8 @@ import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.interact.InteractService;
 import picocli.CommandLine;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @CommandLine.Command(name = "list", description = "List config contexts", mixinStandardHelpOptions = true)
 public class ConfigListCommand implements Runnable {
@@ -20,7 +20,7 @@ public class ConfigListCommand implements Runnable {
 
     @Override
     public void run() {
-        List<String> contexts = new LinkedList<>();
+        Set<String> contexts = new LinkedHashSet<>();
         if (config.isConfiguredFromProperties()) {
             contexts.add("<properties>");
         }

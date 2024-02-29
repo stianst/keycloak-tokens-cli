@@ -1,13 +1,15 @@
 #!/bin/bash
 
-rm -rf target/keycloak-23.0.7
+VERSION=999.0.0-SNAPSHOT
 
-unzip ~/dev/dl/keycloak-23.0.7.zip -d target/
-mkdir -p target/keycloak-23.0.7/data/import
+rm -rf target/keycloak-$VERSION
 
-cp src/test/resources/testrealm.json target/keycloak-23.0.7/data/import/
+unzip ~/dev/dl/keycloak-$VERSION.zip -d target/
+mkdir -p target/keycloak-$VERSION/data/import
+
+cp src/test/resources/testrealm.json target/keycloak-$VERSION/data/import/
 
 export KEYCLOAK_ADMIN=admin
 export KEYCLOAK_ADMIN_PASSWORD=admin
 
-target/keycloak-23.0.7/bin/kc.sh start-dev --import-realm
+target/keycloak-$VERSION/bin/kc.sh start-dev --import-realm

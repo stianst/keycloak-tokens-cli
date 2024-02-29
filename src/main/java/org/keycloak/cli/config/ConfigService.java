@@ -11,7 +11,8 @@ import org.keycloak.cli.enums.Flow;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -84,6 +85,15 @@ public class ConfigService {
         this.context = context;
     }
 
+    public boolean isStoreTokens() {
+        if (context == null) {
+            return false;
+        } else {
+            Boolean storeTokens = config.getStoreTokens();
+            return storeTokens != null ? storeTokens : false;
+        }
+    }
+
     public String getIssuer() {
         return issuer.get();
     }
@@ -108,9 +118,9 @@ public class ConfigService {
         return flow.get();
     }
 
-    public List<String> getScope() {
+    public Set<String> getScope() {
         String s = scope.get();
-        return s != null ? Arrays.stream(s.split("\\.")).map(String::trim).collect(Collectors.toList()) : null;
+        return s != null ? Arrays.stream(s.split("\\.")).map(String::trim).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
     }
 
     private Config.Context getCurrent() {

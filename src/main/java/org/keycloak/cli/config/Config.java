@@ -14,6 +14,9 @@ public class Config {
     @JsonProperty("default")
     private String defaultContext;
 
+    @JsonProperty("store-tokens")
+    private Boolean storeTokens;
+
     private Map<String, Context> contexts;
 
     public String getDefaultContext() {
@@ -22,6 +25,14 @@ public class Config {
 
     public void setDefaultContext(String defaultContext) {
         this.defaultContext = defaultContext;
+    }
+
+    public Boolean getStoreTokens() {
+        return storeTokens;
+    }
+
+    public void setStoreTokens(Boolean storeTokens) {
+        this.storeTokens = storeTokens;
     }
 
     public Map<String, Context> getContexts() {

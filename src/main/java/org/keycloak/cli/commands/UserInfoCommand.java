@@ -10,14 +10,14 @@ import org.keycloak.cli.tokens.TokenManagerService;
 import org.keycloak.cli.utils.PrettyPrinterService;
 import picocli.CommandLine;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @CommandLine.Command(name = "userinfo", description = "Retrieve userinfo", mixinStandardHelpOptions = true)
 public class UserInfoCommand implements Runnable {
 
     @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
-    List<String> scope;
+    Set<String> scope;
 
     @Inject
     TokenManagerService tokens;
@@ -33,7 +33,7 @@ public class UserInfoCommand implements Runnable {
 
     @Override
     public void run() {
-        List<String> scope = this.scope != null ? new LinkedList<>(this.scope) : new LinkedList<>();
+        Set<String> scope = this.scope != null ? new LinkedHashSet<>(this.scope) : new LinkedHashSet<>();
         if (!scope.contains("openid")) {
             scope.add("openid");
         }

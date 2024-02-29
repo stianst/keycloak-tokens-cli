@@ -8,7 +8,7 @@ import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.interact.InteractService;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @ApplicationScoped
@@ -27,7 +27,7 @@ public class DeviceAuthorizationService {
     @Inject
     ProviderMetadata providerMetadata;
 
-    public Tokens getToken(List<String> scope) {
+    public Tokens getToken(Set<String> scope) {
         if (scope == null) {
             scope = config.getScope();
         }

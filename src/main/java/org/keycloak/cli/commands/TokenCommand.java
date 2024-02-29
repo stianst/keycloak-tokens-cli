@@ -10,7 +10,7 @@ import org.keycloak.cli.tokens.TokenDecoderService;
 import org.keycloak.cli.tokens.TokenManagerService;
 import picocli.CommandLine;
 
-import java.util.List;
+import java.util.Set;
 
 @CommandLine.Command(name = "token", description = "Retrieve tokens", mixinStandardHelpOptions = true)
 public class TokenCommand implements Runnable {
@@ -25,7 +25,7 @@ public class TokenCommand implements Runnable {
     TokenType tokenType;
 
     @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
-    List<String> scope;
+    Set<String> scope;
 
     @Inject
     ConfigService config;
