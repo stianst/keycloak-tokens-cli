@@ -12,7 +12,7 @@ public class ConfigRefResolver {
 
     public void resolve() {
         Map<String, Config.Issuer> issuers = config.getIssuers();
-        if (!issuers.isEmpty()) {
+        if (issuers != null && !issuers.isEmpty()) {
             for (Config.Context c : config.getContexts().values()) {
                 if (c.getIssuerRef() != null) {
                     Config.Issuer issuer = issuers.get(c.getIssuerRef());

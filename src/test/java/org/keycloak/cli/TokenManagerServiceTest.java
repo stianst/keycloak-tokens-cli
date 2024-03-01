@@ -3,20 +3,20 @@ package org.keycloak.cli;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import jakarta.annotation.PostConstruct;
+import io.quarkus.test.junit.QuarkusTestProfile;
+import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.cli.assertion.OpenIDAssertions;
 import org.keycloak.cli.config.Config;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.container.KeycloakTestResource;
-import org.keycloak.cli.container.MockConfigResource;
-import org.keycloak.cli.container.MockTokenStoreResource;
-import org.keycloak.cli.enums.Flow;
+import org.keycloak.cli.container.MockConfigFile;
+import org.keycloak.cli.container.MockTokenStoreFile;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.oidc.Tokens;
 import org.keycloak.cli.tokens.TokenManagerService;
@@ -28,8 +28,8 @@ import java.util.Set;
 
 @QuarkusTest
 @QuarkusTestResource(KeycloakTestResource.class)
-@QuarkusTestResource(MockTokenStoreResource.class)
-@QuarkusTestResource(MockConfigResource.class)
+@ExtendWith({MockTokenStoreFile.class, MockConfigFile.class})
+@TestProfile(TokenManagerServiceTest.Profile.class)
 public class TokenManagerServiceTest {
 
     @ConfigProperty(name = "keycloak.issuer")
@@ -46,7 +46,11 @@ public class TokenManagerServiceTest {
 
     @BeforeEach
     public void updateIssuer() {
-        configService.getConfig().getContexts().get("test-context").setIssuer(issuerUrl);
+        Config config = configService.getConfig();
+        Config.Context context = config.getContexts().get("mycontext");
+        context.setIssuer(issuerUrl);
+        context.setScope("email,roles");
+        config.setStoreTokens(true);
     }
 
     @Test
@@ -116,6 +120,18 @@ public class TokenManagerServiceTest {
         Assertions.assertNull(jsonNode2.get("resource_access"));
 
         tokenStoreService.clearAll();
+    }
+
+    public static class Profile implements QuarkusTestProfile {
+
+        @Override
+        public Map<String, String> getConfigOverrides() {
+            return Map.of(
+                    "kct.tokens.file", "${java.io.tmpdir}/test-kct-tokens.yaml",
+                    "kct.config.file", "${java.io.tmpdir}/test-kct-config.yaml"
+            );
+        }
+
     }
 
 }

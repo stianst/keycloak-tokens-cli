@@ -18,8 +18,4 @@ public class PasswordProfile implements QuarkusTestProfile {
         );
     }
 
-    @Override
-    public String getConfigProfile() {
-        return "test";
-    }
 }

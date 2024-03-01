@@ -1,26 +1,27 @@
 package org.keycloak.cli;
 
 import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.keycloak.cli.container.ConfigFromFileProfile;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.cli.container.KeycloakTestResource;
-import org.keycloak.cli.mock.MockConfigFile;
+import org.keycloak.cli.container.MockConfigFile;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @QuarkusMainIntegrationTest
 @QuarkusTestResource(KeycloakTestResource.class)
-@TestProfile(ConfigFromFileProfile.class)
+@TestProfile(ConfigViewIT.Profile.class)
+@ExtendWith(MockConfigFile.class)
 public class ConfigViewIT {
-
-    MockConfigFile mockConfigFile = new MockConfigFile();
 
     @Test
     public void view(QuarkusMainLauncher launcher) throws IOException {
@@ -38,6 +39,16 @@ public class ConfigViewIT {
         try (InputStream is = getClass().getResourceAsStream(resource)) {
             String expectedOutput = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             Assertions.assertEquals(expectedOutput, result.getOutput());
+        }
+    }
+
+    public static class Profile implements QuarkusTestProfile {
+
+        @Override
+        public Map<String, String> getConfigOverrides() {
+            return Map.of(
+                    "kct.config.file", "${java.io.tmpdir}/test-kct.yaml"
+            );
         }
     }
 

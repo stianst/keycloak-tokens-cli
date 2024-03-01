@@ -36,8 +36,8 @@ public class VerifyConfig {
     }
 
     private void verify(String contextId, Config.Issuer issuer) {
-        checkNotEmpty(issuer.getUrl(),"context={0} invalid: missing issuer", contextId);
-        checkUrl(issuer.getUrl(),"context={0} invalid: issuer is not valid", contextId);
+        checkNotEmpty(issuer.getUrl(), "context={0} invalid: missing issuer", contextId);
+        checkUrl(issuer.getUrl(), "context={0} invalid: issuer is not valid", contextId);
     }
 
     private void verify(String contextId, Config.Context context) {
@@ -54,11 +54,11 @@ public class VerifyConfig {
         }
 
         if (context.getFlow().equals(Flow.PASSWORD)) {
-            checkNotEmpty(context.getUser(), "context={0} invalid: user required for flow={1}", contextId, Flow.PASSWORD.jsonName());
-            checkNotEmpty(context.getUser(), "context={0} invalid: user-password required for flow={1}", contextId, Flow.PASSWORD.jsonName());
+            checkNotEmpty(context.getUser(), "context={0} invalid: user required for flow={1}", contextId, context.getFlow().jsonName());
+            checkNotEmpty(context.getUser(), "context={0} invalid: user-password required for flow={1}", contextId, context.getFlow().jsonName());
         } else if (context.getFlow().equals(Flow.DEVICE)) {
-            checkEmpty(context.getUser(), "context={0} invalid: user specified for flow={1}", contextId, Flow.PASSWORD.jsonName());
-            checkEmpty(context.getUser(), "context={0} invalid: user-password specified for flow={1}", contextId, Flow.PASSWORD.jsonName());
+            checkEmpty(context.getUser(), "context={0} invalid: user specified for flow={1}", contextId, context.getFlow().jsonName());
+            checkEmpty(context.getUser(), "context={0} invalid: user-password specified for flow={1}", contextId, context.getFlow().jsonName());
         }
     }
 
