@@ -1,4 +1,4 @@
-package org.keycloak.cli;
+package org.keycloak.cli.tokens;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
@@ -13,7 +13,6 @@ import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.container.MockTokenStoreFile;
 import org.keycloak.cli.oidc.Tokens;
-import org.keycloak.cli.tokens.TokenStoreService;
 
 import java.io.File;
 import java.io.IOException;

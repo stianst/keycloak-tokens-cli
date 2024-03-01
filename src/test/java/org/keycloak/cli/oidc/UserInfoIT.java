@@ -1,4 +1,4 @@
-package org.keycloak.cli;
+package org.keycloak.cli.oidc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.quarkus.test.common.QuarkusTestResource;

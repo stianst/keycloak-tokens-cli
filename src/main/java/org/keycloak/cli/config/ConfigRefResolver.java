@@ -6,8 +6,12 @@ public class ConfigRefResolver {
 
     private final Config config;
 
-    public ConfigRefResolver(Config config) {
+    private ConfigRefResolver(Config config) {
         this.config = config;
+    }
+
+    public static void resolve(Config config) {
+        new ConfigRefResolver(config).resolve();
     }
 
     public void resolve() {

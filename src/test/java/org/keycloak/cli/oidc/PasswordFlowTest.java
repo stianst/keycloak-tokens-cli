@@ -1,4 +1,4 @@
-package org.keycloak.cli;
+package org.keycloak.cli.oidc;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;

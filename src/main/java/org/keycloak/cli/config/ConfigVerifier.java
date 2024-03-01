@@ -10,8 +10,12 @@ public class ConfigVerifier {
 
     private final Config config;
 
-    public ConfigVerifier(Config config) {
+    private ConfigVerifier(Config config) {
         this.config = config;
+    }
+
+    public static void verify(Config config) {
+        new ConfigVerifier(config).verify();
     }
 
     public void verify() {
@@ -36,8 +40,8 @@ public class ConfigVerifier {
     }
 
     private void verify(String contextId, Config.Issuer issuer) {
-        checkNotEmpty(issuer.getUrl(), "context={0} invalid: missing issuer", contextId);
-        checkUrl(issuer.getUrl(), "context={0} invalid: issuer is not valid", contextId);
+        checkNotEmpty(issuer.getUrl(), "issuer={0} invalid: missing url", contextId);
+        checkUrl(issuer.getUrl(), "issuer={0} invalid: invalid url", contextId);
     }
 
     private void verify(String contextId, Config.Context context) {
@@ -47,18 +51,18 @@ public class ConfigVerifier {
 
         if (empty(context.getIssuerRef())) {
             checkNotEmpty(context.getIssuer(), "context={0} invalid: missing issuer", contextId);
-            checkUrl(context.getIssuer(), "context={0} invalid: issuer is not valid", contextId);
+            checkUrl(context.getIssuer(), "context={0} invalid: invalid issuer", contextId);
             checkNotEmpty(context.getClient(), "context={0} invalid: missing client", contextId);
         } else {
-            checkNotNull(config.getIssuers().get(context.getIssuerRef()), "context={0} invalid: issuer-ref {1} not found", contextId, context.getIssuerRef());
+            checkNotNull(config.getIssuers().get(context.getIssuerRef()), "context={0} invalid: issuer-ref={1} not found", contextId, context.getIssuerRef());
         }
 
         if (context.getFlow().equals(Flow.PASSWORD)) {
             checkNotEmpty(context.getUser(), "context={0} invalid: user required for flow={1}", contextId, context.getFlow().jsonName());
-            checkNotEmpty(context.getUser(), "context={0} invalid: user-password required for flow={1}", contextId, context.getFlow().jsonName());
+            checkNotEmpty(context.getUserPassword(), "context={0} invalid: user-password required for flow={1}", contextId, context.getFlow().jsonName());
         } else if (context.getFlow().equals(Flow.DEVICE)) {
-            checkEmpty(context.getUser(), "context={0} invalid: user specified for flow={1}", contextId, context.getFlow().jsonName());
-            checkEmpty(context.getUser(), "context={0} invalid: user-password specified for flow={1}", contextId, context.getFlow().jsonName());
+            checkEmpty(context.getUser(), "context={0} invalid: user set for flow={1}", contextId, context.getFlow().jsonName());
+            checkEmpty(context.getUserPassword(), "context={0} invalid: user-password set for flow={1}", contextId, context.getFlow().jsonName());
         }
     }
 

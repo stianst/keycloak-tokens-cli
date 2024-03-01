@@ -1,4 +1,4 @@
-package org.keycloak.cli;
+package org.keycloak.cli.oidc;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
@@ -9,8 +9,6 @@ import org.keycloak.cli.assertion.OpenIDAssertions;
 import org.keycloak.cli.container.DeviceProfile;
 import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.mock.MockInteractService;
-import org.keycloak.cli.oidc.TokenService;
-import org.keycloak.cli.oidc.Tokens;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;

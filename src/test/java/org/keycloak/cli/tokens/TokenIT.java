@@ -1,4 +1,4 @@
-package org.keycloak.cli;
+package org.keycloak.cli.tokens;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.QuarkusTestResource;

@@ -1,4 +1,4 @@
-package org.keycloak.cli;
+package org.keycloak.cli.tokens;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.QuarkusTestResource;
@@ -19,8 +19,6 @@ import org.keycloak.cli.container.MockConfigFile;
 import org.keycloak.cli.container.MockTokenStoreFile;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.oidc.Tokens;
-import org.keycloak.cli.tokens.TokenManagerService;
-import org.keycloak.cli.tokens.TokenStoreService;
 
 import java.time.Instant;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package org.keycloak.cli;
+package org.keycloak.cli.config;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
@@ -6,33 +6,27 @@ import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.keycloak.cli.config.ConfigService;
-import org.keycloak.cli.container.MockConfigFile;
 import org.keycloak.cli.enums.Flow;
 
 import java.util.Map;
-import java.util.Set;
 
 @QuarkusTest
-@TestProfile(ConfigFromFileTest.Profile.class)
-@ExtendWith(MockConfigFile.class)
-public class ConfigFromFileTest {
+@TestProfile(ConfigFromPropertiesTest.Profile.class)
+public class ConfigFromPropertiesTest {
 
     @Inject
     ConfigService config;
 
-
     @Test
     public void getConfig() {
-        Assertions.assertFalse(config.isConfiguredFromProperties());
-        Assertions.assertEquals("http://issuer", config.getIssuer());
+        Assertions.assertNull(config.getContext());
+        Assertions.assertTrue(config.isConfiguredFromProperties());
+        Assertions.assertEquals("http://localhost:8080/something", config.getIssuer());
         Assertions.assertEquals(Flow.PASSWORD, config.getFlow());
         Assertions.assertEquals("test-password", config.getClient());
         Assertions.assertNull(config.getClientSecret());
         Assertions.assertEquals("test-user", config.getUser());
         Assertions.assertEquals("test-user-password", config.getUserPassword());
-        Assertions.assertEquals(Set.of("openid", "email"), config.getScope());
     }
 
     public static class Profile implements QuarkusTestProfile {
@@ -40,10 +34,15 @@ public class ConfigFromFileTest {
         @Override
         public Map<String, String> getConfigOverrides() {
             return Map.of(
-                    "kct.config.file", MockConfigFile.configFile.getAbsolutePath()
+                    "kct.issuer", "http://localhost:8080/something",
+                    "kct.flow", "password",
+                    "kct.client", "test-password",
+                    "kct.user", "test-user",
+                    "kct.user-password", "test-user-password",
+                    "kct.scopes", "openid"
             );
         }
-    }
 
+    }
 
 }
