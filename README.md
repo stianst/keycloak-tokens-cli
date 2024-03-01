@@ -71,7 +71,7 @@ If multiple contexts are using the same issuer a global issuer can be defined, f
 default: test-password
 issuers:
     local-test:
-      url: http://localhost:8080/realms/test
+        url: http://localhost:8080/realms/test
 contexts:
     test-password:
         issuer-ref: local-test
