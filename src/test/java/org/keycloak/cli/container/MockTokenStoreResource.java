@@ -23,11 +23,11 @@ public class MockTokenStoreResource implements QuarkusTestResourceLifecycleManag
 
     @Override
     public Map<String, String> start() {
-        logger.debug("Setting kct.tokens.file to ${java.io.tmpdir}/test-kct-tokens.yaml");
+        logger.debug("Setting kct.tokens.file to " + tokensFile.getAbsolutePath());
         if (tokensFile.isFile()) {
             tokensFile.delete();
         }
-        return Map.of("kct.tokens.file", "${java.io.tmpdir}/test-kct-tokens.yaml");
+        return Map.of("kct.tokens.file", tokensFile.getAbsolutePath());
     }
 
     @Override
