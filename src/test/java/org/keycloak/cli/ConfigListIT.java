@@ -8,13 +8,16 @@ import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.cli.container.KeycloakTestResource;
+import org.keycloak.cli.container.MockConfigFile;
 
 import java.util.Map;
 
 @QuarkusMainIntegrationTest
 @QuarkusTestResource(KeycloakTestResource.class)
 @TestProfile(ConfigListIT.Profile.class)
+@ExtendWith(MockConfigFile.class)
 public class ConfigListIT {
 
     @Test
@@ -28,7 +31,7 @@ public class ConfigListIT {
         @Override
         public Map<String, String> getConfigOverrides() {
             return Map.of(
-                    "kct.config.file", "${java.io.tmpdir}/test-kct.yaml",
+                    "kct.config.file", MockConfigFile.configFile.getAbsolutePath(),
                     "kct.issuer", "http://issuer"
             );
         }

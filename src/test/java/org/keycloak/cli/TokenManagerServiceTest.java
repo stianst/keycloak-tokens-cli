@@ -127,8 +127,8 @@ public class TokenManagerServiceTest {
         @Override
         public Map<String, String> getConfigOverrides() {
             return Map.of(
-                    "kct.tokens.file", "${java.io.tmpdir}/test-kct-tokens.yaml",
-                    "kct.config.file", "${java.io.tmpdir}/test-kct-config.yaml"
+                    "kct.tokens.file", MockTokenStoreFile.tokensFile.getAbsolutePath(),
+                    "kct.config.file", MockConfigFile.configFile.getAbsolutePath()
             );
         }
 

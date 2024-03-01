@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 public class MockConfigFile implements BeforeAllCallback, AfterAllCallback {
 
-    private static final File configFile = Path.of(System.getProperty("java.io.tmpdir"), "test-kct-config.yaml").toFile();
+    public static final File configFile = Path.of(System.getProperty("java.io.tmpdir"), "test-kct-config.yaml").toFile();
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) {

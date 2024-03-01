@@ -26,12 +26,12 @@ public class ConfigFromFileTest {
     @Test
     public void getConfig() {
         Assertions.assertFalse(config.isConfiguredFromProperties());
-        Assertions.assertEquals("http://myissuer", config.getIssuer());
+        Assertions.assertEquals("http://issuer", config.getIssuer());
         Assertions.assertEquals(Flow.PASSWORD, config.getFlow());
-        Assertions.assertEquals("myclient", config.getClient());
+        Assertions.assertEquals("test-password", config.getClient());
         Assertions.assertNull(config.getClientSecret());
-        Assertions.assertEquals("myuser", config.getUser());
-        Assertions.assertEquals("myuserPassword", config.getUserPassword());
+        Assertions.assertEquals("test-user", config.getUser());
+        Assertions.assertEquals("test-user-password", config.getUserPassword());
         Assertions.assertEquals(Set.of("openid", "email"), config.getScope());
     }
 
@@ -40,7 +40,7 @@ public class ConfigFromFileTest {
         @Override
         public Map<String, String> getConfigOverrides() {
             return Map.of(
-                    "kct.config.file", "${java.io.tmpdir}/test-kct.yaml"
+                    "kct.config.file", MockConfigFile.configFile.getAbsolutePath()
             );
         }
     }

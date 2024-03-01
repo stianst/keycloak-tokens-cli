@@ -12,7 +12,7 @@ public class MockTokenStoreFile implements BeforeAllCallback, AfterAllCallback {
 
     private static final Logger logger = Logger.getLogger(MockTokenStoreFile.class);
 
-    private static final File tokensFile = Path.of(System.getProperty("java.io.tmpdir"), "test-kct-tokens.yaml").toFile();
+    public static final File tokensFile = Path.of(System.getProperty("java.io.tmpdir"), "test-kct-tokens.yaml").toFile();
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception {
@@ -20,7 +20,6 @@ public class MockTokenStoreFile implements BeforeAllCallback, AfterAllCallback {
         if (tokensFile.isFile()) {
             tokensFile.delete();
         }
-//        return Map.of("kct.tokens.file", tokensFile.getAbsolutePath());
     }
 
     @Override

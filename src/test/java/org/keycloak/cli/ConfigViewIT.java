@@ -47,7 +47,7 @@ public class ConfigViewIT {
         @Override
         public Map<String, String> getConfigOverrides() {
             return Map.of(
-                    "kct.config.file", "${java.io.tmpdir}/test-kct.yaml"
+                    "kct.config.file", MockConfigFile.configFile.getAbsolutePath()
             );
         }
     }

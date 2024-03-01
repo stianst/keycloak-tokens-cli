@@ -70,7 +70,7 @@ public class TokenStoreServiceTest {
         public Map<String, String> getConfigOverrides() {
             return Map.of(
                     "kct.issuer", "dummy",
-                    "kct.tokens.file", "${java.io.tmpdir}/test-kct-tokens.yaml"
+                    "kct.tokens.file", MockTokenStoreFile.tokensFile.getAbsolutePath()
             );
         }
 
