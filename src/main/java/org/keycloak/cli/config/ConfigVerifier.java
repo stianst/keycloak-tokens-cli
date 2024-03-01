@@ -6,11 +6,11 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Map;
 
-public class VerifyConfig {
+public class ConfigVerifier {
 
     private final Config config;
 
-    public VerifyConfig(Config config) {
+    public ConfigVerifier(Config config) {
         this.config = config;
     }
 

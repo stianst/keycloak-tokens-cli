@@ -57,7 +57,7 @@ public class ConfigService {
         }
 
         if (!fromProperties) {
-            new VerifyConfig(config).verify();
+            new ConfigVerifier(config).verify();
             new ConfigRefResolver(config).resolve();
         }
 
