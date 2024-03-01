@@ -9,7 +9,6 @@ public class TokenStoreProfile implements QuarkusTestProfile {
     @Override
     public Map<String, String> getConfigOverrides() {
         return Map.of(
-                "kct.tokens.file", "${java.io.tmpdir}/test-kct-tokens.yaml",
                 "kct.issuer", "dummy"
         );
     }

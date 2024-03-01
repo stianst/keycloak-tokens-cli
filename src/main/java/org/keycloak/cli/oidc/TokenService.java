@@ -54,11 +54,8 @@ public class TokenService {
         clientConfig.setId(config.getIssuer());
         clientConfig.setAuthServerUrl(config.getIssuer());
         clientConfig.setClientId(config.getClient());
-
-        if (scope != null) {
+        if (!scope.isEmpty()) {
             clientConfig.setScopes(scope.stream().toList());
-        } else if (config.getScope() != null) {
-            clientConfig.setScopes(config.getScope().stream().toList());
         }
 
         if (config.getClientSecret() != null) {

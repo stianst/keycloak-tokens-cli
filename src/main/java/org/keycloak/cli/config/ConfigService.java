@@ -120,7 +120,7 @@ public class ConfigService {
 
     public Set<String> getScope() {
         String s = scope.get();
-        return s != null ? Arrays.stream(s.split("\\.")).map(String::trim).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
+        return s != null ? Arrays.stream(s.split(",")).map(String::trim).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
     }
 
     private Config.Context getCurrent() {

@@ -111,7 +111,7 @@ export KCT_VERBOSE=true
 Enable debug logging with:
 
 ```
-export QUARKUS_LOG_CATEGORY__ORG_KEYCLOAK__LEVEL=DEBUG
+export QUARKUS_LOG_CATEGORY__ORG_KEYCLOAK_CLI__LEVEL=DEBUG
 ```
 
 The above can also be added to `$PWD/.env`.

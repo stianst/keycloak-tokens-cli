@@ -16,6 +16,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.util.Collections;
+
 @QuarkusTest
 @QuarkusTestResource(KeycloakTestResource.class)
 @TestProfile(DeviceProfile.class)
@@ -32,7 +34,7 @@ public class DeviceFlowTest {
         OpenLink openLink = new OpenLink();
         openLink.start();
 
-        Tokens token = client.getToken(null);
+        Tokens token = client.getToken(Collections.emptySet());
         OpenIDAssertions.assertEncodedToken(token.getAccessToken());
     }
 

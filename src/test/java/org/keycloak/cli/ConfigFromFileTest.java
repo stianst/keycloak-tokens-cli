@@ -10,6 +10,8 @@ import org.keycloak.cli.container.ConfigFromFileProfile;
 import org.keycloak.cli.enums.Flow;
 import org.keycloak.cli.mock.MockConfigFile;
 
+import java.util.Set;
+
 @QuarkusTest
 @TestProfile(ConfigFromFileProfile.class)
 public class ConfigFromFileTest {
@@ -29,6 +31,7 @@ public class ConfigFromFileTest {
         Assertions.assertNull(config.getClientSecret());
         Assertions.assertEquals("myuser", config.getUser());
         Assertions.assertEquals("myuserPassword", config.getUserPassword());
+        Assertions.assertEquals(Set.of("openid", "email"), config.getScope());
     }
 
 }

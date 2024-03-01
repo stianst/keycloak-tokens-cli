@@ -28,12 +28,8 @@ public class DeviceAuthorizationService {
     ProviderMetadata providerMetadata;
 
     public Tokens getToken(Set<String> scope) {
-        if (scope == null) {
-            scope = config.getScope();
-        }
-
         DeviceAuthorizationResponse response = QuarkusRestClientBuilder.newBuilder().baseUri(URI.create(providerMetadata.getDeviceAuthorizationEndpoint()))
-                .build(DeviceAuthorizationResource.class).request(config.getClient(), scope != null ? String.join(",", scope) : null);
+                .build(DeviceAuthorizationResource.class).request(config.getClient(), !scope.isEmpty() ? String.join(",", scope) : null);
 
         if (response.getVerificationUriComplete() != null) {
             interact.println("Open the following URL to complete:");

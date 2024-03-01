@@ -9,6 +9,7 @@ import org.keycloak.cli.oidc.TokenService;
 import org.keycloak.cli.oidc.Tokens;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Set;
 
 @ApplicationScoped
@@ -26,6 +27,10 @@ public class TokenManagerService {
     TokenService tokenService;
 
     public String getToken(TokenType tokenType, Set<String> scope) {
+        if (scope == null) {
+            scope = config.getScope() != null ? config.getScope() : Collections.emptySet();
+        }
+
         if (TokenType.ID.equals(tokenType) && (scope == null || !scope.contains("openid"))) {
             throw new RuntimeException("Request openid scope to retrieve an ID token");
         }
