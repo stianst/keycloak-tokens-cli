@@ -56,6 +56,10 @@ public class ConfigService {
             throw new RuntimeException("Config file " + configFile + " not found");
         }
 
+        if (!fromProperties) {
+            new VerifyConfig(config).verify();
+        }
+
         context = ConfigProvider.getConfig()
                 .getOptionalValue("kct.context", String.class)
                 .orElse(!fromProperties ? config.getDefaultContext() : null);
