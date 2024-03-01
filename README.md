@@ -65,6 +65,22 @@ contexts:
 The default context to use is specified with the `default` field, but can be overwritten in most commands with
 `--context=another-context` or using the environment variable `KC_CONTEXT=another-context`.
 
+If multiple contexts are using the same issuer a global issuer can be defined, for example:
+
+```
+default: test-password
+issuers:
+    local-test:
+      url: http://localhost:8080/realms/test
+contexts:
+    test-password:
+        issuer-ref: local-test
+        ...
+    test-device:
+        issuer-ref: local-test
+        ...
+```
+
 It is also possible to specify an alternative location to the file with the `KCT_CONFIG_FILE` environment variable.
 
 ### Configuring using environment variables
