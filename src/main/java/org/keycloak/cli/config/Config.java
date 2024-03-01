@@ -17,6 +17,8 @@ public class Config {
     @JsonProperty("store-tokens")
     private Boolean storeTokens;
 
+    private Map<String, Issuer> issuers;
+
     private Map<String, Context> contexts;
 
     public String getDefaultContext() {
@@ -35,6 +37,14 @@ public class Config {
         this.storeTokens = storeTokens;
     }
 
+    public Map<String, Issuer> getIssuers() {
+        return issuers;
+    }
+
+    public void setIssuers(Map<String, Issuer> issuers) {
+        this.issuers = issuers;
+    }
+
     public Map<String, Context> getContexts() {
         return contexts;
     }
@@ -47,6 +57,8 @@ public class Config {
     public static class Context {
 
         private String issuer;
+        @JsonProperty("issuer-ref")
+        private String issuerRef;
         private Flow flow;
 
         private String client;
@@ -75,6 +87,14 @@ public class Config {
 
         public void setIssuer(String issuer) {
             this.issuer = issuer;
+        }
+
+        public String getIssuerRef() {
+            return issuerRef;
+        }
+
+        public void setIssuerRef(String issuerRef) {
+            this.issuerRef = issuerRef;
         }
 
         public String getClient() {
@@ -115,6 +135,20 @@ public class Config {
 
         public void setScope(String scope) {
             this.scope = scope;
+        }
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Issuer {
+
+        private String url;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
         }
     }
 

@@ -58,6 +58,7 @@ public class ConfigService {
 
         if (!fromProperties) {
             new VerifyConfig(config).verify();
+            new ConfigRefResolver(config).resolve();
         }
 
         context = ConfigProvider.getConfig()
