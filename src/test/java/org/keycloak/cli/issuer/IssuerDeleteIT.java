@@ -1,4 +1,4 @@
-package org.keycloak.cli.context;
+package org.keycloak.cli.issuer;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTestProfile;
@@ -16,17 +16,17 @@ import java.util.Map;
 
 @QuarkusMainIntegrationTest
 @QuarkusTestResource(KeycloakTestResource.class)
-@TestProfile(ContextDeleteIT.Profile.class)
+@TestProfile(IssuerDeleteIT.Profile.class)
 @ExtendWith(MockConfigFile.class)
-public class ContextDeleteIT {
+public class IssuerDeleteIT {
 
     @Test
     public void test(QuarkusMainLauncher launcher) {
-        LaunchResult result = launcher.launch("context", "delete", "--context=mycontext2");
-        Assertions.assertEquals("context=mycontext2 deleted", result.getOutput());
+        LaunchResult result = launcher.launch("issuer", "delete", "--issuer=issuer2");
+        Assertions.assertEquals("issuer=issuer2 deleted", result.getOutput());
 
-        result = launcher.launch("context", "list");
-        Assertions.assertEquals("mycontext", result.getOutput());
+        result = launcher.launch("issuer", "list");
+        Assertions.assertEquals("issuer1", result.getOutput());
     }
 
     public static class Profile implements QuarkusTestProfile {

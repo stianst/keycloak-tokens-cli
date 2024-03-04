@@ -4,6 +4,7 @@ import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import jakarta.inject.Inject;
 import org.keycloak.cli.commands.context.ContextCommand;
+import org.keycloak.cli.commands.issuers.IssuerCommand;
 import picocli.CommandLine;
 
 @QuarkusMain
@@ -11,7 +12,8 @@ import picocli.CommandLine;
         TokenCommand.class,
         UserInfoCommand.class,
         ClearCommand.class,
-        ContextCommand.class
+        ContextCommand.class,
+        IssuerCommand.class
 }, mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class)
 public class EntryCommand implements QuarkusApplication {

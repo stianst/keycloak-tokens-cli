@@ -55,7 +55,7 @@ public class ContextCreateCommand implements Runnable {
     public void run() {
         Config config = configService.loadConfigFromFile();
 
-        if(config.getContexts().containsKey(contextId) && !overwrite) {
+        if (config.getContexts().containsKey(contextId) && !overwrite) {
             throw new RuntimeException("context=" + contextId + " already exists");
         }
 
