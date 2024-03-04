@@ -1,6 +1,0 @@
-context: mycontext
-issuer: http://issuer
-client: test-password
-user: test-user
-user-password: ******************
-scope: openid,email

@@ -1,4 +1,0 @@
-context: mycontext2
-issuer: http://myissuer2
-client: myclient2
-scope: openid2,email2

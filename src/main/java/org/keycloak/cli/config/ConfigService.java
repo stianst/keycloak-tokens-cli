@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class ConfigService {
 
     @ConfigProperty(name = "kct.config.file")
-    String configFile;
+    File configFile;
 
     boolean fromProperties;
 
@@ -44,11 +44,7 @@ public class ConfigService {
 
     @PostConstruct
     void init() throws IOException {
-        File configFile = new File(this.configFile);
-        if (configFile.isFile()) {
-            ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-            config = objectMapper.readValue(configFile, Config.class);
-        }
+        config = loadConfigFromFile();
 
         fromProperties = ConfigProvider.getConfig().getOptionalValue("kct.issuer", String.class).isPresent();
 
@@ -130,6 +126,28 @@ public class ConfigService {
 
     private Config.Context getCurrent() {
         return config.getContexts().get(getContext());
+    }
+
+    public Config loadConfigFromFile() {
+        if (configFile.isFile()) {
+            ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+            try {
+                return objectMapper.readValue(configFile, Config.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public void saveConfigToFile(Config config) {
+        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+        try {
+            objectMapper.writeValue(configFile, config);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     class PropSupplier<T> implements Supplier<T> {
