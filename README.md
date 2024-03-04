@@ -81,6 +81,23 @@ contexts:
         ...
 ```
 
+An issuer can also specify reusable clients that can be used in contexts:
+
+```
+issuers:
+    local-test:
+        url: http://localhost:8080/realms/test
+        clients:
+            the-client:
+                id: the-client-id
+                secret: the-client-secret
+                flow: device
+contexts:
+    test-device:
+        issuer-ref: local-test
+        client-ref: the-client
+```
+
 It is also possible to specify an alternative location to the file with the `KCT_CONFIG_FILE` environment variable.
 
 ### Configuring using environment variables
