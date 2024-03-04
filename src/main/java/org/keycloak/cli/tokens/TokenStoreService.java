@@ -53,7 +53,7 @@ public class TokenStoreService {
         return tokenStore.getTokens();
     }
 
-    public void clearCurrent() throws IOException {
+    public void clearCurrent() {
         logger.debugv("Deleting stored tokens for {0}", config.getContext());
         tokenStore.getTokens().remove(config.getContext());
         save();
