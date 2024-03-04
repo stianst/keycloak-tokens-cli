@@ -1,4 +1,4 @@
-package org.keycloak.cli.config;
+package org.keycloak.cli.context;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTestProfile;
@@ -19,20 +19,20 @@ import java.util.Map;
 
 @QuarkusMainIntegrationTest
 @QuarkusTestResource(KeycloakTestResource.class)
-@TestProfile(ConfigViewIT.Profile.class)
+@TestProfile(ContextViewIT.Profile.class)
 @ExtendWith(MockConfigFile.class)
-public class ConfigViewIT {
+public class ContextViewIT {
 
     @Test
     public void view(QuarkusMainLauncher launcher) throws IOException {
-        LaunchResult result = launcher.launch("config", "view");
-        assertOutput("ConfigViewIT.view.output", result);
+        LaunchResult result = launcher.launch("context", "view");
+        assertOutput("ContextViewIT.view.output", result);
     }
 
     @Test
     public void viewSpecificContext(QuarkusMainLauncher launcher) throws IOException {
-        LaunchResult result = launcher.launch("config", "view", "-c=mycontext2");
-        assertOutput("ConfigViewIT.viewSpecificContext.output", result);
+        LaunchResult result = launcher.launch("context", "view", "-c=mycontext2");
+        assertOutput("ContextViewIT.viewSpecificContext.output", result);
     }
 
     private void assertOutput(String resource, LaunchResult result) throws IOException {

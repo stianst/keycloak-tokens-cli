@@ -1,4 +1,4 @@
-package org.keycloak.cli.config;
+package org.keycloak.cli.context;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTestProfile;
@@ -16,14 +16,17 @@ import java.util.Map;
 
 @QuarkusMainIntegrationTest
 @QuarkusTestResource(KeycloakTestResource.class)
-@TestProfile(ConfigListIT.Profile.class)
+@TestProfile(ContextDeleteIT.Profile.class)
 @ExtendWith(MockConfigFile.class)
-public class ConfigListIT {
+public class ContextDeleteIT {
 
     @Test
     public void test(QuarkusMainLauncher launcher) {
-        LaunchResult result = launcher.launch("config", "list");
-        Assertions.assertEquals("<properties>, mycontext2, mycontext", result.getOutput());
+        LaunchResult result = launcher.launch("context", "delete", "-c=mycontext2");
+        Assertions.assertEquals("context=mycontext2 deleted", result.getOutput());
+
+        result = launcher.launch("context", "list");
+        Assertions.assertEquals("mycontext", result.getOutput());
     }
 
     public static class Profile implements QuarkusTestProfile {
@@ -31,11 +34,9 @@ public class ConfigListIT {
         @Override
         public Map<String, String> getConfigOverrides() {
             return Map.of(
-                    "kct.config.file", MockConfigFile.configFile.getAbsolutePath(),
-                    "kct.issuer", "http://issuer"
+                    "kct.config.file", MockConfigFile.configFile.getAbsolutePath()
             );
         }
-
     }
 
 }

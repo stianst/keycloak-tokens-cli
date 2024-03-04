@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.keycloak.cli.enums.Flow;
 
+import java.util.HashMap;
 import java.util.Map;
 
-@JsonPropertyOrder({"default", "contexts"})
+@JsonPropertyOrder({"default", "store-tokens", "issuers", "contexts"})
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Config {
 
@@ -17,9 +18,9 @@ public class Config {
     @JsonProperty("store-tokens")
     private Boolean storeTokens;
 
-    private Map<String, Issuer> issuers;
+    private Map<String, Issuer> issuers = new HashMap<>();
 
-    private Map<String, Context> contexts;
+    private Map<String, Context> contexts = new HashMap<>();
 
     public String getDefaultContext() {
         return defaultContext;
@@ -154,7 +155,7 @@ public class Config {
 
         private String url;
 
-        private Map<String, Client> clients;
+        private Map<String, Client> clients = new HashMap<>();
 
         public String getUrl() {
             return url;
