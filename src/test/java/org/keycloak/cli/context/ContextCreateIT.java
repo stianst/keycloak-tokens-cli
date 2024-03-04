@@ -13,7 +13,6 @@ import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.container.MockConfigFile;
 
 import java.util.Map;
-import java.util.Set;
 
 @QuarkusMainIntegrationTest
 @QuarkusTestResource(KeycloakTestResource.class)
@@ -31,7 +30,7 @@ public class ContextCreateIT {
         Assertions.assertEquals("context=mycontext3 created", result.getOutput());
 
         result = launcher.launch("context", "list");
-        Assertions.assertEquals("mycontext2  mycontext  mycontext3", result.getOutput());
+        Assertions.assertEquals("mycontext  mycontext2  mycontext3", result.getOutput());
     }
 
     public static class Profile implements QuarkusTestProfile {

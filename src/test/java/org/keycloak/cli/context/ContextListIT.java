@@ -23,7 +23,7 @@ public class ContextListIT {
     @Test
     public void test(QuarkusMainLauncher launcher) {
         LaunchResult result = launcher.launch("context", "list");
-        Assertions.assertEquals("mycontext2  mycontext", result.getOutput());
+        Assertions.assertEquals("mycontext  mycontext2", result.getOutput());
     }
 
     public static class Profile implements QuarkusTestProfile {

@@ -5,6 +5,8 @@ import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.interact.InteractService;
 import picocli.CommandLine;
 
+import java.util.stream.Collectors;
+
 @CommandLine.Command(name = "list", description = "List config contexts", mixinStandardHelpOptions = true)
 public class ContextListCommand implements Runnable {
 
@@ -16,7 +18,7 @@ public class ContextListCommand implements Runnable {
 
     @Override
     public void run() {
-        interact.println(String.join("  ", config.loadConfigFromFile().getContexts().keySet()));
+        interact.println(config.loadConfigFromFile().getContexts().keySet().stream().sorted().collect(Collectors.joining("  ")));
     }
 
 }

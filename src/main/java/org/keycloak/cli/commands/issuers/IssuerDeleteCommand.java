@@ -1,4 +1,4 @@
-package org.keycloak.cli.commands.context;
+package org.keycloak.cli.commands.issuers;
 
 import jakarta.inject.Inject;
 import org.keycloak.cli.config.Config;
@@ -7,11 +7,11 @@ import org.keycloak.cli.config.ConfigVerifier;
 import org.keycloak.cli.interact.InteractService;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "delete", description = "Delete config context", mixinStandardHelpOptions = true)
-public class ContextDeleteCommand implements Runnable {
+@CommandLine.Command(name = "delete", description = "Delete config issuer", mixinStandardHelpOptions = true)
+public class IssuerDeleteCommand implements Runnable {
 
-    @CommandLine.Option(names = {"--context"}, description = "Context to delete", required = true)
-    String contextId;
+    @CommandLine.Option(names = {"--issuer"}, description = "Issuer to delete", required = true)
+    String issuerId;
 
     @Inject
     ConfigService configService;
@@ -24,12 +24,12 @@ public class ContextDeleteCommand implements Runnable {
         Config config = configService.loadConfigFromFile();
         ConfigVerifier.verify(config);
 
-        config.getContexts().remove(contextId);
+        config.getIssuers().remove(issuerId);
         ConfigVerifier.verify(config);
 
         configService.saveConfigToFile(config);
 
-        interact.println("context=" + contextId + " deleted");
+        interact.println("issuer=" + issuerId + " deleted");
     }
 
 }
