@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=999.0.0-SNAPSHOT
+VERSION=24.0.0
 
 rm -rf target/keycloak-$VERSION
 
