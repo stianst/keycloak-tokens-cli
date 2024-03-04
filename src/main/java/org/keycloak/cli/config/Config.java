@@ -63,6 +63,9 @@ public class Config {
 
         private String client;
 
+        @JsonProperty("client-ref")
+        private String clientRef;
+
         @JsonProperty("client-secret")
         private String clientSecret;
 
@@ -105,6 +108,14 @@ public class Config {
             this.client = client;
         }
 
+        public String getClientRef() {
+            return clientRef;
+        }
+
+        public void setClientRef(String clientRef) {
+            this.clientRef = clientRef;
+        }
+
         public String getClientSecret() {
             return clientSecret;
         }
@@ -143,12 +154,55 @@ public class Config {
 
         private String url;
 
+        private Map<String, Client> clients;
+
         public String getUrl() {
             return url;
         }
 
         public void setUrl(String url) {
             this.url = url;
+        }
+
+        public Map<String, Client> getClients() {
+            return clients;
+        }
+
+        public void setClients(Map<String, Client> clients) {
+            this.clients = clients;
+        }
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Client {
+
+        private String id;
+        private String secret;
+
+        private Flow flow;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getSecret() {
+            return secret;
+        }
+
+        public void setSecret(String secret) {
+            this.secret = secret;
+        }
+
+        public Flow getFlow() {
+            return flow;
+        }
+
+        public void setFlow(Flow flow) {
+            this.flow = flow;
         }
     }
 

@@ -21,6 +21,13 @@ public class ConfigRefResolver {
                 if (c.getIssuerRef() != null) {
                     Config.Issuer issuer = issuers.get(c.getIssuerRef());
                     c.setIssuer(issuer.getUrl());
+
+                    if (c.getClientRef() != null) {
+                        Config.Client client = issuer.getClients().get(c.getClientRef());
+                        c.setClient(client.getId());
+                        c.setClientSecret(client.getSecret());
+                        c.setFlow(client.getFlow());
+                    }
                 }
             }
         }

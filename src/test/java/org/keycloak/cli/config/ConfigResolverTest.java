@@ -12,6 +12,7 @@ public class ConfigResolverTest {
     private Config config;
     private Config.Issuer issuer;
     private Config.Context context;
+    private Config.Context context2;
 
     @BeforeEach
     public void createValidConfig() {
@@ -24,6 +25,12 @@ public class ConfigResolverTest {
 
         config.setIssuers(Map.of("myissuer", issuer));
 
+        Config.Client client = new Config.Client();
+        client.setId("myissuer-client-id");
+        client.setSecret("myissuer-client-secret");
+        client.setFlow(Flow.DEVICE);
+        config.getIssuers().get("myissuer").setClients(Map.of("myissuer-client", client));
+
         context = new Config.Context();
         context.setIssuerRef("myissuer");
         context.setClient("myclient");
@@ -31,7 +38,16 @@ public class ConfigResolverTest {
         context.setUser("myuser");
         context.setUserPassword("myuserpassword");
 
-        config.setContexts(Map.of("mycontext", context));
+        context2 = new Config.Context();
+        context2.setIssuerRef("myissuer");
+        context2.setClientRef("myissuer-client");
+        context2.setUser("myuser");
+        context2.setUserPassword("myuserpassword");
+
+        config.setContexts(Map.of(
+                "mycontext", context,
+                "mycontext2", context2
+        ));
     }
 
     @Test
@@ -42,6 +58,17 @@ public class ConfigResolverTest {
         ConfigRefResolver.resolve(config);
 
         Assertions.assertEquals("https://myissuer", context.getIssuer());
+    }
+
+    @Test
+    public void resolveClient() {
+        Assertions.assertEquals("myissuer-client", context2.getClientRef());
+
+        ConfigRefResolver.resolve(config);
+
+        Assertions.assertEquals("myissuer-client-id", context2.getClient());
+        Assertions.assertEquals("myissuer-client-secret", context2.getClientSecret());
+        Assertions.assertEquals(Flow.DEVICE, context2.getFlow());
     }
 
 }
