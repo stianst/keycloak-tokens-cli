@@ -9,6 +9,7 @@ import picocli.CommandLine;
 @CommandLine.Command(subcommands = {
         TokenCommand.class,
         UserInfoCommand.class,
+        ClearCommand.class,
         ConfigCommand.class
 }, mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class)
