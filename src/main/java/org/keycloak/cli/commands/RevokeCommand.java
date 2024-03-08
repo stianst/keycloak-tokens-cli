@@ -1,0 +1,48 @@
+package org.keycloak.cli.commands;
+
+import jakarta.inject.Inject;
+import org.keycloak.cli.commands.converter.TokenTypeConverter;
+import org.keycloak.cli.config.ConfigService;
+import org.keycloak.cli.enums.TokenType;
+import org.keycloak.cli.interact.InteractService;
+import org.keycloak.cli.tokens.TokenDecoderService;
+import org.keycloak.cli.tokens.TokenManagerService;
+import picocli.CommandLine;
+
+@CommandLine.Command(name = "revoke", description = "Revoke token", mixinStandardHelpOptions = true)
+public class RevokeCommand implements Runnable {
+
+    @CommandLine.Option(names = {"-c", "--context"}, description = "Context to use")
+    String context;
+
+    @CommandLine.Option(names = {"-t", "--type"}, description = "Token type to get", defaultValue = "refresh", converter = TokenTypeConverter.class)
+    TokenType tokenType;
+
+    @Inject
+    ConfigService config;
+
+    @Inject
+    TokenManagerService tokens;
+
+    @Inject
+    TokenDecoderService tokenDecoder;
+
+    @Inject
+    InteractService interact;
+
+    @Override
+    public void run() {
+        if (context != null) {
+            config.setContext(context);
+        }
+
+        boolean revoked = tokens.revoke(tokenType);
+
+        if (revoked) {
+            interact.println("Token revoked");
+        } else {
+            interact.println("Token not revoked");
+        }
+    }
+
+}

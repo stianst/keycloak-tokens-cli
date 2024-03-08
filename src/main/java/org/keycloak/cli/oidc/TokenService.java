@@ -8,8 +8,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.Flow;
+import org.keycloak.cli.enums.TokenType;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +45,11 @@ public class TokenService {
         return new Tokens(getQuarkusClient(requestScope).refreshTokens(refreshToken).await().atMost(DEFAULT_WAIT), refreshScope, requestScope);
     }
 
+    public boolean revoke(String token) {
+        OidcClient quarkusClient = getQuarkusClient(Collections.emptySet());
+        return quarkusClient.revokeAccessToken(token).await().atMost(DEFAULT_WAIT);
+    }
+
     private OidcClient getQuarkusClient(Set<String> scope) {
         if (quarkusClient != null) {
             return quarkusClient;
@@ -51,6 +58,7 @@ public class TokenService {
         OidcClientConfig clientConfig = new OidcClientConfig();
         clientConfig.setDiscoveryEnabled(false);
         clientConfig.setTokenPath(providerMetadata.getTokenEndpoint());
+        clientConfig.setRevokePath(providerMetadata.getRevocationEndpoint());
         clientConfig.setId(config.getIssuer());
         clientConfig.setAuthServerUrl(config.getIssuer());
         clientConfig.setClientId(config.getClient());

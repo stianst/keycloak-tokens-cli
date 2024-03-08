@@ -12,6 +12,8 @@ public class ProviderMetadata {
     private String tokenEndpoint;
     @JsonProperty("userinfo_endpoint")
     private String userinfoEndpoint;
+    @JsonProperty("revocation_endpoint")
+    private String revocationEndpoint;
 
     @JsonProperty("device_authorization_endpoint")
     private String deviceAuthorizationEndpoint;
@@ -46,5 +48,13 @@ public class ProviderMetadata {
 
     public void setDeviceAuthorizationEndpoint(String deviceAuthorizationEndpoint) {
         this.deviceAuthorizationEndpoint = deviceAuthorizationEndpoint;
+    }
+
+    public String getRevocationEndpoint() {
+        return revocationEndpoint;
+    }
+
+    public void setRevocationEndpoint(String revocationEndpoint) {
+        this.revocationEndpoint = revocationEndpoint;
     }
 }

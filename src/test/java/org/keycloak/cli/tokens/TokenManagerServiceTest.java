@@ -120,6 +120,42 @@ public class TokenManagerServiceTest {
         tokenStoreService.clearAll();
     }
 
+    @Test
+    public void revokeRefreshToken() {
+        String refresh1 = tokens.getToken(TokenType.REFRESH, null);
+        OpenIDAssertions.assertEncodedToken(refresh1);
+
+        Tokens stored1 = tokenStoreService.getCurrent();
+        Assertions.assertEquals(refresh1, stored1.getRefreshToken());
+
+        Assertions.assertTrue(tokens.revoke(TokenType.REFRESH));
+
+        Assertions.assertNull(tokenStoreService.getCurrent());
+
+        String refresh2 = tokens.getToken(TokenType.REFRESH, null);
+        OpenIDAssertions.assertEncodedToken(refresh2);
+
+        Assertions.assertNotEquals(refresh1, refresh2);
+    }
+
+    @Test
+    public void revokeAccessToken() {
+        String access1 = tokens.getToken(TokenType.ACCESS, null);
+        OpenIDAssertions.assertEncodedToken(access1);
+
+        Tokens stored1 = tokenStoreService.getCurrent();
+        Assertions.assertEquals(access1, stored1.getAccessToken());
+
+        Assertions.assertTrue(tokens.revoke(TokenType.ACCESS));
+
+        Assertions.assertNull(tokenStoreService.getCurrent().getAccessToken());
+
+        String access2 = tokens.getToken(TokenType.ACCESS, null);
+        OpenIDAssertions.assertEncodedToken(access2);
+
+        Assertions.assertNotEquals(access1, access2);
+    }
+
     public static class Profile implements QuarkusTestProfile {
 
         @Override
