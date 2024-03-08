@@ -3,6 +3,7 @@ package org.keycloak.cli.commands;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import jakarta.inject.Inject;
+import org.keycloak.cli.commands.clients.ClientCommand;
 import org.keycloak.cli.commands.context.ContextCommand;
 import org.keycloak.cli.commands.issuers.IssuerCommand;
 import picocli.CommandLine;
@@ -14,7 +15,8 @@ import picocli.CommandLine;
         RevokeCommand.class,
         ClearCommand.class,
         ContextCommand.class,
-        IssuerCommand.class
+        IssuerCommand.class,
+        ClientCommand.class
 }, mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class)
 public class EntryCommand implements QuarkusApplication {

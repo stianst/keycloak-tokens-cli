@@ -24,7 +24,7 @@ public class ContextCreateCommand implements Runnable {
     @CommandLine.Option(names = {"--issuer"})
     String issuer;
 
-    @CommandLine.Option(names = {"--flow"}, converter = FlowConverter.class)
+    @CommandLine.Option(names = {"--flow"}, converter = FlowConverter.class, required = true)
     Flow flow;
 
     @CommandLine.Option(names = {"--scope"})

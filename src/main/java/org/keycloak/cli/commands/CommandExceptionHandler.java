@@ -15,19 +15,25 @@ public class CommandExceptionHandler implements CommandLine.IExecutionExceptionH
         if (verbose) {
             e.printStackTrace(commandLine.getErr());
         } else {
-            String message = null;
-            Throwable current = e;
-            while (message == null && e != null) {
-                message = e.getMessage();
-                current = e.getCause();
-            }
-
+            String message = getDeepestMessage(e);
             if (message != null) {
-                commandLine.getErr().println(message);
+                commandLine.getErr().println("Error: " + message);
             } else {
                 commandLine.getErr().println("Exception: " + e.getClass().getName());
             }
         }
         return 1;
     }
+
+    private String getDeepestMessage(Throwable t) {
+        String current = t.getMessage();
+        while (t.getCause() != null) {
+            t = t.getCause();
+            if (t.getMessage() != null) {
+                current = t.getMessage();
+            }
+        }
+        return current;
+    }
+
 }
