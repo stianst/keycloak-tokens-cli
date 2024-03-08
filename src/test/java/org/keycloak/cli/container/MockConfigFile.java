@@ -66,10 +66,18 @@ public class MockConfigFile implements BeforeAllCallback, AfterAllCallback {
         c.getContexts().put("mycontext2", myContext2);
 
         try {
-            new ObjectMapper(new YAMLFactory()).writeValue(configFile, c);
+            updateCurrent(c);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Config loadCurrent() throws IOException {
+        return new ObjectMapper(new YAMLFactory()).readValue(configFile, Config.class);
+    }
+
+    public static void updateCurrent(Config config) throws IOException {
+        new ObjectMapper(new YAMLFactory()).writeValue(configFile, config);
     }
 
     @Override

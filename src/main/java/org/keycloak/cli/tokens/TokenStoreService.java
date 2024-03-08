@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.keycloak.cli.config.ConfigService;
+import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.oidc.Tokens;
 
 import java.io.File;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @ApplicationScoped
@@ -56,6 +58,22 @@ public class TokenStoreService {
     public void clearCurrent() {
         logger.debugv("Deleting stored tokens for {0}", config.getContext());
         tokenStore.getTokens().remove(config.getContext());
+        save();
+    }
+
+    public void clearCurrent(TokenType tokenType) {
+        logger.debugv("Deleting stored {0} token for {1}", tokenType.name().toLowerCase(Locale.ENGLISH), config.getContext());
+        switch (tokenType) {
+            case REFRESH:
+                tokenStore.getTokens().remove(config.getContext());
+                break;
+            case ACCESS:
+                getCurrent().setAccessToken(null);
+                break;
+            case ID:
+                getCurrent().setIdToken(null);
+
+        }
         save();
     }
 

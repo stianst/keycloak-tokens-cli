@@ -42,7 +42,7 @@ public class TokenManagerService {
 
         Tokens tokens;
         if (storedTokens != null) {
-            tokens = checkStored(storedTokens, scope);
+            tokens = checkStored(storedTokens, tokenType, scope);
         } else {
             tokens = tokenService.getToken(scope);
         }
@@ -56,7 +56,17 @@ public class TokenManagerService {
         return getTokenType(tokens, tokenType);
     }
 
-    private Tokens checkStored(Tokens storedTokens, Set<String> requestedScope) {
+    public boolean revoke(TokenType tokenType) {
+        Tokens tokens = tokenStoreService.getCurrent();
+        String token = getTokenType(tokens, tokenType);
+        boolean revoked = tokenService.revoke(token);
+        if (revoked) {
+            tokenStoreService.clearCurrent(tokenType);
+        }
+        return revoked;
+    }
+
+    private Tokens checkStored(Tokens storedTokens, TokenType requestedType, Set<String> requestedScope) {
         if (!scopeContainsAll(storedTokens.getRefreshScope(), requestedScope)) {
             throw new RuntimeException("Requested scopes is not a subset of stored refresh scopes");
         }
@@ -69,6 +79,14 @@ public class TokenManagerService {
 
         if (!scopeMatches(storedTokens.getTokenScope(), requestedScope)) {
             logger.debug("Requested scope differs from stored scope, refreshing");
+            shouldRefresh = true;
+        }
+
+        if (requestedType.equals(TokenType.ACCESS) && storedTokens.getAccessToken() == null) {
+            shouldRefresh = true;
+        }
+
+        if (requestedType.equals(TokenType.ID) && storedTokens.getIdToken() == null) {
             shouldRefresh = true;
         }
 
