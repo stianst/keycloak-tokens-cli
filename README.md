@@ -8,6 +8,7 @@ Features include:
 * Several OAuth flows
     * Device Code
     * Password Grant
+    * Client Credentials Grant
 * Decode tokens
 * UserInfo endpoint
 * Token store

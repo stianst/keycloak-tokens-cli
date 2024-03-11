@@ -36,7 +36,7 @@ public class TokenService {
     public Tokens getToken(Set<String> scope) {
         return switch (config.getFlow()) {
             case DEVICE -> deviceAuthorizationService.getToken(scope);
-            case PASSWORD -> new Tokens(getQuarkusClient(scope).getTokens().await().atMost(DEFAULT_WAIT), scope, scope);
+            case PASSWORD, CLIENT -> new Tokens(getQuarkusClient(scope).getTokens().await().atMost(DEFAULT_WAIT), scope, scope);
         };
     }
 
@@ -74,6 +74,8 @@ public class TokenService {
 
             Map<String, Map<String, String>> grantOptions = Map.of("password", Map.of("username", config.getUser(), "password", config.getUserPassword()));
             clientConfig.setGrantOptions(grantOptions);
+        } else if (Flow.CLIENT.equals(config.getFlow())) {
+            clientConfig.getGrant().setType(OidcClientConfig.Grant.Type.CLIENT);
         } else {
             throw new IllegalArgumentException("Unknown flow");
         }

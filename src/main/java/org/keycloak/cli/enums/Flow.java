@@ -7,7 +7,9 @@ public enum Flow {
     @JsonProperty("password")
     PASSWORD,
     @JsonProperty("device")
-    DEVICE;
+    DEVICE,
+    @JsonProperty("client")
+    CLIENT;
 
     public String jsonName() {
         try {
