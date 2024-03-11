@@ -7,8 +7,6 @@ import org.keycloak.cli.config.ConfigVerifier;
 import org.keycloak.cli.interact.InteractService;
 import picocli.CommandLine;
 
-import java.util.stream.Collectors;
-
 @CommandLine.Command(name = "view", description = "View config issuer", mixinStandardHelpOptions = true)
 public class ClientViewCommand implements Runnable {
 

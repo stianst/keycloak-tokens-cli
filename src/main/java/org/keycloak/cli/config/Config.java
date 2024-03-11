@@ -18,6 +18,12 @@ public class Config {
     @JsonProperty("store-tokens")
     private Boolean storeTokens;
 
+    @JsonProperty("truststore-path")
+    private String truststorePath;
+
+    @JsonProperty("truststore-password")
+    private String truststorePassword;
+
     private Map<String, Issuer> issuers = new HashMap<>();
 
     private Map<String, Context> contexts = new HashMap<>();
@@ -36,6 +42,22 @@ public class Config {
 
     public void setStoreTokens(Boolean storeTokens) {
         this.storeTokens = storeTokens;
+    }
+
+    public String getTruststorePath() {
+        return truststorePath;
+    }
+
+    public void setTruststorePath(String truststorePath) {
+        this.truststorePath = truststorePath;
+    }
+
+    public String getTruststorePassword() {
+        return truststorePassword;
+    }
+
+    public void setTruststorePassword(String truststorePassword) {
+        this.truststorePassword = truststorePassword;
     }
 
     public Map<String, Issuer> getIssuers() {
