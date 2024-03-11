@@ -5,7 +5,6 @@ import org.keycloak.cli.commands.converter.TokenTypeConverter;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
-import org.keycloak.cli.tokens.TokenDecoderService;
 import org.keycloak.cli.tokens.TokenManagerService;
 import picocli.CommandLine;
 
@@ -15,17 +14,17 @@ public class RevokeCommand implements Runnable {
     @CommandLine.Option(names = {"-c", "--context"}, description = "Context to use")
     String context;
 
-    @CommandLine.Option(names = {"-t", "--type"}, description = "Token type to get", defaultValue = "refresh", converter = TokenTypeConverter.class)
+    @CommandLine.Option(names = {"-t", "--type"}, description = "Token type to revoke", defaultValue = "refresh", converter = TokenTypeConverter.class)
     TokenType tokenType;
+
+    @CommandLine.Option(names = {"--token"}, description = "Token to revoke")
+    String token;
 
     @Inject
     ConfigService config;
 
     @Inject
     TokenManagerService tokens;
-
-    @Inject
-    TokenDecoderService tokenDecoder;
 
     @Inject
     InteractService interact;
@@ -36,7 +35,7 @@ public class RevokeCommand implements Runnable {
             config.setContext(context);
         }
 
-        boolean revoked = tokens.revoke(tokenType);
+        boolean revoked = token != null ? tokens.revoke(token) : tokens.revoke(tokenType);
 
         if (revoked) {
             interact.println("Token revoked");

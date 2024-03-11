@@ -9,6 +9,7 @@ mkdir -p target/keycloak-$VERSION/data/import
 
 cp src/test/resources/testrealm.json target/keycloak-$VERSION/data/import/
 
+export DEBUG=true
 export KEYCLOAK_ADMIN=admin
 export KEYCLOAK_ADMIN_PASSWORD=admin
 

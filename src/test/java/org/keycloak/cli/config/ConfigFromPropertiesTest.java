@@ -39,7 +39,7 @@ public class ConfigFromPropertiesTest {
                     "kct.client", "test-password",
                     "kct.user", "test-user",
                     "kct.user-password", "test-user-password",
-                    "kct.scopes", "openid"
+                    "kct.scope", "openid"
             );
         }
 
