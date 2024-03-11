@@ -66,6 +66,10 @@ public class TokenManagerService {
         return revoked;
     }
 
+    public boolean revoke(String token) {
+        return tokenService.revoke(token);
+    }
+
     private Tokens checkStored(Tokens storedTokens, TokenType requestedType, Set<String> requestedScope) {
         if (!scopeContainsAll(storedTokens.getRefreshScope(), requestedScope)) {
             throw new RuntimeException("Requested scopes is not a subset of stored refresh scopes");

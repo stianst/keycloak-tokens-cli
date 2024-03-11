@@ -19,6 +19,9 @@ public class UserInfoCommand implements Runnable {
     @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
     Set<String> scope;
 
+    @CommandLine.Option(names = {"--access-token"}, description = "Optional access token to use")
+    String accessToken;
+
     @Inject
     TokenManagerService tokens;
 
@@ -38,7 +41,9 @@ public class UserInfoCommand implements Runnable {
             scope.add("openid");
         }
 
-        String accessToken = tokens.getToken(TokenType.ACCESS, scope);
+        if (accessToken == null) {
+            accessToken = tokens.getToken(TokenType.ACCESS, scope);
+        }
         UserInfo userInfo = userInfoService.getUserInfo(accessToken);
 
         interact.println(prettyPrinter.prettyPrint(userInfo));

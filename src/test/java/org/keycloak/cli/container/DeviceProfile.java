@@ -13,7 +13,7 @@ public class DeviceProfile implements QuarkusTestProfile {
                 "kct.flow", "device",
                 "kct.client", "test-device",
                 "kct.client-secret", "",
-                "kct.scopes", "openid"
+                "kct.scope", "openid"
         );
     }
 
