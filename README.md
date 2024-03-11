@@ -157,6 +157,54 @@ to an environment variable or another process, for example:
 mycommand --token $(kct token)
 ```
 
+## Kubernetes command line tool (`kubectl`)
+
+`kct` can be used as a plugin to `kubectl` to enable seamless authentication to a
+[Kubernetes cluster configured to support OpenID Connect Tokens](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#openid-connect-tokens)
+for authentication.
+
+First step is to copy `kct` to `kubectl-kct` and make it available on the path. After that run the following to
+verify it works:
+
+```
+kubectl kct token
+```
+
+Configure credentials for `kubectl` to enable using `kct` to obtain tokens. For example:
+
+```
+kubectl config set-credentials kct --exec-api-version=client.authentication.k8s.io/v1 --exec-command='kubectl' --exec-arg='kct' --exec-arg='token'
+```
+
+If you want to use a specific `kct` configuration context for `kubectl` add `--exec-arg='--context=<context name>' at
+the
+end of the command above.
+
+`kubectl config set-credentials` doesn't currently allow specifying `interactiveMode`, so you need to
+edit `.kube/config`,
+search for `kct`, and add `interactiveMode: IfAvailable` like shown below:
+
+```
+- name: kct
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1
+      args:
+      - kct
+      - token
+      command: kubectl
+      env: null
+      provideClusterInfo: false
+      interactiveMode: IfAvailable
+```
+
+Next, you need to create a context entry that uses the previously configured credentials. For example:
+
+```
+kubectl config set-context kct --cluster=minikube --user kct
+kubectl config use-context kct
+``` 
+
 ## Debugging
 
 To show the full stack trace for an error set `KCT_VERBOSE` environment variable:

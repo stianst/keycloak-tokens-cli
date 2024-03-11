@@ -6,6 +6,7 @@ import org.keycloak.cli.commands.converter.TokenTypeConverter;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
+import org.keycloak.cli.kubectl.KubeCtlService;
 import org.keycloak.cli.tokens.TokenDecoderService;
 import org.keycloak.cli.tokens.TokenManagerService;
 import picocli.CommandLine;
@@ -26,6 +27,8 @@ public class TokenCommand implements Runnable {
 
     @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
     Set<String> scope;
+    @CommandLine.Option(names = {"--kubectl"}, description = "Kubectl mode", defaultValue = "false")
+    boolean kubectl;
 
     @Inject
     ConfigService config;
@@ -39,15 +42,24 @@ public class TokenCommand implements Runnable {
     @Inject
     InteractService interact;
 
+    @Inject
+    KubeCtlService kubeCtlService;
+
     @Override
     public void run() {
+        if (kubeCtlService.isKubeExecContext()) {
+            kubectl = true;
+        }
+
         if (context != null) {
             config.setContext(context);
         }
 
         String token = tokens.getToken(tokenType, scope);
 
-        if (decode) {
+        if (kubectl) {
+            token = kubeCtlService.wrapToken(token);
+        } else if (decode) {
             token = tokenDecoder.decode(token);
         }
 
