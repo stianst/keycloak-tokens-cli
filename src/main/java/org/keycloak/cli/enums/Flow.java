@@ -8,6 +8,8 @@ public enum Flow {
     PASSWORD,
     @JsonProperty("device")
     DEVICE,
+    @JsonProperty("browser")
+    BROWSER,
     @JsonProperty("client")
     CLIENT;
 

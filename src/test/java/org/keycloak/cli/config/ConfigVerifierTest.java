@@ -152,6 +152,17 @@ public class ConfigVerifierTest {
     }
 
     @Test
+    public void userSetForBrowser() {
+        context.setFlow(Flow.BROWSER);
+
+        context.setUser("asdf");
+        assertContextError("mycontext", "user set for flow=browser");
+        context.setUser(null);
+        context.setUserPassword("pass");
+        assertContextError("mycontext", "user-password set for flow=browser");
+    }
+
+    @Test
     public void flowMissingForContext() {
         context.setFlow(null);
         assertContextError("mycontext", "missing flow");

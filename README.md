@@ -6,6 +6,7 @@ Features include:
 
 * Multiple configuration contexts to easily switch between different issuers, flows, or clients
 * Several OAuth flows
+    * Authorization Code + PKCE
     * Device Code
     * Password Grant
     * Client Credentials Grant
@@ -16,12 +17,7 @@ Features include:
 
 Additional features that are coming soon:
 
-* Additional OAuth flows
-    * Authorization Code + PKCE
-    * Client Credentials
-* Plugin mode for `kubectl`
 * Token Introspection Endpoint
-* Create config contexts with `kct config`
 
 Tested with [Keycloak](https://www.keycloak.org/), but should work with any OpenID Connect provider or
 OAuth Authorization Server.

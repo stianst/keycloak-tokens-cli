@@ -1,7 +1,6 @@
 package org.keycloak.cli.tokens;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.Launch;
