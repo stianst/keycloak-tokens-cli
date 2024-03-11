@@ -14,10 +14,10 @@ jobs:
   uber-jar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
       - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
@@ -30,10 +30,10 @@ jobs:
   linux-amd64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
       - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
@@ -47,10 +47,10 @@ jobs:
   macos-amd64:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'graalvm'
       - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
       - run: ./mvnw package -Pnative -DskipTests
@@ -63,10 +63,10 @@ jobs:
   windows-amd64:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'graalvm'
       - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
       - run: ./mvnw package -Pnative -DskipTests
