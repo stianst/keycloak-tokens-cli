@@ -85,6 +85,10 @@ public class ConfigVerifier {
         } else if (flow.equals(Flow.DEVICE)) {
             checkEmpty(context.getUser(), "context={0} invalid: user set for flow={1}", contextId, flow.jsonName());
             checkEmpty(context.getUserPassword(), "context={0} invalid: user-password set for flow={1}", contextId, flow.jsonName());
+        } else if (flow.equals(Flow.CLIENT)) {
+            checkNotEmpty(context.getClientSecret(), "context={0} invalid: client-secret required for flow={1}", contextId, flow.jsonName());
+            checkEmpty(context.getUser(), "context={0} invalid: user set for flow={1}", contextId, flow.jsonName());
+            checkEmpty(context.getUserPassword(), "context={0} invalid: user-password set for flow={1}", contextId, flow.jsonName());
         }
     }
 

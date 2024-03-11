@@ -138,6 +138,20 @@ public class ConfigVerifierTest {
     }
 
     @Test
+    public void userSetForClient() {
+        context.setFlow(Flow.CLIENT);
+        context.setClientSecret(null);
+        assertContextError("mycontext", "client-secret required for flow=client");
+        context.setClientSecret("client-secret");
+
+        context.setUser("asdf");
+        assertContextError("mycontext", "user set for flow=client");
+        context.setUser(null);
+        context.setUserPassword("pass");
+        assertContextError("mycontext", "user-password set for flow=client");
+    }
+
+    @Test
     public void flowMissingForContext() {
         context.setFlow(null);
         assertContextError("mycontext", "missing flow");
