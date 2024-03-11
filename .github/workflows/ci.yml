@@ -30,3 +30,14 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - run: ./mvnw verify -Pnative
+
+  macos-amd64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v3
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+      - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
+      - run: ./mvnw package -Pnative -DskipTests
