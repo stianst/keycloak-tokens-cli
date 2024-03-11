@@ -60,6 +60,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  macos-m1:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+      - run: ./mvnw versions:set -DnewVersion="${{ github.event.release.tag_name }}"
+      - run: ./mvnw package -Pnative -DskipTests
+      - run: |
+          cp target/kct kct-macos-arm
+          gh release upload ${{ github.event.release.tag_name }} kct-macos-arm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   windows-amd64:
     runs-on: windows-latest
     steps:
