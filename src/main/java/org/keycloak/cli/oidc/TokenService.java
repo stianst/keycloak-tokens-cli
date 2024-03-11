@@ -17,7 +17,7 @@ import java.util.Set;
 @ApplicationScoped
 public class TokenService {
 
-    private static final Duration DEFAULT_WAIT = Duration.ofMinutes(1);
+    public static final Duration DEFAULT_WAIT = Duration.ofMinutes(1);
 
     @Inject
     ConfigService config;
@@ -28,6 +28,9 @@ public class TokenService {
     @Inject
     DeviceAuthorizationService deviceAuthorizationService;
 
+    @Inject
+    AuthorizationCodeService authorizationCodeService;
+
     OidcClient quarkusClient;
 
     @Inject
@@ -36,7 +39,9 @@ public class TokenService {
     public Tokens getToken(Set<String> scope) {
         return switch (config.getFlow()) {
             case DEVICE -> deviceAuthorizationService.getToken(scope);
-            case PASSWORD, CLIENT -> new Tokens(getQuarkusClient(scope).getTokens().await().atMost(DEFAULT_WAIT), scope, scope);
+            case PASSWORD, CLIENT ->
+                    new Tokens(getQuarkusClient(scope).getTokens().await().atMost(DEFAULT_WAIT), scope, scope);
+            case BROWSER -> authorizationCodeService.getToken(scope);
         };
     }
 
@@ -49,7 +54,7 @@ public class TokenService {
         return quarkusClient.revokeAccessToken(token).await().atMost(DEFAULT_WAIT);
     }
 
-    private OidcClient getQuarkusClient(Set<String> scope) {
+    public OidcClient getQuarkusClient(Set<String> scope) {
         if (quarkusClient != null) {
             return quarkusClient;
         }
@@ -76,6 +81,8 @@ public class TokenService {
             clientConfig.setGrantOptions(grantOptions);
         } else if (Flow.CLIENT.equals(config.getFlow())) {
             clientConfig.getGrant().setType(OidcClientConfig.Grant.Type.CLIENT);
+        } else if (Flow.BROWSER.equals(config.getFlow())) {
+            clientConfig.getGrant().setType(OidcClientConfig.Grant.Type.CODE);
         } else {
             throw new IllegalArgumentException("Unknown flow");
         }
