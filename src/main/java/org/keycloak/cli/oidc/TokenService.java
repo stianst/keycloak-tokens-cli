@@ -8,7 +8,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.Flow;
-import org.keycloak.cli.enums.TokenType;
 
 import java.time.Duration;
 import java.util.Collections;

@@ -118,6 +118,29 @@ be set in `$PWD/.env`. The following environment variables are available:
 
 If the environment variable `KCT_ISSUER` is set the configuration file will be ignored (`~/.kct/config.yaml`).
 
+### Configuring a truststore
+
+If the identity provider is using self-signed certificates, or certificates signed by a certificate authority not
+trusted by the operating system, the certificate needs to be added to a truststore.
+
+First create a Java truststore with the certificate imported:
+
+```
+keytool -import -file <path to certificate> -keystore myTrustStore
+```
+
+Then configure `truststore-path` and `truststore-password` in the `config.yaml` file, for example:
+
+```
+---
+default: "tls"
+store-tokens: true
+truststore-path: /path/myTrustStore
+truststore-password: <truststore password>
+```
+
+Alternatively, you can use the environment variable `KCT_TRUSTSTORE_PATH` and `KCT_TRUSTSTORE_PASSWORD`.
+
 ## Using
 
 ### Help
