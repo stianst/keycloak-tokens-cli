@@ -43,3 +43,4 @@ nb-configuration.xml
 /.quarkus/cli/plugins/
 
 kct
+test-server/
