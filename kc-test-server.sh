@@ -2,15 +2,16 @@
 
 VERSION=24.0.1
 
-rm -rf target/keycloak-$VERSION
+rm -rf test-server/
+mkdir test-server
 
-unzip ~/dev/dl/keycloak-$VERSION.zip -d target/
-mkdir -p target/keycloak-$VERSION/data/import
+unzip ~/dev/dl/keycloak-$VERSION.zip -d test-server/
+mkdir -p test-server/keycloak-$VERSION/data/import
 
-cp src/test/resources/testrealm.json target/keycloak-$VERSION/data/import/
+cp src/test/resources/testrealm.json test-server/keycloak-$VERSION/data/import/
 
 export DEBUG=true
 export KEYCLOAK_ADMIN=admin
 export KEYCLOAK_ADMIN_PASSWORD=admin
 
-target/keycloak-$VERSION/bin/kc.sh start-dev --import-realm
+test-server/keycloak-$VERSION/bin/kc.sh start-dev --import-realm
