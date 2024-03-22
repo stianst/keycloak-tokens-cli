@@ -22,6 +22,9 @@ public class TokenCommand implements Runnable {
     @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token", defaultValue = "false")
     boolean decode;
 
+    @CommandLine.Option(names = {"-r", "--refresh"}, description = "Force refresh", defaultValue = "false")
+    boolean refresh;
+
     @CommandLine.Option(names = {"-t", "--type"}, description = "Token type to get", defaultValue = "access", converter = TokenTypeConverter.class)
     TokenType tokenType;
 
@@ -55,7 +58,7 @@ public class TokenCommand implements Runnable {
             config.setContext(context);
         }
 
-        String token = tokens.getToken(tokenType, scope);
+        String token = tokens.getToken(tokenType, scope, refresh);
 
         if (kubectl) {
             token = kubeCtlService.wrapToken(token);

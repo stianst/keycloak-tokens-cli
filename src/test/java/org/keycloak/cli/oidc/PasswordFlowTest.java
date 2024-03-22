@@ -21,7 +21,7 @@ public class PasswordFlowTest {
 
     @Test
     public void token() {
-        String token = tokens.getToken(TokenType.ACCESS, null);
+        String token = tokens.getToken(TokenType.ACCESS, null, false);
         OpenIDAssertions.assertEncodedToken(token);
     }
 

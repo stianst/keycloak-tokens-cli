@@ -42,7 +42,7 @@ public class UserInfoCommand implements Runnable {
         }
 
         if (accessToken == null) {
-            accessToken = tokens.getToken(TokenType.ACCESS, scope);
+            accessToken = tokens.getToken(TokenType.ACCESS, scope, false);
         }
         UserInfo userInfo = userInfoService.getUserInfo(accessToken);
 

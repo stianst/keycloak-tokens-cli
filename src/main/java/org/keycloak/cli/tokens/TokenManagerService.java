@@ -26,7 +26,7 @@ public class TokenManagerService {
     @Inject
     TokenService tokenService;
 
-    public String getToken(TokenType tokenType, Set<String> scope) {
+    public String getToken(TokenType tokenType, Set<String> scope, boolean forceRefresh) {
         if (scope == null) {
             scope = config.getScope() != null ? config.getScope() : Collections.emptySet();
         }
@@ -40,10 +40,12 @@ public class TokenManagerService {
             storedTokens = tokenStoreService.getCurrent();
         }
 
-        Tokens tokens;
+        Tokens tokens = null;
         if (storedTokens != null) {
-            tokens = checkStored(storedTokens, tokenType, scope);
-        } else {
+            tokens = checkStored(storedTokens, tokenType, scope, forceRefresh);
+        }
+
+        if (tokens == null) {
             tokens = tokenService.getToken(scope);
         }
 
@@ -70,12 +72,12 @@ public class TokenManagerService {
         return tokenService.revoke(token);
     }
 
-    private Tokens checkStored(Tokens storedTokens, TokenType requestedType, Set<String> requestedScope) {
+    private Tokens checkStored(Tokens storedTokens, TokenType requestedType, Set<String> requestedScope, boolean forceRefresh) {
         if (!scopeContainsAll(storedTokens.getRefreshScope(), requestedScope)) {
             throw new RuntimeException("Requested scopes is not a subset of stored refresh scopes");
         }
 
-        boolean shouldRefresh = false;
+        boolean shouldRefresh = forceRefresh;
         if (storedTokens.getExpiresAt() < Instant.now().getEpochSecond() + 30) {
             logger.debug("Stored token has expired, refreshing");
             shouldRefresh = true;
@@ -95,7 +97,12 @@ public class TokenManagerService {
         }
 
         if (shouldRefresh) {
-            return tokenService.refresh(storedTokens.getRefreshToken(), storedTokens.getRefreshScope(), requestedScope);
+            try {
+                return tokenService.refresh(storedTokens.getRefreshToken(), storedTokens.getRefreshScope(), requestedScope);
+            } catch (Exception e) {
+                logger.warn("Refresh token is not valid");
+                return null;
+            }
         } else {
             logger.debug("Using stored tokens");
             return storedTokens;
