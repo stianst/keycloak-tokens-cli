@@ -1,7 +1,7 @@
 package org.keycloak.cli.commands.context;
 
 import jakarta.inject.Inject;
-import org.keycloak.cli.config.ConfigService;
+import org.keycloak.cli.config.ConfigFileService;
 import org.keycloak.cli.interact.InteractService;
 import picocli.CommandLine;
 
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class ContextListCommand implements Runnable {
 
     @Inject
-    ConfigService config;
+    ConfigFileService config;
 
     @Inject
     InteractService interact;

@@ -3,6 +3,7 @@ package org.keycloak.cli.commands.context;
 import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.FlowConverter;
 import org.keycloak.cli.config.Config;
+import org.keycloak.cli.config.ConfigFileService;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.ConfigVerifier;
 import org.keycloak.cli.enums.Flow;
@@ -46,7 +47,7 @@ public class ContextCreateCommand implements Runnable {
     String userPassword;
 
     @Inject
-    ConfigService configService;
+    ConfigFileService configService;
 
     @Inject
     InteractService interact;
@@ -54,9 +55,13 @@ public class ContextCreateCommand implements Runnable {
     @Override
     public void run() {
         Config config = configService.loadConfigFromFile();
-
-        if (config.getContexts().containsKey(contextId) && !overwrite) {
-            throw new RuntimeException("context=" + contextId + " already exists");
+        if (config == null) {
+            config = new Config();
+            config.setDefaultContext(contextId);
+        } else {
+            if (config.getContexts().containsKey(contextId) && !overwrite) {
+                throw new RuntimeException("context=" + contextId + " already exists");
+            }
         }
 
         Config.Context context = new Config.Context();

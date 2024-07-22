@@ -2,6 +2,7 @@ package org.keycloak.cli.commands.issuers;
 
 import jakarta.inject.Inject;
 import org.keycloak.cli.config.Config;
+import org.keycloak.cli.config.ConfigFileService;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.ConfigVerifier;
 import org.keycloak.cli.interact.InteractService;
@@ -16,7 +17,7 @@ public class IssuerViewCommand implements Runnable {
     String issuerId;
 
     @Inject
-    ConfigService configService;
+    ConfigFileService configService;
 
     @Inject
     InteractService interact;
