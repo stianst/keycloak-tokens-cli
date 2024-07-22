@@ -1,14 +1,11 @@
 package org.keycloak.cli.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.ConfigProvider;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.keycloak.cli.enums.Flow;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -19,8 +16,8 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class ConfigService {
 
-    @ConfigProperty(name = "kct.config.file")
-    File configFile;
+    @Inject
+    ConfigFileService configFileService;
 
     boolean fromProperties;
 
@@ -44,12 +41,12 @@ public class ConfigService {
 
     @PostConstruct
     void init() throws IOException {
-        config = loadConfigFromFile();
+        config = configFileService.loadConfigFromFile();
 
         fromProperties = ConfigProvider.getConfig().getOptionalValue("kct.issuer", String.class).isPresent();
 
         if (!fromProperties && config == null) {
-            throw new RuntimeException("Config file " + configFile + " not found");
+            throw new RuntimeException("Config file " + configFileService.configFile + " not found");
         }
 
         if (!fromProperties) {
@@ -126,28 +123,6 @@ public class ConfigService {
 
     private Config.Context getCurrent() {
         return config.getContexts().get(getContext());
-    }
-
-    public Config loadConfigFromFile() {
-        if (configFile.isFile()) {
-            ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-            try {
-                return objectMapper.readValue(configFile, Config.class);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return null;
-        }
-    }
-
-    public void saveConfigToFile(Config config) {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        try {
-            objectMapper.writeValue(configFile, config);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     class PropSupplier<T> implements Supplier<T> {

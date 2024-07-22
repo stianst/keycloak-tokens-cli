@@ -2,6 +2,7 @@ package org.keycloak.cli.commands.clients;
 
 import jakarta.inject.Inject;
 import org.keycloak.cli.config.Config;
+import org.keycloak.cli.config.ConfigFileService;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.ConfigVerifier;
 import org.keycloak.cli.interact.InteractService;
@@ -17,7 +18,7 @@ public class ClientDeleteCommand implements Runnable {
     String clientId;
 
     @Inject
-    ConfigService configService;
+    ConfigFileService configService;
 
     @Inject
     InteractService interact;

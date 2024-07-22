@@ -3,6 +3,7 @@ package org.keycloak.cli.commands.clients;
 import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.FlowConverter;
 import org.keycloak.cli.config.Config;
+import org.keycloak.cli.config.ConfigFileService;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.ConfigVerifier;
 import org.keycloak.cli.enums.Flow;
@@ -31,7 +32,7 @@ public class ClientCreateCommand implements Runnable {
     boolean overwrite = false;
 
     @Inject
-    ConfigService configService;
+    ConfigFileService configService;
 
     @Inject
     InteractService interact;

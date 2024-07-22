@@ -58,7 +58,13 @@ public class DeviceFlowTest {
             }
 
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless=new");
+            options.addArguments(
+                    "--headless",
+                    "--disable-gpu",
+                    "--window-size=1920,1200",
+                    "--ignore-certificate-errors",
+                    "--disable-dev-shm-usage"
+            );
 
             WebDriver driver = new ChromeDriver(options);
             driver.get(deviceUrl);
