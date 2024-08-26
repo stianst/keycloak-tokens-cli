@@ -1,6 +1,6 @@
 package org.keycloak.cli.context;
 
-import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
@@ -16,7 +16,7 @@ import org.keycloak.cli.container.MockEmptyConfigFile;
 import java.util.Map;
 
 @QuarkusMainIntegrationTest
-@QuarkusTestResource(KeycloakTestResource.class)
+@WithTestResource(KeycloakTestResource.class)
 @TestProfile(ContextCreateEmptyConfigIT.Profile.class)
 @ExtendWith(MockEmptyConfigFile.class)
 public class ContextCreateEmptyConfigIT {

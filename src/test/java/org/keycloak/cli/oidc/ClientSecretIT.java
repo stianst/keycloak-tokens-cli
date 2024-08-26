@@ -3,7 +3,7 @@ package org.keycloak.cli.oidc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
@@ -17,7 +17,7 @@ import org.keycloak.cli.container.KeycloakTestResource;
 import java.util.Map;
 
 @QuarkusMainIntegrationTest
-@QuarkusTestResource(KeycloakTestResource.class)
+@WithTestResource(KeycloakTestResource.class)
 @TestProfile(ClientSecretIT.Profile.class)
 public class ClientSecretIT {
 

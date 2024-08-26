@@ -1,7 +1,7 @@
 package org.keycloak.cli.tokens;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.Launch;
 import io.quarkus.test.junit.main.LaunchResult;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @QuarkusMainIntegrationTest
-@QuarkusTestResource(KeycloakTestResource.class)
+@WithTestResource(KeycloakTestResource.class)
 @TestProfile(PasswordProfile.class)
 public class TokenIT {
 

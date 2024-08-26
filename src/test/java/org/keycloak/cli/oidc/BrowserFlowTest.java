@@ -1,6 +1,6 @@
 package org.keycloak.cli.oidc;
 
-import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
@@ -12,7 +12,6 @@ import org.keycloak.cli.assertion.OpenIDAssertions;
 import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.container.MockConfigFile;
 import org.keycloak.cli.mock.MockInteractService;
-import org.keycloak.cli.web.WebCallback;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -20,12 +19,11 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
 @QuarkusTest
-@QuarkusTestResource(KeycloakTestResource.class)
+@WithTestResource(KeycloakTestResource.class)
 @TestProfile(BrowserFlowTest.Profile.class)
 @ExtendWith(MockConfigFile.class)
 public class BrowserFlowTest {

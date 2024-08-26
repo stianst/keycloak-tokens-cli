@@ -1,7 +1,7 @@
 package org.keycloak.cli.oidc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.Launch;
 import io.quarkus.test.junit.main.LaunchResult;
@@ -12,7 +12,7 @@ import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.container.PasswordProfile;
 
 @QuarkusMainIntegrationTest
-@QuarkusTestResource(KeycloakTestResource.class)
+@WithTestResource(KeycloakTestResource.class)
 @TestProfile(PasswordProfile.class)
 public class UserInfoIT {
 

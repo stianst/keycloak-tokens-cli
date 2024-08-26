@@ -1,6 +1,6 @@
 package org.keycloak.cli.oidc;
 
-import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
@@ -17,7 +17,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import java.util.Collections;
 
 @QuarkusTest
-@QuarkusTestResource(KeycloakTestResource.class)
+@WithTestResource(KeycloakTestResource.class)
 @TestProfile(DeviceProfile.class)
 public class DeviceFlowTest {
 

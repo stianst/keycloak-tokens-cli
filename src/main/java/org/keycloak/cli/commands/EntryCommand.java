@@ -11,6 +11,7 @@ import picocli.CommandLine;
 @QuarkusMain
 @CommandLine.Command(subcommands = {
         TokenCommand.class,
+        DecodeCommand.class,
         UserInfoCommand.class,
         RevokeCommand.class,
         ClearCommand.class,

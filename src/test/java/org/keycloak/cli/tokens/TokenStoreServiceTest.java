@@ -1,6 +1,6 @@
 package org.keycloak.cli.tokens;
 
-import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 @QuarkusTest
-@QuarkusTestResource(KeycloakTestResource.class)
+@WithTestResource(KeycloakTestResource.class)
 @ExtendWith(MockTokenStoreFile.class)
 @TestProfile(TokenStoreServiceTest.Profile.class)
 public class TokenStoreServiceTest {
