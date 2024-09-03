@@ -49,4 +49,18 @@ public class OpenIDAssertions {
         return userInfo;
     }
 
+
+    public static UserInfo assertTokenIntrospectionResponse(String jsonString) {
+        UserInfo userInfo = null;
+        try {
+            userInfo = new UserInfo(JSONObjectUtils.parse(jsonString));
+            Assertions.assertTrue(userInfo.getClaim("active", Boolean.class));
+            Assertions.assertNotNull(userInfo.getSubject());
+            Assertions.assertNotNull(userInfo.getPreferredUsername());
+        } catch (ParseException e) {
+            Assertions.fail("Failed to parse userinfo", e);
+        }
+        return userInfo;
+    }
+
 }
