@@ -1,16 +1,23 @@
 package org.keycloak.cli.oidc;
 
+import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
+import com.nimbusds.oauth2.sdk.AuthorizationRequest;
+import com.nimbusds.oauth2.sdk.ResponseType;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod;
+import com.nimbusds.oauth2.sdk.pkce.CodeVerifier;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.interact.InteractService;
-import org.keycloak.cli.web.UriBuilder;
 import org.keycloak.cli.web.WebCallback;
 
-import java.util.HashMap;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @ApplicationScoped
 public class AuthorizationCodeService {
@@ -22,7 +29,7 @@ public class AuthorizationCodeService {
     InteractService interact;
 
     @Inject
-    ProviderMetadata providerMetadata;
+    OidcService oidcService;
 
     @Inject
     TokenService tokenService;
@@ -33,26 +40,25 @@ public class AuthorizationCodeService {
     public Tokens getToken(Set<String> scope) {
         webCallback.start();
 
-        String state = UUID.randomUUID().toString();
-        String nonce = UUID.randomUUID().toString();
-        String redirectUri = "http://127.0.0.1:" + webCallback.getPort() + "/callback";
+        State state = new State();
+        CodeVerifier codeVerifier = new CodeVerifier();
 
-        PKCE pkce = PKCE.create();
-
-        UriBuilder uriBuilder = UriBuilder.create(providerMetadata.getAuthorizationEndpoint())
-                .query("response_type", "code")
-                .query("client_id", config.getClient())
-                .query("redirect_uri", redirectUri)
-                .query("state", state)
-                .query("nonce", nonce)
-                .query("code_challenge", pkce.getCodeChallenge())
-                .query("code_challenge_method", PKCE.S256);
-
-        if (!scope.isEmpty()) {
-            uriBuilder.query("scope", String.join(" ", scope));
+        URI redirectUri;
+        try {
+            redirectUri = new URI("http://127.0.0.1:" + webCallback.getPort() + "/callback");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
 
-        interact.openUrl(uriBuilder.toURI());
+        AuthorizationRequest authorizationRequest = new AuthorizationRequest.Builder(new ResponseType("code"), config.getContext().getClientId())
+                .endpointURI(oidcService.providerMetadata().getAuthorizationEndpointURI())
+                .redirectionURI(redirectUri)
+                .scope(!scope.isEmpty() ? new Scope(scope.toArray(new String[0])) : null)
+                .state(state)
+                .codeChallenge(codeVerifier, CodeChallengeMethod.S256)
+                .build();
+
+        interact.openUrl(authorizationRequest.toURI());
 
         Map<String, String> callback;
         try {
@@ -69,16 +75,15 @@ public class AuthorizationCodeService {
         String code = callback.get("code");
         String returnedState = callback.get("state");
 
-        if (!state.equals(returnedState)) {
+        if (!state.getValue().equals(returnedState)) {
             throw new RuntimeException("Invalid state parameter returned");
         }
 
-        Map<String, String> additionalGrantParameters = new HashMap<>();
-        additionalGrantParameters.put("code", code);
-        additionalGrantParameters.put("code_verifier", pkce.getCodeVerifier());
-        additionalGrantParameters.put("redirect_uri", redirectUri);
-
-        return new Tokens(tokenService.getQuarkusClient(scope).getTokens(additionalGrantParameters).await().atMost(TokenService.DEFAULT_WAIT), scope, scope);
+        try {
+            return oidcService.tokenRequest(new AuthorizationCodeGrant(new AuthorizationCode(code), redirectUri, codeVerifier), scope, scope);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

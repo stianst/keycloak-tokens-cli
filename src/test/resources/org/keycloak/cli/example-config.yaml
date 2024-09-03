@@ -1,0 +1,32 @@
+---
+default-context: test-service-account
+store-tokens: false
+issuers:
+  test-issuer:
+    url: ${keycloak.url}/realms/test
+contexts:
+  test-service-account:
+    issuer:
+      url: ${keycloak.url}/realms/test
+    flow: client
+    client:
+      client-id: test-service-account
+      secret: ErHRtK0BXg92kWMVfpJndwJsqn7b9BX5
+  test-password:
+    issuer:
+      url: ${keycloak.url}/realms/test
+    flow: password
+    client:
+      client-id: test-password
+    user:
+      username: test-user
+      password: test-user-password
+    scope: [ openid ]
+  test-browser:
+    issuer:
+      url: ${keycloak.url}/realms/test
+    flow: browser
+    client:
+      client-id: test-browser
+    scope: [ openid ]
+

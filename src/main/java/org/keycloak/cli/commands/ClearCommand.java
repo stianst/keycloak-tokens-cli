@@ -10,9 +10,9 @@ import picocli.CommandLine;
 public class ClearCommand implements Runnable {
 
     @CommandLine.Option(names = {"-c", "--context"}, description = "Context to use")
-    String context;
+    String contextId;
 
-    @CommandLine.Option(names = {"--all"}, description = "Clear all stored tokens", defaultValue = "false")
+    @CommandLine.Option(names = {"-a", "--all"}, description = "Clear all stored tokens", defaultValue = "false")
     boolean all;
 
     @Inject
@@ -31,12 +31,10 @@ public class ClearCommand implements Runnable {
 
             interactService.println("Cleared all stored tokens");
         } else {
-            if (context != null) {
-                config.setContext(context);
-            }
+            config.setCurrentContext(contextId);
 
             tokenStoreService.clearCurrent();
-            interactService.println("Cleared tokens for context=" + config.getContext());
+            interactService.println("Cleared tokens for context '" + config.getContextId() + "'");
         }
     }
 

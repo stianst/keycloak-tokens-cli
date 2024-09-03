@@ -29,8 +29,7 @@ public class KeycloakTestResource implements QuarkusTestResourceLifecycleManager
 
         return switch (containerMode) {
             case MANUAL -> manual();
-            case DEFAULT -> container("keycloak/keycloak:24.0.1", containerLog, "start-dev", "--import-realm");
-            case FAST -> container("keycloak-fast-dev", containerLog, "start", "--optimized", "--import-realm");
+            case DEFAULT -> container("keycloak/keycloak:24.0.1", containerLog, "start-dev", "--import-realm", "--cache=local");
         };
     }
 
@@ -58,21 +57,21 @@ public class KeycloakTestResource implements QuarkusTestResourceLifecycleManager
 
         String url = "http://" + container.getHost() + ":" + container.getMappedPort(8080);
         return Map.of(
-                "keycloak.url", url,
-                "keycloak.issuer", url + "/realms/test"
+                "keycloak.url", url
         );
     }
 
     private Map<String, String> manual() {
         String url = "http://localhost:8080";
         return Map.of(
-                "keycloak.url", url,
-                "keycloak.issuer", url + "/realms/test"
+                "keycloak.url", url
         );
     }
 
     @Override
     public void stop() {
-//        keycloak.stop();
+        if (container != null) {
+//            container.stop();
+        }
     }
 }

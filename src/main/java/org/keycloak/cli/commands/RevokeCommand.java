@@ -31,9 +31,7 @@ public class RevokeCommand implements Runnable {
 
     @Override
     public void run() {
-        if (context != null) {
-            config.setContext(context);
-        }
+        config.setCurrentContext(context);
 
         boolean revoked = token != null ? tokens.revoke(token) : tokens.revoke(tokenType);
 

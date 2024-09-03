@@ -1,17 +1,19 @@
 package org.keycloak.cli.oidc;
 
-import io.quarkus.oidc.client.OidcClient;
-import io.quarkus.oidc.client.OidcClientConfig;
-import io.quarkus.oidc.client.OidcClients;
-import io.smallrye.mutiny.Uni;
+import com.nimbusds.oauth2.sdk.AuthorizationGrant;
+import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
+import com.nimbusds.oauth2.sdk.token.RefreshToken;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import net.minidev.json.JSONObject;
 import org.keycloak.cli.config.ConfigService;
-import org.keycloak.cli.enums.Flow;
+import org.keycloak.cli.config.Context;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 @ApplicationScoped
@@ -20,10 +22,10 @@ public class TokenService {
     public static final Duration DEFAULT_WAIT = Duration.ofMinutes(1);
 
     @Inject
-    ConfigService config;
+    NimbusApacheHttpClient apacheHttpClient;
 
     @Inject
-    OidcClients quarkusClients;
+    ConfigService config;
 
     @Inject
     DeviceAuthorizationService deviceAuthorizationService;
@@ -31,64 +33,43 @@ public class TokenService {
     @Inject
     AuthorizationCodeService authorizationCodeService;
 
-    OidcClient quarkusClient;
-
     @Inject
-    ProviderMetadata providerMetadata;
+    OidcService oidcService;
+
+    Context context;
+
+    @PostConstruct
+    public void init() {
+        context = config.getContext();
+    }
 
     public Tokens getToken(Set<String> scope) {
-        return switch (config.getFlow()) {
+        return switch (context.getFlow()) {
             case DEVICE -> deviceAuthorizationService.getToken(scope);
-            case PASSWORD, CLIENT ->
-                    new Tokens(getQuarkusClient(scope).getTokens().await().atMost(DEFAULT_WAIT), scope, scope);
+            case CLIENT, PASSWORD -> oidcService.token(scope);
             case BROWSER -> authorizationCodeService.getToken(scope);
         };
     }
 
     public Tokens refresh(String refreshToken, Set<String> refreshScope, Set<String> requestScope) {
-        return new Tokens(getQuarkusClient(requestScope).refreshTokens(refreshToken).await().atMost(DEFAULT_WAIT), refreshScope, requestScope);
+        RefreshToken rt = new RefreshToken(refreshToken);
+        AuthorizationGrant refreshTokenGrant = new RefreshTokenGrant(rt);
+
+        try {
+            Scope scope = new Scope(requestScope.toArray(new String[0]));
+
+            TokenRequest tokenRequest = new TokenRequest(oidcService.providerMetadata().getTokenEndpointURI(), context.getClientAuthentication(), refreshTokenGrant, scope);
+            HTTPResponse response = tokenRequest.toHTTPRequest().send(apacheHttpClient);
+            JSONObject jsonObject = response.getBodyAsJSONObject();
+
+            return new Tokens(jsonObject.getAsString("refresh_token"), refreshScope, jsonObject.getAsString("access_token"), jsonObject.getAsString("id_token"), requestScope, jsonObject.getAsNumber("expires_at").longValue());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean revoke(String token) {
-        OidcClient quarkusClient = getQuarkusClient(Collections.emptySet());
-        return quarkusClient.revokeAccessToken(token).await().atMost(DEFAULT_WAIT);
-    }
-
-    public OidcClient getQuarkusClient(Set<String> scope) {
-        if (quarkusClient != null) {
-            return quarkusClient;
-        }
-
-        OidcClientConfig clientConfig = new OidcClientConfig();
-        clientConfig.setDiscoveryEnabled(false);
-        clientConfig.setTokenPath(providerMetadata.getTokenEndpoint());
-        clientConfig.setRevokePath(providerMetadata.getRevocationEndpoint());
-        clientConfig.setId(config.getIssuer());
-        clientConfig.setAuthServerUrl(config.getIssuer());
-        clientConfig.setClientId(config.getClient());
-        if (!scope.isEmpty()) {
-            clientConfig.setScopes(scope.stream().toList());
-        }
-
-        if (config.getClientSecret() != null) {
-            clientConfig.getCredentials().setSecret(config.getClientSecret());
-        }
-
-        if (Flow.PASSWORD.equals(config.getFlow())) {
-            clientConfig.getGrant().setType(OidcClientConfig.Grant.Type.PASSWORD);
-
-            Map<String, Map<String, String>> grantOptions = Map.of("password", Map.of("username", config.getUser(), "password", config.getUserPassword()));
-            clientConfig.setGrantOptions(grantOptions);
-        } else if (Flow.CLIENT.equals(config.getFlow())) {
-            clientConfig.getGrant().setType(OidcClientConfig.Grant.Type.CLIENT);
-        } else if (Flow.BROWSER.equals(config.getFlow())) {
-            clientConfig.getGrant().setType(OidcClientConfig.Grant.Type.CODE);
-        } else {
-            throw new IllegalArgumentException("Unknown flow");
-        }
-
-        Uni<OidcClient> client = quarkusClients.newClient(clientConfig);
-        return quarkusClient = client.await().atMost(DEFAULT_WAIT);
+        return oidcService.revoke(token);
     }
 
 }

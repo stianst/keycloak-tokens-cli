@@ -5,8 +5,9 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.OpenIDAssertions;
-import org.keycloak.cli.container.DeviceProfile;
 import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.mock.MockInteractService;
 import org.openqa.selenium.By;
@@ -18,7 +19,8 @@ import java.util.Collections;
 
 @QuarkusTest
 @WithTestResource(KeycloakTestResource.class)
-@TestProfile(DeviceProfile.class)
+@TestProfile(ConfigTestProfile.class)
+@ExtendWith({ConfigTestProfile.class})
 public class DeviceFlowTest {
 
     @Inject
@@ -28,23 +30,13 @@ public class DeviceFlowTest {
     MockInteractService mockInteractService;
 
     @Test
-    public void token() {
+    public void testDeviceFlow() {
         OpenLink openLink = new OpenLink();
         openLink.start();
 
         Tokens token = client.getToken(Collections.emptySet());
         OpenIDAssertions.assertEncodedToken(token.getAccessToken());
     }
-
-//    @Test
-//    public void tokenWithScope() {
-//        OpenLink openLink = new OpenLink();
-//        openLink.start();
-//
-//        String token = client.getToken(TokenType.ID, List.of("openid", "email"));
-//        JsonNode jsonNode = OpenIDAssertions.assertEncodedToken(token);
-//        Assertions.assertTrue(jsonNode.has("email"));
-//    }
 
     private class OpenLink extends Thread {
         @Override

@@ -1,6 +1,8 @@
 package org.keycloak.cli.oidc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
+import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 
 import java.time.Instant;
 import java.util.Set;
@@ -19,22 +21,15 @@ public class Tokens {
     public Tokens() {
     }
 
-    public Tokens(TokenResponse tokenResponse, Set<String> refreshScope, Set<String> tokenScope) {
-        this.refreshToken = tokenResponse.getRefreshToken();
-        this.refreshScope = refreshScope;
-        this.accessToken = tokenResponse.getAccessToken();
-        this.idToken = tokenResponse.getIdToken();
-        this.tokenScope = tokenScope;
-        this.expiresAt = Instant.now().getEpochSecond() + tokenResponse.getExpiresIn();
-    }
+    public Tokens(OIDCTokenResponse tokenResponse, Set<String> refreshScope, Set<String> tokenScope) {
+        OIDCTokens oidcTokens = tokenResponse.getOIDCTokens();
 
-    public Tokens(io.quarkus.oidc.client.Tokens tokens, Set<String> refreshScope, Set<String> tokenScope) {
-        this.refreshToken = tokens.getRefreshToken();
+        this.refreshToken = oidcTokens.getRefreshToken() != null ? oidcTokens.getRefreshToken().getValue() : null;
         this.refreshScope = refreshScope;
-        this.accessToken = tokens.getAccessToken();
-        this.idToken = tokens.get("id_token");
+        this.accessToken = oidcTokens.getAccessToken() != null ? oidcTokens.getAccessToken().getValue() : null;
+        this.idToken = oidcTokens.getIDTokenString();
         this.tokenScope = tokenScope;
-        this.expiresAt = tokens.getAccessTokenExpiresAt();
+        this.expiresAt = Instant.now().getEpochSecond() + oidcTokens.getAccessToken().getLifetime();
     }
 
     public Tokens(String refreshToken, Set<String> refreshScope, String accessToken, String idToken, Set<String> tokenScope, Long expiresAt) {

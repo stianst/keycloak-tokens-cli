@@ -5,7 +5,7 @@ import org.keycloak.cli.interact.InteractService;
 import org.keycloak.cli.tokens.TokenDecoderService;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "decode", description = "Retrieve tokens", mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "decode", description = "Decode token", mixinStandardHelpOptions = true)
 public class DecodeCommand implements Runnable {
 
     @CommandLine.Parameters(index = "0", description = "Token to decode")

@@ -8,25 +8,32 @@ import org.keycloak.cli.enums.Flow;
 import java.util.HashMap;
 import java.util.Map;
 
-@JsonPropertyOrder({"default", "store-tokens", "issuers", "contexts"})
+@JsonPropertyOrder({"default-context", "store-tokens", "truststore", "issuers", "clients", "contexts"})
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Config {
 
-    @JsonProperty("default")
+    @JsonProperty("default-context")
     private String defaultContext;
 
     @JsonProperty("store-tokens")
     private Boolean storeTokens;
 
-    @JsonProperty("truststore-path")
-    private String truststorePath;
-
-    @JsonProperty("truststore-password")
-    private String truststorePassword;
-
     private Map<String, Issuer> issuers = new HashMap<>();
 
     private Map<String, Context> contexts = new HashMap<>();
+
+    private Truststore truststore;
+
+    public Config() {
+    }
+
+    public Config(String defaultContext, Boolean storeTokens, Map<String, Issuer> issuers, Map<String, Context> contexts, Truststore truststore) {
+        this.defaultContext = defaultContext;
+        this.storeTokens = storeTokens;
+        this.issuers = issuers;
+        this.contexts = contexts;
+        this.truststore = truststore;
+    }
 
     public String getDefaultContext() {
         return defaultContext;
@@ -44,20 +51,12 @@ public class Config {
         this.storeTokens = storeTokens;
     }
 
-    public String getTruststorePath() {
-        return truststorePath;
+    public Truststore getTruststore() {
+        return truststore;
     }
 
-    public void setTruststorePath(String truststorePath) {
-        this.truststorePath = truststorePath;
-    }
-
-    public String getTruststorePassword() {
-        return truststorePassword;
-    }
-
-    public void setTruststorePassword(String truststorePassword) {
-        this.truststorePassword = truststorePassword;
+    public void setTruststore(Truststore truststore) {
+        this.truststore = truststore;
     }
 
     public Map<String, Issuer> getIssuers() {
@@ -79,25 +78,25 @@ public class Config {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Context {
 
-        private String issuer;
-        @JsonProperty("issuer-ref")
-        private String issuerRef;
+        private Issuer issuer;
         private Flow flow;
 
-        private String client;
+        private Client client;
 
-        @JsonProperty("client-ref")
-        private String clientRef;
+        private User user;
 
-        @JsonProperty("client-secret")
-        private String clientSecret;
+        public String[] scope;
 
-        private String user;
+        public Context() {
+        }
 
-        @JsonProperty("user-password")
-        private String userPassword;
-
-        public String scope;
+        public Context(Issuer issuer, Flow flow, Client client, User user, String[] scope) {
+            this.issuer = issuer;
+            this.flow = flow;
+            this.client = client;
+            this.user = user;
+            this.scope = scope;
+        }
 
         public Flow getFlow() {
             return flow;
@@ -107,77 +106,53 @@ public class Config {
             this.flow = flow;
         }
 
-        public String getIssuer() {
+        public Issuer getIssuer() {
             return issuer;
         }
 
-        public void setIssuer(String issuer) {
+        public void setIssuer(Issuer issuer) {
             this.issuer = issuer;
         }
 
-        public String getIssuerRef() {
-            return issuerRef;
-        }
-
-        public void setIssuerRef(String issuerRef) {
-            this.issuerRef = issuerRef;
-        }
-
-        public String getClient() {
+        public Client getClient() {
             return client;
         }
 
-        public void setClient(String client) {
+        public void setClient(Client client) {
             this.client = client;
         }
 
-        public String getClientRef() {
-            return clientRef;
-        }
-
-        public void setClientRef(String clientRef) {
-            this.clientRef = clientRef;
-        }
-
-        public String getClientSecret() {
-            return clientSecret;
-        }
-
-        public void setClientSecret(String clientSecret) {
-            this.clientSecret = clientSecret;
-        }
-
-        public String getUser() {
+        public User getUser() {
             return user;
         }
 
-        public void setUser(String user) {
+        public void setUser(User user) {
             this.user = user;
         }
 
-        public String getUserPassword() {
-            return userPassword;
-        }
-
-        public void setUserPassword(String userPassword) {
-            this.userPassword = userPassword;
-        }
-
-        public String getScope() {
+        public String[] getScope() {
             return scope;
         }
 
-        public void setScope(String scope) {
+        public void setScope(String[] scope) {
             this.scope = scope;
         }
+
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Issuer {
 
         private String url;
+        private String ref;
 
-        private Map<String, Client> clients = new HashMap<>();
+        public Issuer() {
+        }
+
+        public Issuer(String url, String ref) {
+            this.url = url;
+            this.ref = ref;
+        }
 
         public String getUrl() {
             return url;
@@ -187,29 +162,37 @@ public class Config {
             this.url = url;
         }
 
-        public Map<String, Client> getClients() {
-            return clients;
+        public String getRef() {
+            return ref;
         }
 
-        public void setClients(Map<String, Client> clients) {
-            this.clients = clients;
+        public void setRef(String ref) {
+            this.ref = ref;
         }
+
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Client {
 
-        private String id;
+        @JsonProperty("client-id")
+        private String clientId;
         private String secret;
 
-        private Flow flow;
-
-        public String getId() {
-            return id;
+        public Client() {
         }
 
-        public void setId(String id) {
-            this.id = id;
+        public Client(String clientId, String secret) {
+            this.clientId = clientId;
+            this.secret = secret;
+        }
+
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setClientId(String clientId) {
+            this.clientId = clientId;
         }
 
         public String getSecret() {
@@ -220,13 +203,71 @@ public class Config {
             this.secret = secret;
         }
 
-        public Flow getFlow() {
-            return flow;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class User {
+
+        private String username;
+        private String password;
+
+        public User() {
         }
 
-        public void setFlow(Flow flow) {
-            this.flow = flow;
+        public User(String username, String password) {
+            this.username = username;
+            this.password = password;
         }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static class Truststore {
+
+        private String path;
+
+        private String password;
+
+        public Truststore() {
+        }
+
+        public Truststore(String password, String path) {
+            this.password = password;
+            this.path = path;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
     }
 
 }

@@ -33,22 +33,6 @@ Just run the tests:
 ./mvnw test
 ```
 
-### Keycloak fast dev container
-
-The fast dev container starts in ~30% of the time as it's an optimized container, with H2 DB pre-initialized.
-
-First build the container with:
-
-```
-podman build containers/keycloak-fast-dev -t keycloak-fast-dev
-```
-
-Then run the tests with:
-
-```
-./mvnw test -Dkc.container.mode=fast
-```
-
 ### Enabling log output from Keycloak container
 
 To redirect log output from the Keycloak container use `kc.container.log`:

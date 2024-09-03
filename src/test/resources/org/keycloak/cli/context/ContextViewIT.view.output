@@ -1,9 +1,0 @@
-issuer=http://issuer
-
-flow=password
-client=test-password
-
-scope=openid,email
-
-user=test-user
-user-password=******************

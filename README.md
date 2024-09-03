@@ -39,28 +39,43 @@ chmod +x kct
 `kct` provides a few different ways for configuration depending on the use-case, and supports multiple configuration
 contexts to make it easy to switch between different issuers, flows, or clients.
 
+### Configuring with `kct`
+
+Creating a context with `kct`:
+
+```
+kct config context create --iss=http://localhost:8080/realms/myrealm --client=myclient --client-secret=secret --flow=client
+```
+
+For more details see `kct config -h`.
+
 ### Configuration file
 
 The standard way to configure `kct` is through `~/.kct/config.yaml`. This configuration approach supports multiple
 configuration contexts. An example config file looks like:
 
 ```
-default: test-password
+default-context: test-password
 contexts:
     test-password:
-        issuer: http://localhost:8080/realms/test
-        client: test-password
+        issuer: 
+          url: http://localhost:8080/realms/test
+        client: 
+          client-id: test-password
         flow: password
-        user: test-user
-        user-password: test-user-password
+        user: 
+          username: test-user
+          password: test-user-password
     test-device:
-        issuer: http://localhost:8080/realms/test
-        client: test-device
+        issuer: 
+          url: http://localhost:8080/realms/test
+        client: 
+          client-id: test-device
         flow: device
 ```
 
 The default context to use is specified with the `default` field, but can be overwritten in most commands with
-`--context=another-context` or using the environment variable `KC_CONTEXT=another-context`.
+`--context=another-context`.
 
 If multiple contexts are using the same issuer a global issuer can be defined, for example:
 
@@ -78,42 +93,7 @@ contexts:
         ...
 ```
 
-An issuer can also specify reusable clients that can be used in contexts:
-
-```
-issuers:
-    local-test:
-        url: http://localhost:8080/realms/test
-        clients:
-            the-client:
-                id: the-client-id
-                secret: the-client-secret
-                flow: device
-contexts:
-    test-device:
-        issuer-ref: local-test
-        client-ref: the-client
-```
-
 It is also possible to specify an alternative location to the file with the `KCT_CONFIG_FILE` environment variable.
-
-### Configuring using environment variables
-
-If you want to quickly test with a single config this can be done with setting environment variables, which can also
-be set in `$PWD/.env`. The following environment variables are available:
-
-| Environment Variable |
-|----------------------|
-| KCT_CONTEXT          |
-| KCT_ISSUER           |
-| KCT_FLOW             |
-| KCT_SCOPE            |
-| KCT_CLIENT           |
-| KCT_CLIENT_SECRET    |
-| KCT_USER             |
-| KCT_USER_PASSWORD    |
-
-If the environment variable `KCT_ISSUER` is set the configuration file will be ignored (`~/.kct/config.yaml`).
 
 ### Configuring a truststore
 
@@ -130,13 +110,12 @@ Then configure `truststore-path` and `truststore-password` in the `config.yaml` 
 
 ```
 ---
-default: "tls"
+default-context: "tls"
 store-tokens: true
-truststore-path: /path/myTrustStore
-truststore-password: <truststore password>
+truststore
+  path: /path/myTrustStore
+  password: <truststore password>
 ```
-
-Alternatively, you can use the environment variable `KCT_TRUSTSTORE_PATH` and `KCT_TRUSTSTORE_PASSWORD`.
 
 ## Using
 

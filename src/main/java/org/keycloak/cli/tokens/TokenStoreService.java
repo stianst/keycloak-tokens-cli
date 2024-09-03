@@ -12,6 +12,7 @@ import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.oidc.Tokens;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -39,7 +40,7 @@ public class TokenStoreService {
     @PostConstruct
     public void init() throws IOException {
         tokensFile = new File(this.tokensFilePath);
-        if (tokensFile.isFile()) {
+        if (tokensFile.isFile() && tokensFile.length() > 0) {
             tokenStore = objectMapper.readValue(tokensFile, TokenStore.class);
             logger.debug("Loading existing token store");
         } else {
@@ -48,7 +49,7 @@ public class TokenStoreService {
     }
 
     public Tokens getCurrent() {
-        return tokenStore.getTokens().get(config.getContext());
+        return tokenStore.getTokens().get(config.getContextId());
     }
 
     public Map<String, Tokens> getAll() {
@@ -57,7 +58,7 @@ public class TokenStoreService {
 
     public void clearCurrent() {
         logger.debugv("Deleting stored tokens for {0}", config.getContext());
-        tokenStore.getTokens().remove(config.getContext());
+        tokenStore.getTokens().remove(config.getContextId());
         save();
     }
 
@@ -65,7 +66,7 @@ public class TokenStoreService {
         logger.debugv("Deleting stored {0} token for {1}", tokenType.name().toLowerCase(Locale.ENGLISH), config.getContext());
         switch (tokenType) {
             case REFRESH:
-                tokenStore.getTokens().remove(config.getContext());
+                tokenStore.getTokens().remove(config.getContextId());
                 break;
             case ACCESS:
                 getCurrent().setAccessToken(null);
@@ -85,7 +86,7 @@ public class TokenStoreService {
 
     public void updateCurrent(Tokens tokens) {
         logger.debugv("Updating stored tokens for {0}", config.getContext());
-        tokenStore.getTokens().put(config.getContext(), tokens);
+        tokenStore.getTokens().put(config.getContextId(), tokens);
         save();
     }
 
@@ -106,7 +107,11 @@ public class TokenStoreService {
                 throw new RuntimeException(e);
             }
         } else {
-            tokensFile.delete();
+            try {
+                new FileOutputStream(tokensFile).close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

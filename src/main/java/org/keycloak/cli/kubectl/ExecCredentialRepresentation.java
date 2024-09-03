@@ -50,6 +50,7 @@ public class ExecCredentialRepresentation {
     @RegisterForReflection
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class Spec {
+
         private boolean interactive = true;
 
         public boolean isInteractive() {
@@ -59,6 +60,7 @@ public class ExecCredentialRepresentation {
         public void setInteractive(boolean interactive) {
             this.interactive = interactive;
         }
+
     }
 
     @RegisterForReflection
@@ -83,6 +85,7 @@ public class ExecCredentialRepresentation {
         public void setToken(String token) {
             this.token = token;
         }
+
     }
 
 }

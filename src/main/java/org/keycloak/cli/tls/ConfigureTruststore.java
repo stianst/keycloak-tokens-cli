@@ -20,7 +20,7 @@ public class ConfigureTruststore {
     @ConfigProperty(name = "kct.truststore.password")
     Optional<String> truststorePassword;
 
-    void onStart(@Observes StartupEvent ev) {
+    void onStart(@Observes StartupEvent event) {
         if (truststore.isPresent()) {
             System.setProperty("javax.net.ssl.trustStore", truststore.get().getAbsolutePath());
             if (truststorePassword.isPresent()) {

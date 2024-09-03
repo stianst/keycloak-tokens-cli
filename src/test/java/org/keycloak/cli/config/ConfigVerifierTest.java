@@ -6,176 +6,135 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.keycloak.cli.enums.Flow;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigVerifierTest {
 
     private Config config;
-    private Config.Context context;
-    private Config.Context clientRefContext;
-    private Config.Issuer issuer;
+    private StringReplacer stringReplacer;
 
     @BeforeEach
     public void createValidConfig() {
-        config = new Config();
-        config.setDefaultContext("mycontext");
-
-        issuer = new Config.Issuer();
-        issuer.setUrl("https://myissuer");
-
-        Config.Client issuerClient = new Config.Client();
-        issuerClient.setId("myissuer-client-id");
-        issuerClient.setSecret("myissuer-client-secret");
-        issuerClient.setFlow(Flow.DEVICE);
-        issuer.setClients(Map.of("myissuer-client", issuerClient));
-
-        config.setDefaultContext("mycontext");
-
-        config.setIssuers(Map.of("myissuer", issuer));
-
-        context = new Config.Context();
-        context.setIssuer("https://issuer");
-        context.setClient("myclient");
-        context.setFlow(Flow.PASSWORD);
-        context.setUser("myuser");
-        context.setUserPassword("myuserpassword");
-
-        clientRefContext = new Config.Context();
-        clientRefContext.setIssuer(null);
-        clientRefContext.setIssuerRef("myissuer");
-        clientRefContext.setClientRef("myissuer-client");
-
-        config.setContexts(Map.of(
-                "mycontext", context,
-                "mycontext2", clientRefContext
-        ));
+        config = new Config(
+                "mycontext",
+                true,
+                Map.of("myissuer", new Config.Issuer("https://issuer", null)),
+                Map.of("mycontext", new Config.Context(new Config.Issuer("https://issuer", null), Flow.PASSWORD, new Config.Client("myclient", null), new Config.User("myuser", "myuserpassword"), null)),
+                null);
+        stringReplacer = new StringReplacer();
+        stringReplacer.init(Collections.emptyMap());
     }
 
     @Test
-    public void validConfig() throws Throwable {
+    public void testValidConfig() throws Throwable {
         verify().execute();
     }
 
     @Test
-    public void invalidDefaultContext() {
-        config.setDefaultContext(null);
-        assertError("default context not set");
+    public void testInvalidDefaultContext() {
         config.setDefaultContext("nosuch");
-        assertError("default context=nosuch not found");
+        assertError("Default context 'nosuch' not found");
     }
 
     @Test
-    public void invalidIssuer() {
+    public void testInvalidIssuer() {
+        Config.Issuer issuer = config.getIssuers().get("myissuer");
+
         issuer.setUrl(null);
-        assertIssuerError("missing url");
+        assertIssuerError("missing issuer url");
         issuer.setUrl("localhost:8080");
-        assertIssuerError("invalid url");
+        assertIssuerError("invalid issuer url");
     }
 
     @Test
-    public void invalidContextIssuer() {
-        context.setIssuer(null);
-        assertContextError("mycontext", "missing issuer");
-        context.setIssuer("localhost:8080");
-        assertContextError("mycontext", "invalid issuer");
-
-        context.setIssuer("http://localhost:8080");
-        context.setIssuerRef("localhost");
-
-        assertContextError("mycontext", "both issuer and issuer-ref set");
+    public void testInvalidContextIssuer() {
+        Config.Context context = config.getContexts().get("mycontext");
+        Config.Issuer issuer = context.getIssuer();
 
         context.setIssuer(null);
-        assertContextError("mycontext", "issuer-ref=localhost not found");
+        assertContextError("mycontext", "issuer not configured");
+        context.setIssuer(issuer);
+
+        issuer.setUrl("localhost:8080");
+        assertContextError("mycontext", "invalid issuer url");
+
+        issuer.setUrl("http://localhost:8080");
+        issuer.setRef("localhost");
+
+        assertContextError("mycontext", "both issuer url and issuer ref set");
+
+        issuer.setUrl(null);
+        assertContextError("mycontext", "issuer ref 'localhost' not found");
     }
 
     @Test
-    public void invalidIssuerClient() {
-        issuer.getClients().get("myissuer-client").setId(null);
-        assertError("issuer=myissuer invalid: client=myissuer-client missing id");
-        issuer.getClients().get("myissuer-client").setId("myissuer-client-id");
+    public void testUserMissingForPassword() {
+        Config.Context context = config.getContexts().get("mycontext");
+        Config.User user = context.getUser();
 
-        issuer.getClients().get("myissuer-client").setFlow(null);
-        assertError("issuer=myissuer invalid: client=myissuer-client missing flow");
-        issuer.getClients().get("myissuer-client").setFlow(Flow.DEVICE);
-    }
-
-    @Test
-    public void invalidClientRef() {
-        clientRefContext.setClient("invalid");
-        assertContextError("mycontext2", "both client and client-ref set");
-        clientRefContext.setClient(null);
-
-        clientRefContext.setClientSecret("invalid");
-        assertContextError("mycontext2", "both client-secret and client-ref set");
-        clientRefContext.setClientSecret(null);
-
-        clientRefContext.setFlow(Flow.DEVICE);
-        assertContextError("mycontext2", "both flow and client-ref set");
-        clientRefContext.setFlow(null);
-
-        clientRefContext.setClientRef("nosuch");
-        assertContextError("mycontext2", "client-ref=nosuch not found in issuer-ref=myissuer");
-    }
-
-    @Test
-    public void userMissingForPassword() {
         context.setFlow(Flow.PASSWORD);
         context.setUser(null);
-        assertContextError("mycontext", "user required for flow=password");
-        context.setUser("asdf");
-        context.setUserPassword(null);
-        assertContextError("mycontext", "user-password required for flow=password");
+        assertContextError("mycontext", "user required for flow 'password'");
+        context.setUser(user);
+
+        user.setUsername(null);
+        assertContextError("mycontext", "user username required for flow 'password'");
+        user.setUsername("user");
+
+        user.setPassword(null);
+        assertContextError("mycontext", "user password required for flow 'password'");
     }
 
     @Test
-    public void userSetForDevice() {
+    public void testDeviceFlow() {
+        Config.Context context = config.getContexts().get("mycontext");
         context.setFlow(Flow.DEVICE);
-        context.setUser("asdf");
-        assertContextError("mycontext", "user set for flow=device");
-        context.setUser(null);
-        context.setUserPassword("pass");
-        assertContextError("mycontext", "user-password set for flow=device");
+
+        assertContextError("mycontext", "user set for flow 'device'");
     }
 
     @Test
-    public void userSetForClient() {
+    public void testClientFlow() {
+        Config.Context context = config.getContexts().get("mycontext");
+        Config.User user = context.getUser();
         context.setFlow(Flow.CLIENT);
-        context.setClientSecret(null);
-        assertContextError("mycontext", "client-secret required for flow=client");
-        context.setClientSecret("client-secret");
-
-        context.setUser("asdf");
-        assertContextError("mycontext", "user set for flow=client");
         context.setUser(null);
-        context.setUserPassword("pass");
-        assertContextError("mycontext", "user-password set for flow=client");
+
+        context.getClient().setSecret(null);
+        assertContextError("mycontext", "client secret required for flow 'client'");
+        context.getClient().setSecret("client-secret");
+
+        context.setUser(user);
+        assertContextError("mycontext", "user set for flow 'client'");
+        context.setUser(null);
     }
 
     @Test
-    public void userSetForBrowser() {
+    public void testBrowser() {
+        Config.Context context = config.getContexts().get("mycontext");
         context.setFlow(Flow.BROWSER);
 
-        context.setUser("asdf");
-        assertContextError("mycontext", "user set for flow=browser");
-        context.setUser(null);
-        context.setUserPassword("pass");
-        assertContextError("mycontext", "user-password set for flow=browser");
+        assertContextError("mycontext", "user set for flow 'browser'");
     }
 
     @Test
-    public void flowMissingForContext() {
+    public void testFlowMissing() {
+        Config.Context context = config.getContexts().get("mycontext");
         context.setFlow(null);
+
         assertContextError("mycontext", "missing flow");
     }
 
     private void assertIssuerError(String expectedMessage) {
         ConfigException configException = Assertions.assertThrows(ConfigException.class, verify());
-        Assertions.assertEquals("issuer=myissuer invalid: " + expectedMessage, configException.getMessage());
+        Assertions.assertEquals("Issuer 'myissuer' invalid: " + expectedMessage, configException.getMessage());
     }
 
     private void assertContextError(String expectedContextId, String expectedMessage) {
         ConfigException configException = Assertions.assertThrows(ConfigException.class, verify());
-        Assertions.assertEquals("context=" + expectedContextId + " invalid: " + expectedMessage, configException.getMessage());
+        Assertions.assertEquals("Context '" + expectedContextId + "' invalid: " + expectedMessage, configException.getMessage());
     }
 
     private void assertError(String expectedMessage) {
@@ -184,7 +143,7 @@ public class ConfigVerifierTest {
     }
 
     private Executable verify() {
-        return () -> ConfigVerifier.verify(config);
+        return () -> ConfigVerifier.verify(config, stringReplacer);
     }
 
 }

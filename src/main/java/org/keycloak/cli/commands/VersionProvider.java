@@ -5,6 +5,7 @@ import org.eclipse.microprofile.config.ConfigProvider;
 import picocli.CommandLine;
 
 public class VersionProvider implements CommandLine.IVersionProvider {
+
     @Override
     public String[] getVersion() {
         Config cf = ConfigProvider.getConfig(getClass().getClassLoader());
@@ -12,4 +13,5 @@ public class VersionProvider implements CommandLine.IVersionProvider {
                 cf.getValue("quarkus.application.version", String.class)
         };
     }
+
 }

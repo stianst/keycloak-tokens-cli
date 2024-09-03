@@ -18,16 +18,10 @@ public class ConfigRefResolver {
         Map<String, Config.Issuer> issuers = config.getIssuers();
         if (issuers != null && !issuers.isEmpty()) {
             for (Config.Context c : config.getContexts().values()) {
-                if (c.getIssuerRef() != null) {
-                    Config.Issuer issuer = issuers.get(c.getIssuerRef());
-                    c.setIssuer(issuer.getUrl());
-
-                    if (c.getClientRef() != null) {
-                        Config.Client client = issuer.getClients().get(c.getClientRef());
-                        c.setClient(client.getId());
-                        c.setClientSecret(client.getSecret());
-                        c.setFlow(client.getFlow());
-                    }
+                Config.Issuer i = c.getIssuer();
+                if (i != null) {
+                    i = issuers.get(i.getRef());
+                    c.setIssuer(i);
                 }
             }
         }

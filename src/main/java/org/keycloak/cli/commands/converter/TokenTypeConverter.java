@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class TokenTypeConverter implements CommandLine.ITypeConverter<TokenType> {
+
     @Override
     public TokenType convert(String s) {
         try {
@@ -15,4 +16,5 @@ public class TokenTypeConverter implements CommandLine.ITypeConverter<TokenType>
             throw new CommandLine.TypeConversionException("valid values: " + Arrays.stream(TokenType.values()).map(t -> t.toString().toLowerCase()).collect(Collectors.joining(", ")));
         }
     }
+
 }

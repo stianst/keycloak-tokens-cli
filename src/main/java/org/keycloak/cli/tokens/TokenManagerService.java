@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 import org.keycloak.cli.config.ConfigService;
+import org.keycloak.cli.config.Context;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.oidc.TokenService;
 import org.keycloak.cli.oidc.Tokens;
@@ -27,8 +28,9 @@ public class TokenManagerService {
     TokenService tokenService;
 
     public String getToken(TokenType tokenType, Set<String> scope, boolean forceRefresh) {
+        Context context = config.getContext();
         if (scope == null) {
-            scope = config.getScope() != null ? config.getScope() : Collections.emptySet();
+            scope = context.getScope() != null ? context.getScope() : Collections.emptySet();
         }
 
         if (TokenType.ID.equals(tokenType) && (scope == null || !scope.contains("openid"))) {
@@ -36,7 +38,7 @@ public class TokenManagerService {
         }
 
         Tokens storedTokens = null;
-        if (config.isStoreTokens()) {
+        if (context.storeTokens()) {
             storedTokens = tokenStoreService.getCurrent();
         }
 
@@ -49,7 +51,7 @@ public class TokenManagerService {
             tokens = tokenService.getToken(scope);
         }
 
-        if (config.isStoreTokens()) {
+        if (context.storeTokens()) {
             if (!tokens.equals(storedTokens)) {
                 tokenStoreService.updateCurrent(tokens);
             }

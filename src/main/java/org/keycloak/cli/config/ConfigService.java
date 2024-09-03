@@ -1,157 +1,90 @@
 package org.keycloak.cli.config;
 
-import jakarta.annotation.PostConstruct;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.ConfigProvider;
-import org.keycloak.cli.enums.Flow;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ConfigService {
 
     @Inject
-    ConfigFileService configFileService;
+    StringReplacer stringReplacer;
 
-    boolean fromProperties;
+    @ConfigProperty(name = "kct.config.file")
+    private File configFile;
 
-    String context;
+    private Config config;
 
-    Supplier<String> issuer;
+    private String currentContext;
 
-    Supplier<String> client;
+    private String issuerUrl;
 
-    Supplier<String> clientSecret;
+    private Context context;
 
-    Supplier<String> user;
-
-    Supplier<String> userPassword;
-
-    Supplier<Flow> flow;
-
-    Supplier<String> scope;
-
-    Config config;
-
-    @PostConstruct
-    void init() throws IOException {
-        config = configFileService.loadConfigFromFile();
-
-        fromProperties = ConfigProvider.getConfig().getOptionalValue("kct.issuer", String.class).isPresent();
-
-        if (!fromProperties && config == null) {
-            throw new RuntimeException("Config file " + configFileService.configFile + " not found");
+    public String getContextId() {
+        if (config == null) {
+            loadConfig();
         }
 
-        if (!fromProperties) {
-            ConfigVerifier.verify(config);
-            ConfigRefResolver.resolve(config);
+        String contextId = currentContext != null ? currentContext : config.getDefaultContext();
+        if (contextId == null) {
+            throw new ConfigException("No context specified, and no default context set");
+        }
+        return contextId;
+    }
+
+    public Context getContext() {
+        if (context == null) {
+            if (config == null) {
+                loadConfig();
+            }
+
+            String contextId = getContextId();
+            Config.Context context = config.getContexts().get(contextId);
+            if (context == null) {
+                throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
+            }
+
+            String issuerUrl = stringReplacer.replace(context.getIssuer().getUrl());
+            this.context = new Context(config.getStoreTokens(), context, issuerUrl);
         }
 
-        context = ConfigProvider.getConfig()
-                .getOptionalValue("kct.context", String.class)
-                .orElse(!fromProperties ? config.getDefaultContext() : null);
-
-        issuer = new PropSupplier<>("issuer", () -> getCurrent().getIssuer(), String.class);
-        client = new PropSupplier<>("client", () -> getCurrent().getClient(), String.class);
-        clientSecret = new PropSupplier<>("client-secret", () -> getCurrent().getClientSecret(), String.class, true);
-        user = new PropSupplier<>("user", () -> getCurrent().getUser(), String.class, true);
-        userPassword = new PropSupplier<>("user-password", () -> getCurrent().getUserPassword(), String.class, true);
-        flow = new PropSupplier<>("flow", () -> getCurrent().getFlow(), Flow.class);
-        scope = new PropSupplier<>("scope", () -> getCurrent().getScope(), String.class, true);
-    }
-
-    public Config getConfig() {
-        return config;
-    }
-
-    public boolean isConfiguredFromProperties() {
-        return fromProperties;
-    }
-
-    public String getContext() {
         return context;
     }
 
-    public void setContext(String context) {
-        this.context = context;
+    public void setCurrentContext(String contextId) {
+        this.currentContext = contextId;
+        this.context = null;
     }
 
-    public boolean isStoreTokens() {
-        if (context == null) {
-            return false;
+    public Config loadConfig() {
+        if (!configFile.isFile() || configFile.length() == 0) {
+            config = new Config();
         } else {
-            Boolean storeTokens = config.getStoreTokens();
-            return storeTokens != null ? storeTokens : false;
-        }
-    }
-
-    public String getIssuer() {
-        return issuer.get();
-    }
-
-    public String getClient() {
-        return client.get();
-    }
-
-    public String getClientSecret() {
-        return clientSecret.get();
-    }
-
-    public String getUser() {
-        return user.get();
-    }
-
-    public String getUserPassword() {
-        return userPassword.get();
-    }
-
-    public Flow getFlow() {
-        return flow.get();
-    }
-
-    public Set<String> getScope() {
-        String s = scope.get();
-        return s != null ? Arrays.stream(s.split(",")).map(String::trim).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
-    }
-
-    private Config.Context getCurrent() {
-        return config.getContexts().get(getContext());
-    }
-
-    class PropSupplier<T> implements Supplier<T> {
-        private final String key;
-        private final Supplier<T> configSupplier;
-        private final Class<T> clazz;
-        private final boolean optional;
-
-        public PropSupplier(String key, Supplier<T> configSupplier, Class<T> clazz) {
-            this.key = key;
-            this.configSupplier = configSupplier;
-            this.clazz = clazz;
-            this.optional = false;
-        }
-
-        public PropSupplier(String key, Supplier<T> configSupplier, Class<T> clazz, boolean optional) {
-            this.key = key;
-            this.configSupplier = configSupplier;
-            this.clazz = clazz;
-            this.optional = optional;
-        }
-
-        @Override
-        public T get() {
-            T value = fromProperties ? ConfigProvider.getConfig().getOptionalValue("kct." + key, clazz).orElse(null) : configSupplier.get();
-            if (value == null && !optional) {
-                throw new RuntimeException(key + " is not configured");
+            ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+            try {
+                config = objectMapper.readValue(configFile, Config.class);
+            } catch (IOException e) {
+                throw new ConfigException("Failed to load config file", e);
             }
-            return value;
+            ConfigVerifier.verify(config, stringReplacer);
+        }
+
+        return config;
+    }
+
+    public void saveConfig(Config config) {
+        ConfigVerifier.verify(config, stringReplacer);
+        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+        try {
+            objectMapper.writeValue(configFile, config);
+        } catch (IOException e) {
+            throw new ConfigException("Failed to save config file", e);
         }
     }
 

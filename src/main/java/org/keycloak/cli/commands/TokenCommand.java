@@ -50,16 +50,13 @@ public class TokenCommand implements Runnable {
 
     @Override
     public void run() {
+        config.setCurrentContext(context);
+
         if (kubeCtlService.isKubeExecContext()) {
             kubectl = true;
         }
 
-        if (context != null) {
-            config.setContext(context);
-        }
-
         String token = tokens.getToken(tokenType, scope, refresh);
-
         if (kubectl) {
             token = kubeCtlService.wrapToken(token);
         } else if (decode) {

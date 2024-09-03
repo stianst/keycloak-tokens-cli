@@ -3,9 +3,7 @@ package org.keycloak.cli.commands;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import jakarta.inject.Inject;
-import org.keycloak.cli.commands.clients.ClientCommand;
-import org.keycloak.cli.commands.context.ContextCommand;
-import org.keycloak.cli.commands.issuers.IssuerCommand;
+import org.keycloak.cli.commands.config.ConfigParentCommand;
 import picocli.CommandLine;
 
 @QuarkusMain
@@ -16,9 +14,7 @@ import picocli.CommandLine;
         UserInfoCommand.class,
         RevokeCommand.class,
         ClearCommand.class,
-        ContextCommand.class,
-        IssuerCommand.class,
-        ClientCommand.class
+        ConfigParentCommand.class
 }, mixinStandardHelpOptions = true,
         versionProvider = VersionProvider.class)
 public class EntryCommand implements QuarkusApplication {
@@ -29,7 +25,8 @@ public class EntryCommand implements QuarkusApplication {
     @Override
     public int run(String... args) throws Exception {
         CommandLine commandLine = new CommandLine(this, factory);
-        commandLine.setExecutionExceptionHandler(new CommandExceptionHandler());
+        boolean verbose = System.getenv().containsKey("KCT_VERBOSE");
+        commandLine.setExecutionExceptionHandler(new CommandExceptionHandler(verbose));
         return commandLine.execute(args);
     }
 

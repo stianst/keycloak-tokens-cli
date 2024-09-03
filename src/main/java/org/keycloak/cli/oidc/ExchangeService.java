@@ -1,29 +1,28 @@
 package org.keycloak.cli.oidc;
 
-import io.quarkus.rest.client.reactive.QuarkusRestClientBuilder;
+import com.nimbusds.oauth2.sdk.id.Audience;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
+import com.nimbusds.oauth2.sdk.token.TokenTypeURI;
+import com.nimbusds.oauth2.sdk.tokenexchange.TokenExchangeGrant;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.keycloak.cli.config.ConfigService;
 
-import java.net.URI;
+import java.util.List;
+import java.util.Set;
 
 @ApplicationScoped
 public class ExchangeService {
 
     @Inject
-    ProviderMetadata providerMetadata;
+    OidcService oidcService;
 
-    @Inject
-    ConfigService config;
-
-    public TokenResponse getExchange(String accessToken, String audience) {
-        return QuarkusRestClientBuilder.newBuilder().baseUri(URI.create(providerMetadata.getTokenEndpoint()))
-                .build(ExchangeResource.class).exchange(
-                        config.getClient(),
-                        config.getClientSecret(),
-                        "urn:ietf:params:oauth:grant-type:token-exchange",
-                        accessToken,
-                        audience);
+    public String getExchange(String accessToken, List<String> audience, Set<String> scope) {
+        TokenExchangeGrant tokenExchangeGrant = new TokenExchangeGrant(new BearerAccessToken(accessToken), TokenTypeURI.ACCESS_TOKEN, null, null, null, audience.stream().map(Audience::new).toList());
+        try {
+            return oidcService.tokenRequest(tokenExchangeGrant, scope, scope).getAccessToken();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

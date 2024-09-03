@@ -4,10 +4,10 @@ import picocli.CommandLine;
 
 public class CommandExceptionHandler implements CommandLine.IExecutionExceptionHandler {
 
-    private boolean verbose;
+    private final boolean verbose;
 
-    public CommandExceptionHandler() {
-        verbose = System.getenv().containsKey("KCT_VERBOSE");
+    public CommandExceptionHandler(boolean verbose) {
+        this.verbose = verbose;
     }
 
     @Override
@@ -17,7 +17,7 @@ public class CommandExceptionHandler implements CommandLine.IExecutionExceptionH
         } else {
             String message = getDeepestMessage(e);
             if (message != null) {
-                commandLine.getErr().println("Error: " + message);
+                commandLine.getErr().println(commandLine.getColorScheme().errorText(message));
             } else {
                 commandLine.getErr().println("Exception: " + e.getClass().getName());
             }
