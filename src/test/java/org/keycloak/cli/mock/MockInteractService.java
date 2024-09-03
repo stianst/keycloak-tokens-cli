@@ -18,7 +18,6 @@ public class MockInteractService extends InteractService {
 
     @Override
     public void println(String message) {
-        System.out.println(message);
         this.messages.add(message);
         super.println(message);
     }

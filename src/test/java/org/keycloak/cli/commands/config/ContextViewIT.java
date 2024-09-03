@@ -11,8 +11,6 @@ import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.LauncherAssertions;
 import org.keycloak.cli.container.KeycloakTestResource;
 
-import java.io.IOException;
-
 @QuarkusMainIntegrationTest
 @WithTestResource(KeycloakTestResource.class)
 @TestProfile(ConfigTestProfile.class)

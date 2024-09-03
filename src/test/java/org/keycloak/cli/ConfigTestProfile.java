@@ -3,7 +3,6 @@ package org.keycloak.cli;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.quarkus.test.junit.QuarkusTestProfile;
-import org.eclipse.microprofile.config.ConfigProvider;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.keycloak.cli.config.Config;

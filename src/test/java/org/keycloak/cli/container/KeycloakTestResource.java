@@ -29,7 +29,8 @@ public class KeycloakTestResource implements QuarkusTestResourceLifecycleManager
 
         return switch (containerMode) {
             case MANUAL -> manual();
-            case DEFAULT -> container("keycloak/keycloak:24.0.1", containerLog, "start-dev", "--import-realm", "--cache=local");
+            case DEFAULT ->
+                    container("keycloak/keycloak:24.0.1", containerLog, "start-dev", "--import-realm", "--cache=local");
         };
     }
 

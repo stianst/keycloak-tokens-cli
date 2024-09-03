@@ -7,7 +7,6 @@ import org.junit.jupiter.api.function.Executable;
 import org.keycloak.cli.enums.Flow;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigVerifierTest {

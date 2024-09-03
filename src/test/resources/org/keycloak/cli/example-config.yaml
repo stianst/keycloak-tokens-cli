@@ -29,4 +29,9 @@ contexts:
     client:
       client-id: test-browser
     scope: [ openid ]
-
+  test-device:
+    issuer:
+      url: ${keycloak.url}/realms/test
+    flow: device
+    client:
+      client-id: test-device

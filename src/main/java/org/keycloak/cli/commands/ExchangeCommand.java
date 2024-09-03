@@ -5,12 +5,11 @@ import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
-import org.keycloak.cli.oidc.ExchangeService;
+import org.keycloak.cli.oidc.OidcService;
 import org.keycloak.cli.tokens.TokenDecoderService;
 import org.keycloak.cli.tokens.TokenManagerService;
 import picocli.CommandLine;
 
-import java.util.Arrays;
 import java.util.Set;
 
 @CommandLine.Command(name = "exchange", description = "Retrieve tokens", mixinStandardHelpOptions = true)
@@ -22,11 +21,14 @@ public class ExchangeCommand implements Runnable {
     @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token", defaultValue = "false")
     boolean decode;
 
-    @CommandLine.Option(names = {"-a", "--audience"}, description = "Target audience")
-    String audience;
+    @CommandLine.Option(names = {"-a", "--audience"}, description = "Target audience", converter = CommaSeparatedListConverter.class)
+    Set<String> audience;
 
     @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
     Set<String> scope;
+
+    @CommandLine.Option(names = {"-st", "--subject-token"}, description = "Subject token")
+    String subjectToken;
 
     @Inject
     ConfigService config;
@@ -35,7 +37,7 @@ public class ExchangeCommand implements Runnable {
     TokenManagerService tokens;
 
     @Inject
-    ExchangeService exchangeService;
+    OidcService oidcService;
 
     @Inject
     TokenDecoderService tokenDecoder;
@@ -47,8 +49,11 @@ public class ExchangeCommand implements Runnable {
     public void run() {
         config.setCurrentContext(context);
 
-        String token = tokens.getToken(TokenType.ACCESS, null, false);
-        String exchangedToken = exchangeService.getExchange(token, Arrays.stream(audience.split(",")).toList(), scope);
+        if (subjectToken == null) {
+            subjectToken = tokens.getToken(TokenType.ACCESS, scope, false);
+        }
+
+        String exchangedToken = oidcService.exchange(subjectToken, audience, scope);
 
         if (decode) {
             exchangedToken = tokenDecoder.decode(exchangedToken);

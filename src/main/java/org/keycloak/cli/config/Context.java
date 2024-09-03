@@ -5,7 +5,6 @@ import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
-import io.smallrye.config.Expressions;
 import org.keycloak.cli.enums.Flow;
 
 import java.util.Arrays;

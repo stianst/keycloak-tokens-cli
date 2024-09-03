@@ -2,6 +2,7 @@ package org.keycloak.cli.oidc;
 
 import com.nimbusds.oauth2.sdk.AuthorizationGrant;
 import com.nimbusds.oauth2.sdk.ClientCredentialsGrant;
+import com.nimbusds.oauth2.sdk.ErrorResponse;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
 import com.nimbusds.oauth2.sdk.ResourceOwnerPasswordCredentialsGrant;
@@ -10,15 +11,18 @@ import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.TokenRevocationRequest;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
+import com.nimbusds.oauth2.sdk.id.Audience;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
-import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
+import com.nimbusds.oauth2.sdk.token.TokenTypeURI;
+import com.nimbusds.oauth2.sdk.tokenexchange.TokenExchangeGrant;
 import com.nimbusds.openid.connect.sdk.UserInfoRequest;
-import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderConfigurationRequest;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
+import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -37,6 +41,12 @@ public class OidcService {
     @Inject
     NimbusApacheHttpClient httpClient;
 
+    @Inject
+    AuthorizationCodeService authorizationCodeService;
+
+    @Inject
+    DeviceAuthorizationService deviceAuthorizationService;
+
     private Context context;
     private OIDCProviderMetadata providerMetadata;
 
@@ -46,35 +56,16 @@ public class OidcService {
     }
 
     public OIDCProviderMetadata providerMetadata() {
-        try {
-            if (providerMetadata == null) {
-                OIDCProviderConfigurationRequest oidcProviderConfigurationRequest = new OIDCProviderConfigurationRequest(context.getIssuer());
-                HTTPResponse httpResponse = oidcProviderConfigurationRequest.toHTTPRequest().send(httpClient);
-                if (!httpResponse.indicatesSuccess()) {
-                    throw new RuntimeException("Failed to retrieve provider metadata " + httpResponse.getStatusCode());
-                }
-                providerMetadata = OIDCProviderMetadata.parse(httpResponse.getBodyAsJSONObject());
-            }
-            return providerMetadata;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (providerMetadata == null) {
+            OIDCProviderConfigurationRequest oidcProviderConfigurationRequest = new OIDCProviderConfigurationRequest(context.getIssuer());
+            providerMetadata = send(oidcProviderConfigurationRequest.toHTTPRequest(), OIDCProviderMetadata.class);
         }
+        return providerMetadata;
     }
 
     public UserInfo userInfo(String accessToken) {
-        try {
-            HTTPResponse httpResponse = new UserInfoRequest(providerMetadata().getUserInfoEndpointURI(), new BearerAccessToken(accessToken))
-                    .toHTTPRequest()
-                    .send(httpClient);
-            UserInfoResponse userInfoResponse = UserInfoResponse.parse(httpResponse);
-            if (userInfoResponse.indicatesSuccess()) {
-                return userInfoResponse.toSuccessResponse().getUserInfo();
-            } else {
-                throw new RuntimeException(userInfoResponse.toErrorResponse().getErrorObject().toString());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        UserInfoRequest request = new UserInfoRequest(providerMetadata().getUserInfoEndpointURI(), new BearerAccessToken(accessToken));
+        return send(request.toHTTPRequest(), UserInfo.class);
     }
 
     public Tokens token(Set<String> scope) {
@@ -82,7 +73,8 @@ public class OidcService {
             return switch (context.getFlow()) {
                 case CLIENT -> clientGrant(scope);
                 case PASSWORD -> passwordGrant(scope);
-                default -> null;
+                case DEVICE -> deviceAuthorizationService.getToken(scope);
+                case BROWSER -> authorizationCodeService.getToken(scope);
             };
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -90,48 +82,81 @@ public class OidcService {
     }
 
     public boolean revoke(String token) {
+        ClientAuthentication clientAuthentication = context.getClientAuthentication();
+        TokenRevocationRequest tokenRevocationRequest;
+        if (clientAuthentication != null) {
+            tokenRevocationRequest = new TokenRevocationRequest(providerMetadata().getRevocationEndpointURI(), context.getClientAuthentication(), new BearerAccessToken(token));
+        } else {
+            tokenRevocationRequest = new TokenRevocationRequest(providerMetadata().getRevocationEndpointURI(), context.getClientId(), new BearerAccessToken(token));
+        }
+        return send(tokenRevocationRequest.toHTTPRequest(), Boolean.class);
+    }
+
+    public String exchange(String subjectToken, Set<String> audience, Set<String> scope) {
+        TokenExchangeGrant tokenExchangeGrant = new TokenExchangeGrant(new BearerAccessToken(subjectToken), TokenTypeURI.ACCESS_TOKEN, null, null, null, audience.stream().map(Audience::new).toList());
         try {
-            ClientAuthentication clientAuthentication = context.getClientAuthentication();
-            TokenRevocationRequest tokenRevocationRequest;
-            if (clientAuthentication != null) {
-                tokenRevocationRequest = new TokenRevocationRequest(providerMetadata().getRevocationEndpointURI(), context.getClientAuthentication(), new BearerAccessToken(token));
-            } else {
-                tokenRevocationRequest = new TokenRevocationRequest(providerMetadata().getRevocationEndpointURI(), context.getClientId(), new BearerAccessToken(token));
-            }
-            HTTPResponse httpResponse = tokenRevocationRequest.toHTTPRequest().send(httpClient);
-            return httpResponse.indicatesSuccess();
+            return tokenRequest(tokenExchangeGrant, scope, scope).getAccessToken();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Tokens passwordGrant(Set<String> scope) throws IOException, ParseException {
+    private Tokens passwordGrant(Set<String> scope) {
         return tokenRequest(new ResourceOwnerPasswordCredentialsGrant(context.getUsername(), new Secret(context.getUserPassword())), scope, scope);
     }
 
-    private Tokens clientGrant(Set<String> scope) throws IOException, ParseException {
+    private Tokens clientGrant(Set<String> scope) {
         return tokenRequest(new ClientCredentialsGrant(), scope, scope);
     }
 
-    public Tokens refresh(String refreshToken, Set<String> refreshScope, Set<String> requestScope) throws IOException, ParseException {
+    public Tokens refresh(String refreshToken, Set<String> refreshScope, Set<String> requestScope) {
         return tokenRequest(new RefreshTokenGrant(new RefreshToken(refreshToken)), refreshScope, requestScope);
     }
 
-    public Tokens tokenRequest(AuthorizationGrant grant, Set<String> refreshScope, Set<String> requestScope) throws IOException, ParseException {
+    public Tokens tokenRequest(AuthorizationGrant grant, Set<String> refreshScope, Set<String> requestScope) {
         ClientAuthentication clientAuthentication = context.getClientAuthentication();
-        Scope s = new Scope(requestScope.toArray(new String[0]));
         TokenRequest tokenRequest;
         if (clientAuthentication != null) {
-            tokenRequest = new TokenRequest(providerMetadata().getTokenEndpointURI(), context.getClientAuthentication(), grant, s);
+            tokenRequest = new TokenRequest(providerMetadata().getTokenEndpointURI(), context.getClientAuthentication(), grant, toScope(requestScope));
         } else {
-            tokenRequest = new TokenRequest(providerMetadata().getTokenEndpointURI(), context.getClientId(), grant, s);
+            tokenRequest = new TokenRequest(providerMetadata().getTokenEndpointURI(), context.getClientId(), grant, toScope(requestScope));
         }
-        OIDCTokenResponse tokenResponse = OIDCTokenResponse.parse(tokenRequest.toHTTPRequest().send(httpClient));
-        if (tokenResponse.indicatesSuccess()) {
-            return new Tokens(tokenResponse.toSuccessResponse(), refreshScope, requestScope);
-        } else {
-            throw new RuntimeException("Failed to send token request: " + tokenResponse.toErrorResponse().getErrorObject().toString());
+        OIDCTokens tokens = send(tokenRequest.toHTTPRequest(), OIDCTokens.class);
+        return new Tokens(tokens, refreshScope, requestScope);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> T send(HTTPRequest httpRequest, Class<T> responseClazz) {
+        HTTPResponse httpResponse;
+        try {
+            httpResponse = httpRequest.send(httpClient);
+            if (!httpResponse.indicatesSuccess()) {
+                throw new OidcException(httpRequest, httpResponse.getStatusCode());
+            }
+        } catch (IOException e) {
+            throw new OidcException(httpRequest, e.getMessage());
         }
+
+        boolean success = httpResponse.indicatesSuccess();
+
+        try {
+            Object response = ResponseConverter.convert(httpResponse, responseClazz);
+
+            if (success) {
+                return (T) response;
+            } else if (response != null) {
+                ErrorResponse errorResponse = (ErrorResponse) response;
+                throw new OidcException(httpRequest, errorResponse);
+            } else {
+                throw new OidcException(httpRequest, httpResponse.getStatusCode());
+            }
+        } catch (ParseException e) {
+            throw new OidcException(httpRequest, e.getMessage());
+        }
+    }
+
+    protected Scope toScope(Set<String> scope) {
+        return scope != null ? new Scope(scope.toArray(new String[0])) : null;
     }
 
 }

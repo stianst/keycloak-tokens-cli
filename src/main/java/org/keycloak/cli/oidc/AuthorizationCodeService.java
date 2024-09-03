@@ -4,7 +4,6 @@ import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
 import com.nimbusds.oauth2.sdk.AuthorizationRequest;
 import com.nimbusds.oauth2.sdk.ResponseType;
-import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod;
 import com.nimbusds.oauth2.sdk.pkce.CodeVerifier;
@@ -32,9 +31,6 @@ public class AuthorizationCodeService {
     OidcService oidcService;
 
     @Inject
-    TokenService tokenService;
-
-    @Inject
     WebCallback webCallback;
 
     public Tokens getToken(Set<String> scope) {
@@ -53,7 +49,7 @@ public class AuthorizationCodeService {
         AuthorizationRequest authorizationRequest = new AuthorizationRequest.Builder(new ResponseType("code"), config.getContext().getClientId())
                 .endpointURI(oidcService.providerMetadata().getAuthorizationEndpointURI())
                 .redirectionURI(redirectUri)
-                .scope(!scope.isEmpty() ? new Scope(scope.toArray(new String[0])) : null)
+                .scope(oidcService.toScope(scope))
                 .state(state)
                 .codeChallenge(codeVerifier, CodeChallengeMethod.S256)
                 .build();

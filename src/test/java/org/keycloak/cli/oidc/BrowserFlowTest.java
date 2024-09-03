@@ -11,15 +11,15 @@ import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.OpenIDAssertions;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.container.KeycloakTestResource;
+import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.mock.MockInteractService;
+import org.keycloak.cli.tokens.TokenManagerService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 
 @QuarkusTest
 @WithTestResource(KeycloakTestResource.class)
@@ -31,20 +31,20 @@ public class BrowserFlowTest {
     ConfigService configService;
 
     @Inject
-    TokenService client;
+    TokenManagerService tokenManagerService;
 
     @Inject
     MockInteractService mockInteractService;
 
     @Test
-    public void testBrowserFlow() throws IOException {
+    public void testBrowserFlow() {
         configService.setCurrentContext("test-browser");
 
         BrowserFlowTest.OpenLink openLink = new BrowserFlowTest.OpenLink();
         openLink.start();
 
-        Tokens token = client.getToken(Collections.emptySet());
-        OpenIDAssertions.assertEncodedToken(token.getAccessToken());
+        String accessToken = tokenManagerService.getToken(TokenType.ACCESS, null, false);
+        OpenIDAssertions.assertEncodedToken(accessToken);
 
         String expectedResponse = "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>\n" +
                 "    <title>Authenticated</title>\n" +

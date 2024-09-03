@@ -6,7 +6,7 @@ import org.jboss.logging.Logger;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.Context;
 import org.keycloak.cli.enums.TokenType;
-import org.keycloak.cli.oidc.TokenService;
+import org.keycloak.cli.oidc.OidcService;
 import org.keycloak.cli.oidc.Tokens;
 
 import java.time.Instant;
@@ -25,7 +25,7 @@ public class TokenManagerService {
     TokenStoreService tokenStoreService;
 
     @Inject
-    TokenService tokenService;
+    OidcService oidcService;
 
     public String getToken(TokenType tokenType, Set<String> scope, boolean forceRefresh) {
         Context context = config.getContext();
@@ -48,7 +48,7 @@ public class TokenManagerService {
         }
 
         if (tokens == null) {
-            tokens = tokenService.getToken(scope);
+            tokens = oidcService.token(scope);
         }
 
         if (context.storeTokens()) {
@@ -63,7 +63,7 @@ public class TokenManagerService {
     public boolean revoke(TokenType tokenType) {
         Tokens tokens = tokenStoreService.getCurrent();
         String token = getTokenType(tokens, tokenType);
-        boolean revoked = tokenService.revoke(token);
+        boolean revoked = oidcService.revoke(token);
         if (revoked) {
             tokenStoreService.clearCurrent(tokenType);
         }
@@ -71,7 +71,7 @@ public class TokenManagerService {
     }
 
     public boolean revoke(String token) {
-        return tokenService.revoke(token);
+        return oidcService.revoke(token);
     }
 
     private Tokens checkStored(Tokens storedTokens, TokenType requestedType, Set<String> requestedScope, boolean forceRefresh) {
@@ -100,7 +100,7 @@ public class TokenManagerService {
 
         if (shouldRefresh) {
             try {
-                return tokenService.refresh(storedTokens.getRefreshToken(), storedTokens.getRefreshScope(), requestedScope);
+                return oidcService.refresh(storedTokens.getRefreshToken(), storedTokens.getRefreshScope(), requestedScope);
             } catch (Exception e) {
                 logger.warn("Refresh token is not valid");
                 return null;

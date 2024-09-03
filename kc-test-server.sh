@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=24.0.1
+VERSION=25.0.4
 
 rm -rf test-server/
 mkdir test-server
@@ -14,4 +14,4 @@ export DEBUG=true
 export KEYCLOAK_ADMIN=admin
 export KEYCLOAK_ADMIN_PASSWORD=admin
 
-test-server/keycloak-$VERSION/bin/kc.sh start-dev --import-realm
+test-server/keycloak-$VERSION/bin/kc.sh start-dev --import-realm --cache=local --features=admin-fine-grained-authz,token-exchange

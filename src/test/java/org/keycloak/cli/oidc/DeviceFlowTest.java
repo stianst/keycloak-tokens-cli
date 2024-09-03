@@ -8,14 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.OpenIDAssertions;
+import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.container.KeycloakTestResource;
+import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.mock.MockInteractService;
+import org.keycloak.cli.tokens.TokenManagerService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
-import java.util.Collections;
 
 @QuarkusTest
 @WithTestResource(KeycloakTestResource.class)
@@ -24,18 +25,24 @@ import java.util.Collections;
 public class DeviceFlowTest {
 
     @Inject
-    TokenService client;
+    ConfigService configService;
+
+    @Inject
+    TokenManagerService tokenManagerService;
 
     @Inject
     MockInteractService mockInteractService;
 
     @Test
     public void testDeviceFlow() {
+        configService.setCurrentContext("test-device");
+
         OpenLink openLink = new OpenLink();
         openLink.start();
 
-        Tokens token = client.getToken(Collections.emptySet());
-        OpenIDAssertions.assertEncodedToken(token.getAccessToken());
+        String accessToken = tokenManagerService.getToken(TokenType.ACCESS, null, false);
+
+        OpenIDAssertions.assertEncodedToken(accessToken);
     }
 
     private class OpenLink extends Thread {

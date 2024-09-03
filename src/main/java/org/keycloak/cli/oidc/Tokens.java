@@ -1,7 +1,6 @@
 package org.keycloak.cli.oidc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 
 import java.time.Instant;
@@ -21,9 +20,7 @@ public class Tokens {
     public Tokens() {
     }
 
-    public Tokens(OIDCTokenResponse tokenResponse, Set<String> refreshScope, Set<String> tokenScope) {
-        OIDCTokens oidcTokens = tokenResponse.getOIDCTokens();
-
+    public Tokens(OIDCTokens oidcTokens, Set<String> refreshScope, Set<String> tokenScope) {
         this.refreshToken = oidcTokens.getRefreshToken() != null ? oidcTokens.getRefreshToken().getValue() : null;
         this.refreshScope = refreshScope;
         this.accessToken = oidcTokens.getAccessToken() != null ? oidcTokens.getAccessToken().getValue() : null;
