@@ -10,6 +10,7 @@ import picocli.CommandLine;
 @CommandLine.Command(subcommands = {
         TokenCommand.class,
         DecodeCommand.class,
+        IntrospectCommand.class,
         ExchangeCommand.class,
         UserInfoCommand.class,
         RevokeCommand.class,

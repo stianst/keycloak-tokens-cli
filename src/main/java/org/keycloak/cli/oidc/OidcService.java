@@ -7,6 +7,7 @@ import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
 import com.nimbusds.oauth2.sdk.ResourceOwnerPasswordCredentialsGrant;
 import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.TokenIntrospectionRequest;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.TokenRevocationRequest;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
@@ -79,6 +80,12 @@ public class OidcService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String introspect(String token) {
+        ClientAuthentication clientAuthentication = context.getClientAuthentication();
+        TokenIntrospectionRequest request = new TokenIntrospectionRequest(providerMetadata().getIntrospectionEndpointURI(), clientAuthentication, new BearerAccessToken(token));
+        return send(request.toHTTPRequest(), String.class);
     }
 
     public boolean revoke(String token) {
