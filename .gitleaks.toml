@@ -1,0 +1,5 @@
+[allowlist]
+    paths = [
+        '''src/test/resources/testrealm.json''',
+        '''src/test/resources/org/keycloak/cli/example-config.yaml'''
+    ]
