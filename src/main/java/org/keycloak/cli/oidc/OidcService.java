@@ -63,9 +63,9 @@ public class OidcService {
         return providerMetadata;
     }
 
-    public UserInfo userInfo(String accessToken) {
+    public String userInfo(String accessToken) {
         UserInfoRequest request = new UserInfoRequest(providerMetadata().getUserInfoEndpointURI(), new BearerAccessToken(accessToken));
-        return send(request.toHTTPRequest(), UserInfo.class);
+        return send(request.toHTTPRequest(), String.class);
     }
 
     public Tokens token(Set<String> scope) {

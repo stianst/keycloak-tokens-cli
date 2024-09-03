@@ -15,7 +15,9 @@ public class ResponseConverter {
     public static <T> Object convert(HTTPResponse response, Class<T> clazz) throws ParseException {
         boolean success = response.indicatesSuccess();
 
-        if (Boolean.class.equals(clazz)) {
+        if (String.class.equals(clazz)) {
+            return success ? response.getBody() : null;
+        } else if (Boolean.class.equals(clazz)) {
             return success ? Boolean.TRUE : Boolean.FALSE;
         } else if (OIDCProviderMetadata.class.equals(clazz)) {
             return success ? OIDCProviderMetadata.parse(response.getBodyAsJSONObject()) : null;

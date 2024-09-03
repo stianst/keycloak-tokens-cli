@@ -20,7 +20,7 @@ import org.keycloak.cli.container.KeycloakTestResource;
 public class UserInfoIT {
 
     @Test
-    public void userinfo(QuarkusMainLauncher launcher) throws JsonProcessingException {
+    public void userinfo(QuarkusMainLauncher launcher) {
         LaunchResult result = launcher.launch("userinfo", "-c=test-password");
         LauncherAssertions.assertSuccess(result);
 

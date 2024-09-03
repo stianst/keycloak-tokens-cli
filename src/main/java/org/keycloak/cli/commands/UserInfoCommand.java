@@ -53,9 +53,9 @@ public class UserInfoCommand implements Runnable {
         if (accessToken == null) {
             accessToken = tokens.getToken(TokenType.ACCESS, scope, false);
         }
-        UserInfo userInfo = oidcService.userInfo(accessToken);
+        String userInfo = oidcService.userInfo(accessToken);
 
-        interact.println(userInfo.toJSONString());
+        interact.println(prettyPrinter.prettyPrint(userInfo));
     }
 
 }

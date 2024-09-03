@@ -37,15 +37,15 @@ public class OpenIDAssertions {
         return jsonNode;
     }
 
-    public static UserInfo assertUserInfoResponse(String jsonString) throws JsonProcessingException {
-        UserInfo userInfo;
+    public static UserInfo assertUserInfoResponse(String jsonString) {
+        UserInfo userInfo = null;
         try {
             userInfo = new UserInfo(JSONObjectUtils.parse(jsonString));
+            Assertions.assertNotNull(userInfo.getSubject());
+            Assertions.assertNotNull(userInfo.getPreferredUsername());
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            Assertions.fail("Failed to parse userinfo", e);
         }
-        Assertions.assertNotNull(userInfo.getSubject());
-        Assertions.assertNotNull(userInfo.getPreferredUsername());
         return userInfo;
     }
 
