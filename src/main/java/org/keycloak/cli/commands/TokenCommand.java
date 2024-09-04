@@ -19,17 +19,18 @@ public class TokenCommand implements Runnable {
     @CommandLine.Option(names = {"-c", "--context"}, description = "Context to use")
     String context;
 
-    @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token", defaultValue = "false")
-    boolean decode;
-
-    @CommandLine.Option(names = {"-r", "--refresh"}, description = "Force refresh", defaultValue = "false")
-    boolean refresh;
-
     @CommandLine.Option(names = {"-t", "--type"}, description = "Token type to get", defaultValue = "access", converter = TokenTypeConverter.class)
     TokenType tokenType;
 
     @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
     Set<String> scope;
+
+    @CommandLine.Option(names = {"-r", "--refresh"}, description = "Force refresh", defaultValue = "false")
+    boolean refresh;
+
+    @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token", defaultValue = "false")
+    boolean decode;
+
     @CommandLine.Option(names = {"--kubectl"}, description = "Kubectl mode", defaultValue = "false")
     boolean kubectl;
 

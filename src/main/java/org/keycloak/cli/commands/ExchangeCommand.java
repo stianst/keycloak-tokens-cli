@@ -18,9 +18,6 @@ public class ExchangeCommand implements Runnable {
     @CommandLine.Option(names = {"-c", "--context"}, description = "Context to use")
     String context;
 
-    @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token", defaultValue = "false")
-    boolean decode;
-
     @CommandLine.Option(names = {"-a", "--audience"}, description = "Target audience", converter = CommaSeparatedListConverter.class)
     Set<String> audience;
 
@@ -29,6 +26,9 @@ public class ExchangeCommand implements Runnable {
 
     @CommandLine.Option(names = {"-st", "--subject-token"}, description = "Subject token")
     String subjectToken;
+
+    @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token", defaultValue = "false")
+    boolean decode;
 
     @Inject
     ConfigService config;

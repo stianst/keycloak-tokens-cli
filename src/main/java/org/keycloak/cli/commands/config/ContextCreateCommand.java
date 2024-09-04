@@ -16,11 +16,11 @@ public class ContextCreateCommand implements Runnable {
     @CommandLine.Option(names = {"-c", "--context"}, description = "Context to create", required = true)
     String contextId;
 
-    @CommandLine.Option(names = {"--iss-ref"})
-    String issuerRef;
-
     @CommandLine.Option(names = {"--iss"})
     String issuer;
+
+    @CommandLine.Option(names = {"--iss-ref"})
+    String issuerRef;
 
     @CommandLine.Option(names = {"--flow"}, converter = FlowConverter.class, required = true)
     Flow flow;

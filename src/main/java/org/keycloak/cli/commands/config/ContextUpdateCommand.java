@@ -15,11 +15,11 @@ public class ContextUpdateCommand implements Runnable {
     @CommandLine.Option(names = {"-c", "--context"}, description = "Context to update")
     String contextId;
 
-    @CommandLine.Option(names = {"--iss-ref"})
-    String issuerRef;
-
     @CommandLine.Option(names = {"--iss"})
     String issuer;
+
+    @CommandLine.Option(names = {"--iss-ref"})
+    String issuerRef;
 
     @CommandLine.Option(names = {"--flow"}, converter = FlowConverter.class)
     Flow flow;

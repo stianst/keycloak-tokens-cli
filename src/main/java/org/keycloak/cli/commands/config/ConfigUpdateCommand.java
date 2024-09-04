@@ -9,11 +9,11 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "update", description = "Update config", mixinStandardHelpOptions = true)
 public class ConfigUpdateCommand implements Runnable {
 
-    @CommandLine.Option(names = {"--store-tokens"}, description = "Store tokens")
-    Boolean storeTokens;
-
     @CommandLine.Option(names = {"--default-context"}, description = "Set default context")
     String defaultContext;
+
+    @CommandLine.Option(names = {"--store-tokens"}, description = "Store tokens")
+    Boolean storeTokens;
 
     @Inject
     ConfigService configService;
