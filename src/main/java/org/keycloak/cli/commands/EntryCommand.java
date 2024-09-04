@@ -4,7 +4,6 @@ import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import jakarta.inject.Inject;
 import org.jboss.logmanager.LogContext;
-import org.jboss.logmanager.Logger;
 import org.keycloak.cli.commands.config.ConfigParentCommand;
 import picocli.CommandLine;
 
@@ -33,9 +32,14 @@ public class EntryCommand implements QuarkusApplication {
 
         if (verbose) {
             CommandExceptionHandler.setVerbose(verbose);
+            LogContext.getLogContext().getLogger("org.keycloak.cli").setLevel(Level.FINE);
+        }
+    }
 
-            Logger logger = LogContext.getLogContext().getLogger("org.keycloak.cli");
-            logger.setLevel(Level.ALL);
+    @CommandLine.Option(names = {"-X"}, description = "Show HTTP request and responses", defaultValue = "false", scope = CommandLine.ScopeType.INHERIT)
+    public void setHttpDebug(boolean httpDebug) {
+        if (httpDebug) {
+            LogContext.getLogContext().getLogger("org.apache.http.wire").setLevel(Level.FINE);
         }
     }
 

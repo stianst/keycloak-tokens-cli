@@ -182,16 +182,20 @@ kubectl config use-context kct
 
 ## Debugging
 
-To show the full stack trace for an error set `KCT_VERBOSE` environment variable:
+To enable logging information and stack-traces for errors use `-v`: 
 
 ```
-export KCT_VERBOSE=true
+kct token -v
 ```
 
-Enable debug logging with:
+You can also enable logging information with setting the `KCT_VERBOSE` environment variable:
 
 ```
-export QUARKUS_LOG_CATEGORY__ORG_KEYCLOAK_CLI__LEVEL=DEBUG
+KCT_VERBOSE=true kct token -v 
 ```
 
-The above can also be added to `$PWD/.env`.
+To enable HTTP request and response output use `-X`:
+
+```
+kct token -X
+```
