@@ -7,15 +7,15 @@ import java.net.URI;
 public class ConfigVerifier {
 
     private final Config config;
-    private final StringReplacer stringReplacer;
+    private final VariableResolver variableResolver;
 
-    private ConfigVerifier(Config config, StringReplacer stringReplacer) {
+    private ConfigVerifier(Config config, VariableResolver variableResolver) {
         this.config = config;
-        this.stringReplacer = stringReplacer;
+        this.variableResolver = variableResolver;
     }
 
-    public static void verify(Config config, StringReplacer stringReplacer) {
-        new ConfigVerifier(config, stringReplacer).verify();
+    public static void verify(Config config, VariableResolver variableResolver) {
+        new ConfigVerifier(config, variableResolver).verify();
     }
 
     public void verify() {
@@ -40,7 +40,7 @@ public class ConfigVerifier {
 
         if (empty(issuer.getRef())) {
             checkNotEmpty(issuer.getUrl(), "{0} ''{1}'' invalid: missing issuer url", type, id);
-            checkUrl(stringReplacer.replace(issuer.getUrl()), "{0} ''{1}'' invalid: invalid issuer url", type, id);
+            checkUrl(variableResolver.resolve(issuer.getUrl()), "{0} ''{1}'' invalid: invalid issuer url", type, id);
         } else {
             checkEmpty(issuer.getUrl(), "{0} ''{1}'' invalid: both issuer url and issuer ref set", type, id);
             checkNotNull(config.getIssuers().get(issuer.getRef()), "{0} ''{1}'' invalid: issuer ref ''{2}'' not found", type, id, issuer.getRef());

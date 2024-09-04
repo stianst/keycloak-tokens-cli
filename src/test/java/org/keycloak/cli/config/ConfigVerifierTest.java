@@ -12,7 +12,7 @@ import java.util.Map;
 public class ConfigVerifierTest {
 
     private Config config;
-    private StringReplacer stringReplacer;
+    private VariableResolver variableResolver;
 
     @BeforeEach
     public void createValidConfig() {
@@ -22,8 +22,8 @@ public class ConfigVerifierTest {
                 Map.of("myissuer", new Config.Issuer("https://issuer", null)),
                 Map.of("mycontext", new Config.Context(new Config.Issuer("https://issuer", null), Flow.PASSWORD, new Config.Client("myclient", null), new Config.User("myuser", "myuserpassword"), null)),
                 null);
-        stringReplacer = new StringReplacer();
-        stringReplacer.init(Collections.emptyMap());
+        variableResolver = new VariableResolver();
+        variableResolver.init(Collections.emptyMap());
     }
 
     @Test
@@ -142,7 +142,7 @@ public class ConfigVerifierTest {
     }
 
     private Executable verify() {
-        return () -> ConfigVerifier.verify(config, stringReplacer);
+        return () -> ConfigVerifier.verify(config, variableResolver);
     }
 
 }

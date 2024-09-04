@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ApplicationScoped
-public class StringReplacer {
+public class VariableResolver {
 
     private StringSubstitutor stringSubstitutor;
 
@@ -24,8 +24,34 @@ public class StringReplacer {
         stringSubstitutor = new StringSubstitutor(valueMap);
     }
 
-    public String replace(String value) {
+    public String resolve(String value) {
         return stringSubstitutor.replace(value);
+    }
+
+    public Config resolve(Config config) {
+        if (config.getIssuers() != null) {
+            for (Config.Issuer issuer : config.getIssuers().values()) {
+                resolve(issuer);
+            }
+        }
+        if (config.getContexts() != null) {
+            for (Config.Context context : config.getContexts().values()) {
+                resolve(context);
+            }
+        }
+        return config;
+    }
+
+    public Config.Context resolve(Config.Context context) {
+        resolve(context.getIssuer());
+        return context;
+    }
+
+    public Config.Issuer resolve(Config.Issuer issuer) {
+        if (issuer != null && issuer.getUrl() != null) {
+            issuer.setUrl(resolve(issuer.getUrl()));
+        }
+        return issuer;
     }
 
 }

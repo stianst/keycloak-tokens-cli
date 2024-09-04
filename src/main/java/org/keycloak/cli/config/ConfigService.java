@@ -13,7 +13,7 @@ import java.io.IOException;
 public class ConfigService {
 
     @Inject
-    StringReplacer stringReplacer;
+    VariableResolver variableResolver;
 
     @ConfigProperty(name = "kct.config.file")
     private File configFile;
@@ -50,7 +50,7 @@ public class ConfigService {
                 throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
             }
 
-            String issuerUrl = stringReplacer.replace(context.getIssuer().getUrl());
+            String issuerUrl = variableResolver.resolve(context.getIssuer().getUrl());
             this.context = new Context(config.getStoreTokens(), context, issuerUrl);
         }
 
@@ -72,14 +72,14 @@ public class ConfigService {
             } catch (IOException e) {
                 throw new ConfigException("Failed to load config file", e);
             }
-            ConfigVerifier.verify(config, stringReplacer);
+            ConfigVerifier.verify(config, variableResolver);
         }
 
         return config;
     }
 
     public void saveConfig(Config config) {
-        ConfigVerifier.verify(config, stringReplacer);
+        ConfigVerifier.verify(config, variableResolver);
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         try {
             objectMapper.writeValue(configFile, config);
