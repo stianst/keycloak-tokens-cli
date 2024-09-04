@@ -1,6 +1,5 @@
 package org.keycloak.cli.commands;
 
-import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.config.ConfigService;

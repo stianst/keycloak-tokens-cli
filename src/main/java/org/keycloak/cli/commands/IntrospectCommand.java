@@ -1,7 +1,6 @@
 package org.keycloak.cli.commands;
 
 import jakarta.inject.Inject;
-import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
@@ -9,9 +8,6 @@ import org.keycloak.cli.oidc.OidcService;
 import org.keycloak.cli.tokens.TokenManagerService;
 import org.keycloak.cli.utils.PrettyPrinterService;
 import picocli.CommandLine;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @CommandLine.Command(name = "introspect", description = "Introspect token", mixinStandardHelpOptions = true)
 public class IntrospectCommand implements Runnable {

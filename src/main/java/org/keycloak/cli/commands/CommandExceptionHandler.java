@@ -4,15 +4,15 @@ import picocli.CommandLine;
 
 public class CommandExceptionHandler implements CommandLine.IExecutionExceptionHandler {
 
-    private final boolean verbose;
+    private static boolean VERBOSE;
 
-    public CommandExceptionHandler(boolean verbose) {
-        this.verbose = verbose;
+    public static void setVerbose(boolean verbose) {
+        VERBOSE = verbose;
     }
 
     @Override
     public int handleExecutionException(Exception e, CommandLine commandLine, CommandLine.ParseResult parseResult) {
-        if (verbose) {
+        if (VERBOSE) {
             e.printStackTrace(commandLine.getErr());
         } else {
             String message = getDeepestMessage(e);

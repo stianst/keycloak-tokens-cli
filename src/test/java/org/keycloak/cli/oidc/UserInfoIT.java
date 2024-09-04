@@ -1,6 +1,5 @@
 package org.keycloak.cli.oidc;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
