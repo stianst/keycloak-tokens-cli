@@ -20,7 +20,7 @@ public class LogFilter implements Filter {
             message = message.substring(message.indexOf(deliminator) + 4, message.length() - 1);
 
             if (!message.matches("\\d+")) {
-                System.err.println((send ? "> " : "< ") + message);
+                System.err.println((send ? ">> " : "<< ") + message);
             }
 
             return false;

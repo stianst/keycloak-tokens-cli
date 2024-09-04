@@ -48,6 +48,7 @@ public class TokenManagerService {
         }
 
         if (tokens == null) {
+            logger.debugv("Fetching tokens for {0}", config.getContextId());
             tokens = oidcService.token(scope);
         }
 
@@ -81,32 +82,35 @@ public class TokenManagerService {
 
         boolean shouldRefresh = forceRefresh;
         if (storedTokens.getExpiresAt() < Instant.now().getEpochSecond() + 30) {
-            logger.debug("Stored token has expired, refreshing");
+            logger.debugv("Stored token for {0} has expired, refreshing", config.getContextId());
             shouldRefresh = true;
         }
 
         if (!scopeMatches(storedTokens.getTokenScope(), requestedScope)) {
-            logger.debug("Requested scope differs from stored scope, refreshing");
+            logger.debugv("Requested scope differs for {0} from stored scope, refreshing", config.getContextId());
             shouldRefresh = true;
         }
 
         if (requestedType.equals(TokenType.ACCESS) && storedTokens.getAccessToken() == null) {
+            logger.debugv("Missing stored access token for {0}, refreshing", config.getContextId());
             shouldRefresh = true;
         }
 
         if (requestedType.equals(TokenType.ID) && storedTokens.getIdToken() == null) {
+            logger.debugv("Missing stored ID token for {0}, refreshing", config.getContextId());
             shouldRefresh = true;
         }
 
         if (shouldRefresh) {
             try {
+                logger.debugv("Refreshing tokens for {0}", config.getContextId());
                 return oidcService.refresh(storedTokens.getRefreshToken(), storedTokens.getRefreshScope(), requestedScope);
             } catch (Exception e) {
-                logger.warn("Refresh token is not valid");
+                logger.warnv("Refresh token is not valid for {0}", config.getContextId());
                 return null;
             }
         } else {
-            logger.debug("Using stored tokens");
+            logger.debugv("Using stored tokens for {0}", config.getContextId());
             return storedTokens;
         }
     }
