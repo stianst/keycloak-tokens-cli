@@ -2,6 +2,7 @@ package org.keycloak.cli.commands;
 
 import io.quarkus.logging.LoggingFilter;
 import org.keycloak.cli.utils.JsonFormatter;
+import picocli.CommandLine;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -25,25 +26,29 @@ public class LogFilter implements Filter {
             message = message.substring(message.indexOf(deliminator) + 4, message.length() - 1);
 
             if (message.startsWith("{") && message.endsWith("}")) {
-                System.out.println(deliminator + deliminator);
+                println(send, deliminator + deliminator);
                 for (String l : jsonFormatter.prettyPrint(message).split("\n")) {
-                    System.err.println(l);
+                    println(send, l);
                 }
-                System.out.println(deliminator + deliminator);
+                println(send, deliminator + deliminator);
             } else if (message.contains("=") && message.contains("&")) {
-                System.out.println(deliminator + deliminator);
+                println(send, deliminator + deliminator);
                 for (String l : message.split("&")) {
-                    System.err.println(URLDecoder.decode(l, StandardCharsets.UTF_8));
+                    println(send, URLDecoder.decode(l, StandardCharsets.UTF_8));
                 }
-                System.out.println(deliminator + deliminator);
+                println(send, deliminator + deliminator);
             } else if (message.length() > 5) {
-                System.err.println(deliminator + " " + message);
+                println(send, deliminator + " " + message);
             }
 
             return false;
         } else {
             return record.getLoggerName().startsWith("org.keycloak");
         }
+    }
+    
+    private void println(boolean send, String message) {
+        System.err.println(CommandLine.Help.Ansi.AUTO.string("@|" + (send ? "yellow" : "cyan") + " " + message + "|@"));
     }
 
 }
