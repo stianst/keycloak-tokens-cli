@@ -1,45 +1,22 @@
 package org.keycloak.cli.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultIndenter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class PrettyPrinterService {
 
-    ObjectReader reader;
-    ObjectWriter writer;
+    private final JsonFormatter jsonFormatter;
 
     public PrettyPrinterService() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-        DefaultPrettyPrinter defaultPrettyPrinter = new DefaultPrettyPrinter();
-        defaultPrettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
-
-        reader = objectMapper.reader();
-        writer = objectMapper.writer(defaultPrettyPrinter);
+        jsonFormatter = new JsonFormatter();
     }
 
     public String prettyPrint(Object value) {
-        try {
-            return writer.writeValueAsString(value);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return jsonFormatter.prettyPrint(value);
     }
 
     public String prettyPrint(String value) {
-        try {
-            return writer.writeValueAsString(reader.readTree(value));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return jsonFormatter.prettyPrint(value);
     }
 
 }
