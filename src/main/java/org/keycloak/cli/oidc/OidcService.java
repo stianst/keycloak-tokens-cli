@@ -30,6 +30,7 @@ import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.Context;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @ApplicationScoped
@@ -99,7 +100,8 @@ public class OidcService {
     }
 
     public String exchange(String subjectToken, Set<String> audience, Set<String> scope) {
-        TokenExchangeGrant tokenExchangeGrant = new TokenExchangeGrant(new BearerAccessToken(subjectToken), TokenTypeURI.ACCESS_TOKEN, null, null, null, audience.stream().map(Audience::new).toList());
+        List<Audience> audiences = audience != null ? audience.stream().map(Audience::new).toList() : null;
+        TokenExchangeGrant tokenExchangeGrant = new TokenExchangeGrant(new BearerAccessToken(subjectToken), TokenTypeURI.ACCESS_TOKEN, null, null, null, audiences);
         try {
             return tokenRequest(tokenExchangeGrant, scope, scope).getAccessToken();
         } catch (Exception e) {
