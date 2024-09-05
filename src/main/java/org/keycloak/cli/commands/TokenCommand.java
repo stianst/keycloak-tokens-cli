@@ -7,8 +7,9 @@ import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
 import org.keycloak.cli.kubectl.KubeCtlService;
-import org.keycloak.cli.tokens.TokenDecoderService;
+import org.keycloak.cli.tokens.TokenDecoder;
 import org.keycloak.cli.tokens.TokenManagerService;
+import org.keycloak.cli.utils.JsonFormatter;
 import picocli.CommandLine;
 
 import java.util.Set;
@@ -41,10 +42,10 @@ public class TokenCommand implements Runnable {
     TokenManagerService tokens;
 
     @Inject
-    TokenDecoderService tokenDecoder;
+    InteractService interact;
 
     @Inject
-    InteractService interact;
+    JsonFormatter jsonFormatter;
 
     @Inject
     KubeCtlService kubeCtlService;
@@ -61,7 +62,7 @@ public class TokenCommand implements Runnable {
         if (kubectl) {
             token = kubeCtlService.wrapToken(token);
         } else if (decode) {
-            token = tokenDecoder.decode(token);
+            token = jsonFormatter.toPrettyJson(TokenDecoder.decode(token));
         }
 
         interact.println(token);

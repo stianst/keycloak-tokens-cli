@@ -24,7 +24,7 @@ public class JsonFormatter {
         writer = objectMapper.writer(defaultPrettyPrinter);
     }
 
-    public String prettyPrint(Object value) {
+    public String toPrettyJson(Object value) {
         try {
             return writer.writeValueAsString(value);
         } catch (JsonProcessingException e) {
@@ -32,7 +32,7 @@ public class JsonFormatter {
         }
     }
 
-    public String prettyPrint(String value) {
+    public String toPrettyJson(String value) {
         try {
             return writer.writeValueAsString(reader.readTree(value));
         } catch (JsonProcessingException e) {

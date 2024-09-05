@@ -7,7 +7,7 @@ import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
 import org.keycloak.cli.oidc.OidcService;
 import org.keycloak.cli.tokens.TokenManagerService;
-import org.keycloak.cli.utils.PrettyPrinterService;
+import org.keycloak.cli.utils.JsonFormatter;
 import picocli.CommandLine;
 
 import java.util.LinkedHashSet;
@@ -35,7 +35,7 @@ public class UserInfoCommand implements Runnable {
     OidcService oidcService;
 
     @Inject
-    PrettyPrinterService prettyPrinter;
+    JsonFormatter jsonFormatter;
 
     @Inject
     InteractService interact;
@@ -54,7 +54,7 @@ public class UserInfoCommand implements Runnable {
         }
         String userInfo = oidcService.userInfo(accessToken);
 
-        interact.println(prettyPrinter.prettyPrint(userInfo));
+        interact.println(jsonFormatter.toPrettyJson(userInfo));
     }
 
 }

@@ -6,7 +6,7 @@ import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
 import org.keycloak.cli.oidc.OidcService;
 import org.keycloak.cli.tokens.TokenManagerService;
-import org.keycloak.cli.utils.PrettyPrinterService;
+import org.keycloak.cli.utils.JsonFormatter;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "introspect", description = "Introspect token", mixinStandardHelpOptions = true)
@@ -28,7 +28,7 @@ public class IntrospectCommand implements Runnable {
     OidcService oidcService;
 
     @Inject
-    PrettyPrinterService prettyPrinter;
+    JsonFormatter jsonFormatter;
 
     @Inject
     InteractService interact;
@@ -42,7 +42,7 @@ public class IntrospectCommand implements Runnable {
         }
         String introspect = oidcService.introspect(accessToken);
 
-        interact.println(prettyPrinter.prettyPrint(introspect));
+        interact.println(jsonFormatter.toPrettyJson(introspect));
     }
 
 }

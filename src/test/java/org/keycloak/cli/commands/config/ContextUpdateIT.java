@@ -18,7 +18,7 @@ import org.keycloak.cli.enums.Flow;
 import java.io.IOException;
 import java.util.Set;
 
-@QuarkusMainTest
+@QuarkusMainIntegrationTest
 @WithTestResource(KeycloakTestResource.class)
 @TestProfile(ConfigTestProfile.class)
 @ExtendWith(ConfigTestProfile.class)

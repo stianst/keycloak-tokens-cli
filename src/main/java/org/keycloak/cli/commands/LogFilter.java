@@ -27,7 +27,7 @@ public class LogFilter implements Filter {
 
             if (message.startsWith("{") && message.endsWith("}")) {
                 println(send, deliminator + deliminator);
-                for (String l : jsonFormatter.prettyPrint(message).split("\n")) {
+                for (String l : jsonFormatter.toPrettyJson(message).split("\n")) {
                     println(send, l);
                 }
                 println(send, deliminator + deliminator);

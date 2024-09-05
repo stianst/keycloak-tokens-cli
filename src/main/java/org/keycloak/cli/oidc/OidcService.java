@@ -64,6 +64,11 @@ public class OidcService {
         return providerMetadata;
     }
 
+    public String keys() {
+        HTTPRequest httpRequest = new HTTPRequest(HTTPRequest.Method.GET, providerMetadata().getJWKSetURI());
+        return send(httpRequest, String.class);
+    }
+
     public String userInfo(String accessToken) {
         UserInfoRequest request = new UserInfoRequest(providerMetadata().getUserInfoEndpointURI(), new BearerAccessToken(accessToken));
         return send(request.toHTTPRequest(), String.class);
