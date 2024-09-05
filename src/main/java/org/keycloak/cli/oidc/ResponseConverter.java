@@ -26,8 +26,7 @@ public class ResponseConverter {
             UserInfoResponse userInfoResponse = UserInfoResponse.parse(response);
             return success ? userInfoResponse.toSuccessResponse().getUserInfo() : userInfoResponse.toErrorResponse();
         } else if (OIDCTokens.class.equals(clazz)) {
-            TokenResponse tokenResponse = TokenResponse.parse(response);
-            return success ? tokenResponse.toSuccessResponse().getTokens().toOIDCTokens() : tokenResponse.toErrorResponse();
+            return success ? OIDCTokenResponse.parse(response).getOIDCTokens() : TokenResponse.parse(response).toErrorResponse();
         } else if (DeviceAuthorizationSuccessResponse.class.equals(clazz)) {
             DeviceAuthorizationResponse deviceAuthorizationResponse = DeviceAuthorizationResponse.parse(response);
             return success ? deviceAuthorizationResponse.toSuccessResponse() : deviceAuthorizationResponse.toErrorResponse();

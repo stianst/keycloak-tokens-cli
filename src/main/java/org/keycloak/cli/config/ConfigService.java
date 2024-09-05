@@ -50,6 +50,7 @@ public class ConfigService {
                 throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
             }
 
+            ConfigRefResolver.resolve(config);
             String issuerUrl = variableResolver.resolve(context.getIssuer().getUrl());
             this.context = new Context(config.getStoreTokens(), context, issuerUrl);
         }

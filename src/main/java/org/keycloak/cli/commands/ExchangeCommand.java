@@ -51,13 +51,13 @@ public class ExchangeCommand implements Runnable {
         config.setCurrentContext(context);
 
         if (subjectToken == null) {
-            subjectToken = tokens.getToken(TokenType.ACCESS, scope, false);
+            subjectToken = tokens.getToken(TokenType.ACCESS, null, false);
         }
 
         String exchangedToken = oidcService.exchange(subjectToken, audience, scope);
 
         if (decode) {
-            exchangedToken = jsonFormatter.toPrettyJson(TokenDecoder.decode(exchangedToken));
+            exchangedToken = jsonFormatter.toPrettyJson(TokenDecoder.decode(exchangedToken).getClaimsMap());
         }
 
         interact.println(exchangedToken);

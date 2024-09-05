@@ -62,7 +62,7 @@ public class TokenCommand implements Runnable {
         if (kubectl) {
             token = kubeCtlService.wrapToken(token);
         } else if (decode) {
-            token = jsonFormatter.toPrettyJson(TokenDecoder.decode(token));
+            token = jsonFormatter.toPrettyJson(TokenDecoder.decode(token).getClaimsMap());
         }
 
         interact.println(token);
