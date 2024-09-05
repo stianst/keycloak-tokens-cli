@@ -22,7 +22,7 @@ public class ExchangeCommand implements Runnable {
     @CommandLine.Option(names = {"-a", "--audience"}, description = "Target audience", converter = CommaSeparatedListConverter.class)
     Set<String> audience;
 
-    @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
+    @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class, arity = "0..1")
     Set<String> scope;
 
     @CommandLine.Option(names = {"-st", "--subject-token"}, description = "Subject token")

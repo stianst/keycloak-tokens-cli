@@ -82,7 +82,7 @@ public class ContextUpdateCommand implements Runnable {
         if (userPassword != null) {
             context.getUser().setPassword(userPassword.isBlank() ? null : userPassword);
         }
-        if (context.getUser().getUsername() == null && context.getUser().getPassword() == null) {
+        if (context.getUser() != null && context.getUser().getUsername() == null && context.getUser().getPassword() == null) {
             context.setUser(null);
         }
 
