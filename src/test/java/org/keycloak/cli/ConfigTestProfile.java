@@ -47,6 +47,10 @@ public class ConfigTestProfile implements QuarkusTestProfile, BeforeAllCallback 
         return OBJECT_MAPPER.readValue(TOKENS_FILE, TokenStore.class);
     }
 
+    public static void updateConfig(Config config) throws IOException {
+        OBJECT_MAPPER.writeValue(CONFIG_FILE, config);
+    }
+
     public static void updateTokens(TokenStore tokenStore) throws IOException {
         OBJECT_MAPPER.writeValue(TOKENS_FILE, tokenStore);
     }

@@ -41,7 +41,7 @@ public class TokenManagerServiceTest {
         config.setDefaultContext("test-password");
         config.setStoreTokens(true);
         Config.Context context = config.getContexts().get("test-password");
-        context.setScope(new String[]{"email", "roles"});
+        context.setScope(Set.of("email", "roles"));
     }
 
     @Test

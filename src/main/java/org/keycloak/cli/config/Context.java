@@ -7,8 +7,6 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import org.keycloak.cli.enums.Flow;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 public class Context {
@@ -57,7 +55,7 @@ public class Context {
     }
 
     public Set<String> getScope() {
-        return config.getScope() != null ? new HashSet<>(Arrays.asList(config.getScope())) : null;
+        return config.getScope();
     }
 
 }

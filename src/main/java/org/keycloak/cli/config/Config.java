@@ -7,6 +7,7 @@ import org.keycloak.cli.enums.Flow;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @JsonPropertyOrder({"default-context", "store-tokens", "truststore", "issuers", "clients", "contexts"})
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -85,12 +86,12 @@ public class Config {
 
         private User user;
 
-        public String[] scope;
+        public Set<String> scope;
 
         public Context() {
         }
 
-        public Context(Issuer issuer, Flow flow, Client client, User user, String[] scope) {
+        public Context(Issuer issuer, Flow flow, Client client, User user, Set<String> scope) {
             this.issuer = issuer;
             this.flow = flow;
             this.client = client;
@@ -130,11 +131,11 @@ public class Config {
             this.user = user;
         }
 
-        public String[] getScope() {
+        public Set<String> getScope() {
             return scope;
         }
 
-        public void setScope(String[] scope) {
+        public void setScope(Set<String> scope) {
             this.scope = scope;
         }
 

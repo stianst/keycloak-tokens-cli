@@ -1,6 +1,7 @@
 package org.keycloak.cli.commands.config;
 
 import jakarta.inject.Inject;
+import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.commands.converter.FlowConverter;
 import org.keycloak.cli.config.Config;
 import org.keycloak.cli.config.ConfigException;
@@ -9,6 +10,8 @@ import org.keycloak.cli.config.Messages;
 import org.keycloak.cli.enums.Flow;
 import org.keycloak.cli.interact.InteractService;
 import picocli.CommandLine;
+
+import java.util.Set;
 
 @CommandLine.Command(name = "create", description = "Create config context", mixinStandardHelpOptions = true)
 public class ContextCreateCommand implements Runnable {
@@ -25,8 +28,8 @@ public class ContextCreateCommand implements Runnable {
     @CommandLine.Option(names = {"--flow"}, converter = FlowConverter.class, required = true)
     Flow flow;
 
-    @CommandLine.Option(names = {"--scope"})
-    String scope;
+    @CommandLine.Option(names = {"--scope"}, converter = CommaSeparatedListConverter.class)
+    Set<String> scope;
 
     @CommandLine.Option(names = {"--client"})
     String client;
@@ -54,7 +57,7 @@ public class ContextCreateCommand implements Runnable {
                 flow,
                 client != null ? new Config.Client(client, clientSecret) : null,
                 user != null ? new Config.User(user, userPassword) : null,
-                scope != null ? scope.split(",") : null
+                scope
         );
         if (config.getContexts().put(contextId, context) != null) {
             throw ConfigException.exists(Messages.Type.CONTEXT, contextId);

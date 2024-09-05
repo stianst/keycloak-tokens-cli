@@ -12,10 +12,13 @@ public class CommaSeparatedListConverter implements CommandLine.ITypeConverter<S
 
     @Override
     public Set<String> convert(String s) {
-        if (s == null || s.isEmpty()) {
+        if (s == null) {
+            return null;
+        } else if (s.isEmpty()) {
             return Collections.emptySet();
+        } else {
+            return Arrays.stream(s.split(",")).map(String::trim).collect(Collectors.toCollection(LinkedHashSet::new));
         }
-        return Arrays.stream(s.split(",")).map(String::trim).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
 }
