@@ -1,6 +1,7 @@
 package org.keycloak.cli.oidc;
 
 import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.TokenResponse;
 import com.nimbusds.oauth2.sdk.device.DeviceAuthorizationResponse;
 import com.nimbusds.oauth2.sdk.device.DeviceAuthorizationSuccessResponse;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
@@ -25,8 +26,8 @@ public class ResponseConverter {
             UserInfoResponse userInfoResponse = UserInfoResponse.parse(response);
             return success ? userInfoResponse.toSuccessResponse().getUserInfo() : userInfoResponse.toErrorResponse();
         } else if (OIDCTokens.class.equals(clazz)) {
-            OIDCTokenResponse tokenResponse = OIDCTokenResponse.parse(response);
-            return success ? tokenResponse.getOIDCTokens() : tokenResponse.toErrorResponse();
+            TokenResponse tokenResponse = TokenResponse.parse(response);
+            return success ? tokenResponse.toSuccessResponse().getTokens().toOIDCTokens() : tokenResponse.toErrorResponse();
         } else if (DeviceAuthorizationSuccessResponse.class.equals(clazz)) {
             DeviceAuthorizationResponse deviceAuthorizationResponse = DeviceAuthorizationResponse.parse(response);
             return success ? deviceAuthorizationResponse.toSuccessResponse() : deviceAuthorizationResponse.toErrorResponse();

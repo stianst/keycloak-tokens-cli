@@ -148,9 +148,6 @@ public class OidcService {
         HTTPResponse httpResponse;
         try {
             httpResponse = httpRequest.send(httpClient);
-            if (!httpResponse.indicatesSuccess()) {
-                throw new OidcException(httpRequest, httpResponse.getStatusCode());
-            }
         } catch (IOException e) {
             throw new OidcException(httpRequest, e.getMessage());
         }
