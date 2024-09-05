@@ -46,3 +46,4 @@ kct
 test-server/
 kct.sh
 build.sh
+build-native.sh
