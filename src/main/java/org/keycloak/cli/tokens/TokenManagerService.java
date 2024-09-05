@@ -5,12 +5,12 @@ import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.Context;
+import org.keycloak.cli.enums.Flow;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.oidc.OidcService;
 import org.keycloak.cli.oidc.Tokens;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Set;
 
 @ApplicationScoped
@@ -27,36 +27,63 @@ public class TokenManagerService {
     @Inject
     OidcService oidcService;
 
-    public String getToken(TokenType tokenType, Set<String> scope, boolean forceRefresh) {
+    public String getToken(TokenType tokenType, Set<String> requestScope, boolean forceRefresh) {
         Context context = config.getContext();
-        if (scope == null) {
-            scope = context.getScope() != null ? context.getScope() : Collections.emptySet();
+
+        Set<String> contextScope = context.getScope();
+        if (requestScope == null) {
+            requestScope = contextScope;
         }
 
-        if (TokenType.ID.equals(tokenType) && (scope == null || !scope.contains("openid"))) {
-            throw new RuntimeException("Request openid scope to retrieve an ID token");
+        boolean supportsRefresh = !config.getContext().getFlow().equals(Flow.CLIENT);
+
+        if (TokenType.ID.equals(tokenType) && (!contextScope.contains("openid") || !requestScope.contains("openid"))) {
+            throw new TokenManagerException("Request 'openid' scope to retrieve an ID token");
+        } else if (TokenType.REFRESH.equals(tokenType) && !supportsRefresh) {
+            throw new TokenManagerException("Flow ''{0}'' does not support refresh token", context.getFlow().jsonName());
         }
 
-        Tokens storedTokens = null;
-        if (context.storeTokens()) {
-            storedTokens = tokenStoreService.getCurrent();
+        if (requestScope != null && !scopeContainsAll(contextScope, requestScope)) {
+            throw new TokenManagerException("Requested scopes must be a subset of configured scopes");
         }
 
-        Tokens tokens = null;
-        if (storedTokens != null) {
-            tokens = checkStored(storedTokens, tokenType, scope, forceRefresh);
+        if (!context.storeTokens()) {
+            return getTokenType(oidcService.token(requestScope), tokenType);
         }
 
-        if (tokens == null) {
-            logger.debugv("Fetching tokens for {0}", config.getContextId());
-            tokens = oidcService.token(scope);
+        Tokens storedTokens = tokenStoreService.getCurrent();
+
+        TokenStatus tokenStatus = checkStored(storedTokens, requestScope);
+        if (TokenStatus.VALID.equals(tokenStatus) && forceRefresh) {
+            tokenStatus = TokenStatus.REFRESH;
         }
 
-        if (context.storeTokens()) {
-            if (!tokens.equals(storedTokens)) {
-                tokenStoreService.updateCurrent(tokens);
+        Tokens tokens;
+        if (TokenStatus.VALID.equals(tokenStatus)) {
+            logger.debug("Using stored tokens");
+            return getTokenType(storedTokens, tokenType);
+        } else if (TokenStatus.REFRESH.equals(tokenStatus) && storedTokens.getRefreshToken() != null) {
+            logger.debug("Refreshing stored tokens");
+            tokens = oidcService.refresh(storedTokens.getRefreshToken(), requestScope);
+            tokens.setContextScope(storedTokens.getContextScope());
+            tokens.setTokenScope(requestScope);
+        } else if (supportsRefresh) {
+            logger.debug("Retrieving tokens");
+            tokens = oidcService.token(contextScope);
+            if (!scopeMatches(contextScope, requestScope)) {
+                logger.debug("Requested scope differs from context scope, refreshing");
+                tokens = oidcService.refresh(storedTokens.getRefreshToken(), requestScope);
             }
+            tokens.setContextScope(contextScope);
+            tokens.setTokenScope(requestScope);
+        } else {
+            tokens = oidcService.token(requestScope);
+            tokens.setContextScope(contextScope);
+            tokens.setTokenScope(requestScope);
         }
+
+        logger.debug("Updating stored tokens");
+        tokenStoreService.updateCurrent(tokens);
 
         return getTokenType(tokens, tokenType);
     }
@@ -75,44 +102,35 @@ public class TokenManagerService {
         return oidcService.revoke(token);
     }
 
-    private Tokens checkStored(Tokens storedTokens, TokenType requestedType, Set<String> requestedScope, boolean forceRefresh) {
-        if (!scopeContainsAll(storedTokens.getRefreshScope(), requestedScope)) {
-            throw new RuntimeException("Requested scopes is not a subset of stored refresh scopes");
+    private TokenStatus checkStored(Tokens storedTokens, Set<String> requestedScope) {
+        if (storedTokens == null) {
+            return TokenStatus.INVALID;
         }
 
-        boolean shouldRefresh = forceRefresh;
+        Set<String> contextScope = config.getContext().getScope();
+
+        if (!scopeMatches(storedTokens.getContextScope(), contextScope)) {
+            logger.debugv("Context scope differs from stored context scope");
+            return TokenStatus.INVALID;
+        }
+
         if (storedTokens.getExpiresAt() < Instant.now().getEpochSecond() + 30) {
-            logger.debugv("Stored token for {0} has expired, refreshing", config.getContextId());
-            shouldRefresh = true;
+            logger.debugv("Stored token has expired");
+            return TokenStatus.REFRESH;
         }
 
         if (!scopeMatches(storedTokens.getTokenScope(), requestedScope)) {
-            logger.debugv("Requested scope differs for {0} from stored scope, refreshing", config.getContextId());
-            shouldRefresh = true;
+            logger.debugv("Requested scope differs from stored scope", config.getContextId());
+            return TokenStatus.REFRESH;
         }
 
-        if (requestedType.equals(TokenType.ACCESS) && storedTokens.getAccessToken() == null) {
-            logger.debugv("Missing stored access token for {0}, refreshing", config.getContextId());
-            shouldRefresh = true;
-        }
+        return TokenStatus.VALID;
+    }
 
-        if (requestedType.equals(TokenType.ID) && storedTokens.getIdToken() == null) {
-            logger.debugv("Missing stored ID token for {0}, refreshing", config.getContextId());
-            shouldRefresh = true;
-        }
-
-        if (shouldRefresh) {
-            try {
-                logger.debugv("Refreshing tokens for {0}", config.getContextId());
-                return oidcService.refresh(storedTokens.getRefreshToken(), storedTokens.getRefreshScope(), requestedScope);
-            } catch (Exception e) {
-                logger.warnv("Refresh token is not valid for {0}", config.getContextId());
-                return null;
-            }
-        } else {
-            logger.debugv("Using stored tokens for {0}", config.getContextId());
-            return storedTokens;
-        }
+    private enum TokenStatus {
+        VALID,
+        REFRESH,
+        INVALID
     }
 
     private String getTokenType(Tokens tokens, TokenType tokenType) {

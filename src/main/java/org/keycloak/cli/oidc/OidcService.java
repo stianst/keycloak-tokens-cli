@@ -113,25 +113,25 @@ public class OidcService {
         List<Audience> audiences = audience != null ? audience.stream().map(Audience::new).toList() : null;
         TokenExchangeGrant tokenExchangeGrant = new TokenExchangeGrant(new BearerAccessToken(subjectToken), TokenTypeURI.ACCESS_TOKEN, null, null, null, audiences);
         try {
-            return tokenRequest(tokenExchangeGrant, scope, scope).getAccessToken();
+            return tokenRequest(tokenExchangeGrant, scope).getAccessToken();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private Tokens passwordGrant(Set<String> scope) {
-        return tokenRequest(new ResourceOwnerPasswordCredentialsGrant(context.getUsername(), new Secret(context.getUserPassword())), scope, scope);
+        return tokenRequest(new ResourceOwnerPasswordCredentialsGrant(context.getUsername(), new Secret(context.getUserPassword())), scope);
     }
 
     private Tokens clientGrant(Set<String> scope) {
-        return tokenRequest(new ClientCredentialsGrant(), scope, scope);
+        return tokenRequest(new ClientCredentialsGrant(), scope);
     }
 
-    public Tokens refresh(String refreshToken, Set<String> refreshScope, Set<String> requestScope) {
-        return tokenRequest(new RefreshTokenGrant(new RefreshToken(refreshToken)), refreshScope, requestScope);
+    public Tokens refresh(String refreshToken, Set<String> requestScope) {
+        return tokenRequest(new RefreshTokenGrant(new RefreshToken(refreshToken)), requestScope);
     }
 
-    public Tokens tokenRequest(AuthorizationGrant grant, Set<String> refreshScope, Set<String> requestScope) {
+    public Tokens tokenRequest(AuthorizationGrant grant, Set<String> requestScope) {
         ClientAuthentication clientAuthentication = context.getClientAuthentication();
         TokenRequest tokenRequest;
         if (clientAuthentication != null) {
@@ -140,7 +140,7 @@ public class OidcService {
             tokenRequest = new TokenRequest(providerMetadata().getTokenEndpointURI(), context.getClientId(), grant, toScope(requestScope));
         }
         OIDCTokens tokens = send(tokenRequest.toHTTPRequest(), OIDCTokens.class);
-        return new Tokens(tokens, refreshScope, requestScope);
+        return new Tokens(tokens);
     }
 
     @SuppressWarnings("unchecked")

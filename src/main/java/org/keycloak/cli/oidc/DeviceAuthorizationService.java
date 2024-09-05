@@ -58,7 +58,7 @@ public class DeviceAuthorizationService {
             DeviceCodeGrant grant = new DeviceCodeGrant(response.getDeviceCode());
 
             try {
-                return oidcService.tokenRequest(grant, scope, scope);
+                return oidcService.tokenRequest(grant, scope);
             } catch (OidcException e) {
                 if (!"authorization_pending".equals(e.getCode())) {
                     throw e;

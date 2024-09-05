@@ -44,3 +44,5 @@ nb-configuration.xml
 
 kct
 test-server/
+kct.sh
+build.sh

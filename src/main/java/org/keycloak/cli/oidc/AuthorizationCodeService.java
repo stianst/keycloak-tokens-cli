@@ -76,7 +76,7 @@ public class AuthorizationCodeService {
         }
 
         try {
-            return oidcService.tokenRequest(new AuthorizationCodeGrant(new AuthorizationCode(code), redirectUri, codeVerifier), scope, scope);
+            return oidcService.tokenRequest(new AuthorizationCodeGrant(new AuthorizationCode(code), redirectUri, codeVerifier), scope);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

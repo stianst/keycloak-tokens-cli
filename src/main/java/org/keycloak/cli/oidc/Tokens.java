@@ -10,7 +10,7 @@ import java.util.Set;
 public class Tokens {
 
     private String refreshToken;
-    private Set<String> refreshScope;
+    private Set<String> contextScope;
     private String accessToken;
     private String idToken;
     private Set<String> tokenScope;
@@ -20,18 +20,16 @@ public class Tokens {
     public Tokens() {
     }
 
-    public Tokens(OIDCTokens oidcTokens, Set<String> refreshScope, Set<String> tokenScope) {
+    public Tokens(OIDCTokens oidcTokens) {
         this.refreshToken = oidcTokens.getRefreshToken() != null ? oidcTokens.getRefreshToken().getValue() : null;
-        this.refreshScope = refreshScope;
         this.accessToken = oidcTokens.getAccessToken() != null ? oidcTokens.getAccessToken().getValue() : null;
         this.idToken = oidcTokens.getIDTokenString();
-        this.tokenScope = tokenScope;
         this.expiresAt = Instant.now().getEpochSecond() + oidcTokens.getAccessToken().getLifetime();
     }
 
     public Tokens(String refreshToken, Set<String> refreshScope, String accessToken, String idToken, Set<String> tokenScope, Long expiresAt) {
         this.refreshToken = refreshToken;
-        this.refreshScope = refreshScope;
+        this.contextScope = refreshScope;
         this.accessToken = accessToken;
         this.idToken = idToken;
         this.tokenScope = tokenScope;
@@ -46,12 +44,12 @@ public class Tokens {
         this.refreshToken = refreshToken;
     }
 
-    public Set<String> getRefreshScope() {
-        return refreshScope;
+    public Set<String> getContextScope() {
+        return contextScope;
     }
 
-    public void setRefreshScope(Set<String> refreshScope) {
-        this.refreshScope = refreshScope;
+    public void setContextScope(Set<String> contextScope) {
+        this.contextScope = contextScope;
     }
 
     public String getAccessToken() {

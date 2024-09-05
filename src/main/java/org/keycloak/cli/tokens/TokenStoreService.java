@@ -57,13 +57,13 @@ public class TokenStoreService {
     }
 
     public void clearCurrent() {
-        logger.debugv("Deleting stored tokens for {0}", config.getContext());
+        logger.debugv("Deleting stored tokens for {0}", config.getContextId());
         tokenStore.getTokens().remove(config.getContextId());
         save();
     }
 
     public void clearCurrent(TokenType tokenType) {
-        logger.debugv("Deleting stored {0} token for {1}", tokenType.name().toLowerCase(Locale.ENGLISH), config.getContext());
+        logger.debugv("Deleting stored {0} token for {1}", tokenType.name().toLowerCase(Locale.ENGLISH), config.getContextId());
         switch (tokenType) {
             case REFRESH:
                 tokenStore.getTokens().remove(config.getContextId());
@@ -85,7 +85,7 @@ public class TokenStoreService {
     }
 
     public void updateCurrent(Tokens tokens) {
-        logger.debugv("Updating stored tokens for {0}", config.getContext());
+        logger.debugv("Updating stored tokens for {0}", config.getContextId());
         tokenStore.getTokens().put(config.getContextId(), tokens);
         save();
     }
