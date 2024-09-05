@@ -30,6 +30,7 @@ import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.Context;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -65,7 +66,11 @@ public class OidcService {
     }
 
     public String keys() {
-        HTTPRequest httpRequest = new HTTPRequest(HTTPRequest.Method.GET, providerMetadata().getJWKSetURI());
+        return keys(providerMetadata().getJWKSetURI());
+    }
+
+    public String keys(URI uri) {
+        HTTPRequest httpRequest = new HTTPRequest(HTTPRequest.Method.GET, uri);
         return send(httpRequest, String.class);
     }
 

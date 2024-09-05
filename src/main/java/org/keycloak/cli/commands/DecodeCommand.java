@@ -14,6 +14,11 @@ import org.keycloak.cli.tokens.TokenManagerService;
 import org.keycloak.cli.utils.JsonFormatter;
 import picocli.CommandLine;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 
 @CommandLine.Command(name = "decode", description = "Decode token", mixinStandardHelpOptions = true)
@@ -27,6 +32,9 @@ public class DecodeCommand implements Runnable {
 
     @CommandLine.Option(names = {"-t", "--type"}, description = "Token type to get", defaultValue = "access", converter = TokenTypeConverter.class)
     TokenType tokenType;
+
+    @CommandLine.Option(names = {"--jwks"}, description = "JSON Web Key Sets")
+    URI uri;
 
     @Inject
     JsonFormatter jsonFormatter;
@@ -47,13 +55,22 @@ public class DecodeCommand implements Runnable {
                 token = tokenManagerService.getToken(tokenType, null, false);
             }
             decode(token);
-        } catch (JoseException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void decode(String token) throws JoseException {
-        JsonWebKeySet jsonWebKeySet = new JsonWebKeySet(oidcService.keys());
+    private void decode(String token) throws JoseException, IOException {
+        JsonWebKeySet jsonWebKeySet;
+        if (uri != null) {
+            if (uri.getScheme().equals("file")) {
+                jsonWebKeySet = new JsonWebKeySet(new String(uri.toURL().openStream().readAllBytes(), StandardCharsets.UTF_8));
+            } else {
+                jsonWebKeySet = new JsonWebKeySet(oidcService.keys(uri));
+            }
+        } else {
+            jsonWebKeySet = new JsonWebKeySet(oidcService.keys());
+        }
         JwksVerificationKeyResolver jwksVerificationKeyResolver = new JwksVerificationKeyResolver(jsonWebKeySet.getJsonWebKeys());
 
         JsonWebSignature jws = new JsonWebSignature();
