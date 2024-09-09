@@ -23,7 +23,15 @@ public class ContextDeleteCommand implements Runnable {
     @Override
     public void run() {
         Config config = configService.loadConfig();
-        if (config.getContexts().remove(contextId) == null) {
+        boolean removed = false;
+        for (Config.Issuer issuer : config.issuers().values()) {
+            if (issuer.contexts().remove(contextId) != null) {
+                removed = true;
+                break;
+            }
+        }
+
+        if (!removed) {
             throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
         }
 

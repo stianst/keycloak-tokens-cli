@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
-import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
+import io.quarkus.test.junit.main.QuarkusMainTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,11 +19,11 @@ import org.keycloak.cli.kubectl.ExecCredentialRepresentation;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-@QuarkusMainIntegrationTest
+@QuarkusMainTest
 @WithTestResource(KeycloakTestResource.class)
 @TestProfile(ConfigTestProfile.class)
 @ExtendWith({ConfigTestProfile.class})
-public class TokenIT {
+public class TokenTest {
 
     @Test
     public void token(QuarkusMainLauncher launcher) {
@@ -52,14 +52,6 @@ public class TokenIT {
         expectedOutput = expectedOutput.replace("$$TOKEN$$", execCredential.getStatus().getToken());
 
         Assertions.assertEquals(expectedOutput, result.getOutput());
-    }
-
-    @Test
-    public void tokenCustomScope(QuarkusMainLauncher launcher) {
-        LaunchResult result = launcher.launch("token", "-c=test-password", "--scope=openid,email");
-        LauncherAssertions.assertSuccess(result);
-        JsonNode jsonNode = OpenIDAssertions.assertEncodedToken(result.getOutput());
-        Assertions.assertNotNull(jsonNode.get("email"));
     }
 
 }

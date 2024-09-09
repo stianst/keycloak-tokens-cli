@@ -15,9 +15,6 @@ public class IssuerViewCommand implements Runnable {
     @CommandLine.Option(names = {"-i", "--iss"}, description = "Issuer to view")
     String issuerId;
 
-    @CommandLine.Option(names = {"-a", "--all"}, description = "View all issuers")
-    boolean all;
-
     @CommandLine.Option(names = {"-r", "--resolve"}, description = "Resolve variables")
     boolean resolve;
 
@@ -37,15 +34,11 @@ public class IssuerViewCommand implements Runnable {
             config = variableResolver.resolve(config);
         }
 
-        if (all) {
-            interact.printYaml(config.getIssuers());
-        } else {
-            Config.Issuer issuer = config.getIssuers().get(issuerId);
-            if (issuer == null) {
-                throw ConfigException.notFound(Messages.Type.ISSUER, issuerId);
-            }
-            interact.printYaml(issuerId, issuer);
+        Config.Issuer issuer = config.issuers().get(issuerId);
+        if (issuer == null) {
+            throw ConfigException.notFound(Messages.Type.ISSUER, issuerId);
         }
+        interact.printYaml(issuerId, issuer);
     }
 
 }

@@ -8,10 +8,12 @@ import org.keycloak.cli.config.Messages;
 import org.keycloak.cli.interact.InteractService;
 import picocli.CommandLine;
 
+import java.util.HashMap;
+
 @CommandLine.Command(name = "create", description = "Create config context", mixinStandardHelpOptions = true)
 public class IssuerCreateCommand implements Runnable {
 
-    @CommandLine.Option(names = {"-i", "--issuer"}, description = "Issuer to create", required = true)
+    @CommandLine.Option(names = {"-i", "--iss"}, description = "Issuer to create", required = true)
     String issuerId;
 
     @CommandLine.Option(names = {"--url"})
@@ -26,8 +28,8 @@ public class IssuerCreateCommand implements Runnable {
     @Override
     public void run() {
         Config config = configService.loadConfig();
-        Config.Issuer issuer = new Config.Issuer(url, null);
-        if (config.getIssuers().put(issuerId, issuer) != null) {
+        Config.Issuer issuer = new Config.Issuer(url, new HashMap<>());
+        if (config.issuers().put(issuerId, issuer) != null) {
             throw ConfigException.exists(Messages.Type.ISSUER, issuerId);
         }
 

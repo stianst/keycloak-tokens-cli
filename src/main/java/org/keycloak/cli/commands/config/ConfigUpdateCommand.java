@@ -23,16 +23,14 @@ public class ConfigUpdateCommand implements Runnable {
 
     @Override
     public void run() {
-        Config config = configService.loadConfig();
-
-        if (storeTokens != null) {
-            config.setStoreTokens(storeTokens);
+        Config old = configService.loadConfig();
+        if (storeTokens == null) {
+            storeTokens = old.storeTokens();
         }
-
-        if (defaultContext != null) {
-            config.setDefaultContext(defaultContext);
+        if (defaultContext == null) {
+            defaultContext = old.defaultContext();
         }
-
+        Config config = new Config(defaultContext, storeTokens, old.issuers(), old.truststore());
         configService.saveConfig(config);
         interact.println("Config updated");
     }

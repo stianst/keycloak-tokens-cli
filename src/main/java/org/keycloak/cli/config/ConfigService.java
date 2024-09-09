@@ -8,6 +8,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 @ApplicationScoped
 public class ConfigService {
@@ -31,7 +32,7 @@ public class ConfigService {
             loadConfig();
         }
 
-        String contextId = currentContext != null ? currentContext : config.getDefaultContext();
+        String contextId = currentContext != null ? currentContext : config.defaultContext();
         if (contextId == null) {
             throw new ConfigException("No context specified, and no default context set");
         }
@@ -45,14 +46,22 @@ public class ConfigService {
             }
 
             String contextId = getContextId();
-            Config.Context context = config.getContexts().get(contextId);
+            Config.Issuer issuer = null;
+            Config.Context context = null;
+            for (Config.Issuer i : config.issuers().values()) {
+                context = i.contexts().get(contextId);
+                if (context != null) {
+                    issuer = i;
+                    break;
+                }
+            }
+
             if (context == null) {
                 throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
             }
 
-            Config.Issuer issuer = context.getIssuer().getUrl() != null ? context.getIssuer() : config.getIssuers().get(context.getIssuer().getRef());
-            String issuerUrl = variableResolver.resolve(issuer.getUrl());
-            this.context = new Context(config.getStoreTokens(), context, issuerUrl);
+            String issuerUrl = variableResolver.resolve(issuer.url());
+            this.context = new Context(config.storeTokens(), context, issuerUrl);
         }
 
         return context;
@@ -65,7 +74,7 @@ public class ConfigService {
 
     public Config loadConfig() {
         if (!configFile.isFile() || configFile.length() == 0) {
-            config = new Config();
+            config = new Config(null, false, Collections.emptyMap(), null);
         } else {
             ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
             try {

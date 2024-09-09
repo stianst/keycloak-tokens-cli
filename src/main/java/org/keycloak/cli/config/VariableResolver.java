@@ -29,29 +29,15 @@ public class VariableResolver {
     }
 
     public Config resolve(Config config) {
-        if (config.getIssuers() != null) {
-            for (Config.Issuer issuer : config.getIssuers().values()) {
-                resolve(issuer);
-            }
+        Config copy = new Config(config.defaultContext(), config.storeTokens(), new HashMap<>(), config.truststore());
+        for (Map.Entry<String, Config.Issuer> e : config.issuers().entrySet()) {
+            copy.issuers().put(e.getKey(), resolve(e.getValue()));
         }
-        if (config.getContexts() != null) {
-            for (Config.Context context : config.getContexts().values()) {
-                resolve(context);
-            }
-        }
-        return config;
-    }
-
-    public Config.Context resolve(Config.Context context) {
-        resolve(context.getIssuer());
-        return context;
+        return copy;
     }
 
     public Config.Issuer resolve(Config.Issuer issuer) {
-        if (issuer != null && issuer.getUrl() != null) {
-            issuer.setUrl(resolve(issuer.getUrl()));
-        }
-        return issuer;
+        return new Config.Issuer(resolve(issuer.url()), issuer.contexts());
     }
 
 }

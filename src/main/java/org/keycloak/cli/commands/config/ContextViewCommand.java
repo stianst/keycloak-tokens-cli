@@ -15,9 +15,6 @@ public class ContextViewCommand implements Runnable {
     @CommandLine.Option(names = {"-c", "--context"}, description = "Context to use")
     String contextId;
 
-    @CommandLine.Option(names = {"-a", "--all"}, description = "View all issuers")
-    boolean all;
-
     @CommandLine.Option(names = {"-r", "--resolve"}, description = "Resolve variables")
     boolean resolve;
 
@@ -37,20 +34,16 @@ public class ContextViewCommand implements Runnable {
             config = variableResolver.resolve(config);
         }
 
-        if (all) {
-            interact.printYaml(config.getContexts());
-        } else {
-            if (contextId == null) {
-                contextId = config.getDefaultContext();
-            }
-
-            Config.Context context = config.getContexts().get(contextId);
-            if (context == null) {
-                throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
-            }
-
-            interact.printYaml(contextId, context);
+        if (contextId == null) {
+            contextId = config.defaultContext();
         }
+
+        Config.Context context = config.findContext(contextId);
+        if (context == null) {
+            throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
+        }
+
+        interact.printYaml(contextId, context);
     }
 
 }

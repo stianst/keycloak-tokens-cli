@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.commands.converter.FlowConverter;
 import org.keycloak.cli.config.Config;
+import org.keycloak.cli.config.ConfigException;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.Messages;
 import org.keycloak.cli.enums.Flow;
@@ -19,10 +20,7 @@ public class ContextUpdateCommand implements Runnable {
     String contextId;
 
     @CommandLine.Option(names = {"--iss"}, arity = "0..1")
-    String issuer;
-
-    @CommandLine.Option(names = {"--iss-ref"}, arity = "0..1")
-    String issuerRef;
+    String iss;
 
     @CommandLine.Option(names = {"--flow"}, converter = FlowConverter.class)
     Flow flow;
@@ -51,40 +49,45 @@ public class ContextUpdateCommand implements Runnable {
     @Override
     public void run() {
         Config config = configService.loadConfig();
-
         if (contextId == null) {
-            contextId = config.getDefaultContext();
+            contextId = config.defaultContext();
         }
 
-        Config.Context context = config.getContexts().get(contextId);
+        Config.Issuer issuer = config.issuers().values().stream().filter(i -> i.contexts().containsKey(contextId)).findFirst().orElse(null);
+        if (issuer == null) {
+            throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
+        }
+        Config.Context context = issuer.contexts().get(contextId);
 
-        if (issuer != null) {
-            context.getIssuer().setUrl(issuer.isBlank() ? null : issuer);
+//        if (issuer != null) {
+//            // TODO Change issuer
+//        }
+        if (flow == null) {
+            flow = context.flow();
         }
-        if (issuerRef != null) {
-            context.getIssuer().setRef(issuerRef.isBlank() ? null : issuerRef);
+        if (scope == null) {
+            scope = context.scope();
         }
-        if (flow != null) {
-            context.setFlow(flow);
+        if (client == null) {
+            client = context.client() != null ? context.client().clientId() : null;
         }
-        if (scope != null) {
-            context.setScope(scope.isEmpty() ? null : scope);
+        if (clientSecret == null) {
+            clientSecret = context.client() != null ? context.client().secret() : null;
         }
-        if (client != null) {
-            context.getClient().setClientId(client.isBlank() ? null : client);
-        }
-        if (clientSecret != null) {
-            context.getClient().setSecret(clientSecret.isBlank() ? null : clientSecret);
-        }
-        if (user != null) {
-            context.getUser().setUsername(user.isBlank() ? null : user);
+        if (user == null) {
+            user = context.user() != null ? context.user().username() : null;
         }
         if (userPassword != null) {
-            context.getUser().setPassword(userPassword.isBlank() ? null : userPassword);
+            userPassword = context.user() != null ? context.user().password() : null;
         }
-        if (context.getUser() != null && context.getUser().getUsername() == null && context.getUser().getPassword() == null) {
-            context.setUser(null);
-        }
+
+        issuer.contexts().remove(contextId);
+        issuer.contexts().put(contextId, new Config.Context(
+                flow,
+                client != null ? new Config.Client(client, clientSecret) : null,
+                user != null ? new Config.User(user, userPassword) : null,
+                scope
+        ));
 
         configService.saveConfig(config);
         interact.printUpdated(Messages.Type.CONTEXT, contextId);

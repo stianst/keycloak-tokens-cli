@@ -42,13 +42,13 @@ public class ConfigFileSmallryeSourceFactory implements ConfigSourceFactory {
             ObjectMapper om = new ObjectMapper(new YAMLFactory());
             try {
                 Config config = om.readValue(configFile, Config.class);
-                Config.Truststore truststore = config.getTruststore();
+                Config.Truststore truststore = config.truststore();
                 if (truststore != null) {
-                    if (truststore.getPath() != null) {
-                        configuration.put("kct.truststore", truststore.getPath());
+                    if (truststore.path() != null) {
+                        configuration.put("kct.truststore", truststore.path());
                     }
-                    if (truststore.getPassword() != null) {
-                        configuration.put("kct.truststore.password", truststore.getPassword());
+                    if (truststore.password() != null) {
+                        configuration.put("kct.truststore.password", truststore.password());
                     }
                 }
 

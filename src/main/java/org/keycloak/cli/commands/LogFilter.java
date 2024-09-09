@@ -16,7 +16,7 @@ public class LogFilter implements Filter {
 
     @Override
     public boolean isLoggable(LogRecord record) {
-        if("org.apache.http.wire".equals(record.getLoggerName())) {
+        if ("org.apache.http.wire".equals(record.getLoggerName())) {
             String message = record.getMessage()
                     .trim()
                     .replace("[\\r]", "").replace("[\\n]", "");
@@ -46,7 +46,7 @@ public class LogFilter implements Filter {
             return record.getLoggerName().startsWith("org.keycloak");
         }
     }
-    
+
     private void println(boolean send, String message) {
         System.err.println(CommandLine.Help.Ansi.AUTO.string("@|" + (send ? "yellow" : "cyan") + " " + message + "|@"));
     }

@@ -11,7 +11,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "delete", description = "Create config context", mixinStandardHelpOptions = true)
 public class IssuerDeleteCommand implements Runnable {
 
-    @CommandLine.Option(names = {"-i", "--issuer"}, description = "Issuer to delete", required = true)
+    @CommandLine.Option(names = {"-i", "--iss"}, description = "Issuer to delete", required = true)
     String issuerId;
 
     @Inject
@@ -23,8 +23,12 @@ public class IssuerDeleteCommand implements Runnable {
     @Override
     public void run() {
         Config config = configService.loadConfig();
-        if (config.getIssuers().remove(issuerId) == null) {
+        Config.Issuer removed = config.issuers().remove(issuerId);
+        if (removed == null) {
             throw ConfigException.notFound(Messages.Type.ISSUER, issuerId);
+        }
+        if (config.defaultContext() != null && removed.contexts().containsKey(config.defaultContext())) {
+            config = new Config(null, config.storeTokens(), config.issuers(), config.truststore());
         }
 
         configService.saveConfig(config);

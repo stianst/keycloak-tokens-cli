@@ -30,7 +30,7 @@ public class Context {
     }
 
     public Flow getFlow() {
-        return config.getFlow();
+        return config.flow();
     }
 
     public ClientAuthentication getClientAuthentication() {
@@ -39,23 +39,23 @@ public class Context {
     }
 
     public ClientID getClientId() {
-        return new ClientID(config.getClient().getClientId());
+        return new ClientID(config.client().clientId());
     }
 
     public Secret getClientSecret() {
-        return config.getClient().getSecret() != null ? new Secret(config.getClient().getSecret()) : null;
+        return config.client().secret() != null ? new Secret(config.client().secret()) : null;
     }
 
     public String getUsername() {
-        return config.getUser().getUsername();
+        return config.user().username();
     }
 
     public String getUserPassword() {
-        return config.getUser().getPassword();
+        return config.user().password();
     }
 
     public Set<String> getScope() {
-        return config.getScope();
+        return config.scope();
     }
 
 }

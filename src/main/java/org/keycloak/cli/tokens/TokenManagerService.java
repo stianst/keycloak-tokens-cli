@@ -7,6 +7,7 @@ import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.Context;
 import org.keycloak.cli.enums.Flow;
 import org.keycloak.cli.enums.TokenType;
+import org.keycloak.cli.oidc.OidcException;
 import org.keycloak.cli.oidc.OidcService;
 import org.keycloak.cli.oidc.Tokens;
 
@@ -53,7 +54,7 @@ public class TokenManagerService {
 
         Tokens storedTokens = tokenStoreService.getCurrent();
 
-        TokenStatus tokenStatus = checkStored(storedTokens, requestScope);
+        TokenStatus tokenStatus = checkStored(storedTokens, tokenType, requestScope);
         if (TokenStatus.VALID.equals(tokenStatus) && forceRefresh) {
             tokenStatus = TokenStatus.REFRESH;
         }
@@ -64,7 +65,12 @@ public class TokenManagerService {
             return getTokenType(storedTokens, tokenType);
         } else if (TokenStatus.REFRESH.equals(tokenStatus) && storedTokens.getRefreshToken() != null) {
             logger.debug("Refreshing stored tokens");
-            tokens = oidcService.refresh(storedTokens.getRefreshToken(), requestScope);
+            try {
+                tokens = oidcService.refresh(storedTokens.getRefreshToken(), requestScope);
+            } catch (OidcException e) {
+                logger.debug("Refresh token not valid, getting new tokens");
+                tokens = oidcService.token(requestScope);
+            }
             tokens.setContextScope(storedTokens.getContextScope());
             tokens.setTokenScope(requestScope);
         } else if (supportsRefresh) {
@@ -72,7 +78,7 @@ public class TokenManagerService {
             tokens = oidcService.token(contextScope);
             if (!scopeMatches(contextScope, requestScope)) {
                 logger.debug("Requested scope differs from context scope, refreshing");
-                tokens = oidcService.refresh(storedTokens.getRefreshToken(), requestScope);
+                tokens = oidcService.refresh(tokens.getRefreshToken(), requestScope);
             }
             tokens.setContextScope(contextScope);
             tokens.setTokenScope(requestScope);
@@ -102,7 +108,7 @@ public class TokenManagerService {
         return oidcService.revoke(token);
     }
 
-    private TokenStatus checkStored(Tokens storedTokens, Set<String> requestedScope) {
+    private TokenStatus checkStored(Tokens storedTokens, TokenType tokenType, Set<String> requestedScope) {
         if (storedTokens == null) {
             return TokenStatus.INVALID;
         }
@@ -121,6 +127,11 @@ public class TokenManagerService {
 
         if (!scopeMatches(storedTokens.getTokenScope(), requestedScope)) {
             logger.debugv("Requested scope differs from stored scope", config.getContextId());
+            return TokenStatus.REFRESH;
+        }
+
+        if (getTokenType(storedTokens, tokenType) == null) {
+            logger.debugv("Requested token type missing from store", config.getContextId());
             return TokenStatus.REFRESH;
         }
 

@@ -5,13 +5,14 @@ import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.OpenIDAssertions;
-import org.keycloak.cli.config.Config;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.enums.TokenType;
@@ -36,12 +37,13 @@ public class TokenManagerServiceTest {
     TokenStoreService tokenStoreService;
 
     @BeforeEach
-    public void updateIssuer() {
-        Config config = configService.loadConfig();
-        config.setDefaultContext("test-password");
-        config.setStoreTokens(true);
-        Config.Context context = config.getContexts().get("test-password");
-        context.setScope(Set.of("email", "roles"));
+    public void setContext() {
+        configService.setCurrentContext("test-password");
+    }
+
+    @AfterEach
+    public void clearTokens() {
+        tokenStoreService.clearAll();
     }
 
     @Test
@@ -82,8 +84,6 @@ public class TokenManagerServiceTest {
 
         String access4 = tokens.getToken(TokenType.ACCESS, null, true);
         Assertions.assertNotEquals(access3, access4);
-
-        tokenStoreService.clearAll();
     }
 
     @Test
@@ -100,8 +100,6 @@ public class TokenManagerServiceTest {
 
         String access3 = tokens.getToken(TokenType.ACCESS, null, true);
         Assertions.assertNotNull(access3);
-
-        tokenStoreService.clearAll();
     }
 
     @Test
@@ -112,9 +110,7 @@ public class TokenManagerServiceTest {
             tokens.getToken(TokenType.ACCESS, Set.of("email,roles"), false);
             Assertions.fail("Expected exception");
         } catch (RuntimeException e) {
-            Assertions.assertEquals("Requested scopes is not a subset of stored refresh scopes", e.getMessage());
-        } finally {
-            tokenStoreService.clearAll();
+            Assertions.assertEquals("Requested scopes must be a subset of configured scopes", e.getMessage());
         }
     }
 
@@ -133,8 +129,6 @@ public class TokenManagerServiceTest {
         Assertions.assertNotNull(jsonNode2.get("email"));
         Assertions.assertNull(jsonNode2.get("realm_access"));
         Assertions.assertNull(jsonNode2.get("resource_access"));
-
-        tokenStoreService.clearAll();
     }
 
     @Test

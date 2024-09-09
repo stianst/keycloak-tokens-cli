@@ -3,8 +3,8 @@ package org.keycloak.cli.tokens;
 import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
-import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
+import io.quarkus.test.junit.main.QuarkusMainTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +18,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-@QuarkusMainIntegrationTest
+@QuarkusMainTest
 @WithTestResource(KeycloakTestResource.class)
 @TestProfile(ConfigTestProfile.class)
 @ExtendWith({ConfigTestProfile.class})
-public class ClearIT {
+public class ClearTest {
 
     @BeforeEach
     public void addSomeTokens() throws IOException {

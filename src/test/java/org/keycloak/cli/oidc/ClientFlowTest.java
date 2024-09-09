@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
-import io.quarkus.test.junit.main.QuarkusMainIntegrationTest;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
+import io.quarkus.test.junit.main.QuarkusMainTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +15,11 @@ import org.keycloak.cli.assertion.LauncherAssertions;
 import org.keycloak.cli.assertion.OpenIDAssertions;
 import org.keycloak.cli.container.KeycloakTestResource;
 
-@QuarkusMainIntegrationTest
+@QuarkusMainTest
 @WithTestResource(KeycloakTestResource.class)
 @TestProfile(ConfigTestProfile.class)
 @ExtendWith({ConfigTestProfile.class})
-public class ClientFlowIT {
+public class ClientFlowTest {
 
     @Test
     public void testClientFlow(QuarkusMainLauncher launcher) {
