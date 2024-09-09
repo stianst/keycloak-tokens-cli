@@ -24,7 +24,7 @@ public class IssuerDeleteTest {
     public void test(QuarkusMainLauncher launcher) throws IOException {
         LaunchResult result = launcher.launch("config", "issuer", "delete", "--iss=test-issuer");
         LauncherAssertions.assertSuccess(result, "Issuer 'test-issuer' deleted");
-        Assertions.assertNull(ConfigTestProfile.loadConfig().issuers());
+        Assertions.assertTrue(ConfigTestProfile.loadConfig().issuers().isEmpty());
     }
 
 }

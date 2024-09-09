@@ -59,9 +59,6 @@ public class ContextUpdateCommand implements Runnable {
         }
         Config.Context context = issuer.contexts().get(contextId);
 
-//        if (issuer != null) {
-//            // TODO Change issuer
-//        }
         if (flow == null) {
             flow = context.flow();
         }
@@ -82,6 +79,11 @@ public class ContextUpdateCommand implements Runnable {
         }
 
         issuer.contexts().remove(contextId);
+
+        if (iss != null) {
+            issuer = config.issuers().get(iss);
+        }
+
         issuer.contexts().put(contextId, new Config.Context(
                 flow,
                 client != null ? new Config.Client(client, clientSecret) : null,

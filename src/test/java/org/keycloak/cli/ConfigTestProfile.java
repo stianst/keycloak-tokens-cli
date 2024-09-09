@@ -1,5 +1,7 @@
 package org.keycloak.cli;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.quarkus.test.junit.QuarkusTestProfile;
@@ -25,6 +27,7 @@ public class ConfigTestProfile implements QuarkusTestProfile, BeforeAllCallback 
         CONFIG_FILE = createTempFile("kct-test-config.yaml");
         TOKENS_FILE = createTempFile("kct-test-tokens.yaml");
         OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
+        OBJECT_MAPPER.configOverride(Map.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
         EMPTY_STORE = new TokenStore();
         try {
             DEFAULT_CONFIG = OBJECT_MAPPER.readValue(ConfigTestProfile.class.getResourceAsStream("example-config.yaml"), Config.class);

@@ -1,6 +1,9 @@
 package org.keycloak.cli.config;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.MutableConfigOverride;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -9,6 +12,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @ApplicationScoped
 public class ConfigService {
@@ -74,9 +79,10 @@ public class ConfigService {
 
     public Config loadConfig() {
         if (!configFile.isFile() || configFile.length() == 0) {
-            config = new Config(null, false, Collections.emptyMap(), null);
+            config = new Config(null, false, new HashMap<>(), null);
         } else {
             ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+            objectMapper.configOverride(Map.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
             try {
                 config = objectMapper.readValue(configFile, Config.class);
             } catch (IOException e) {
@@ -84,7 +90,6 @@ public class ConfigService {
             }
             ConfigVerifier.verify(config, variableResolver);
         }
-
         return config;
     }
 
