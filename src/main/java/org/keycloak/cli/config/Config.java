@@ -44,7 +44,8 @@ public record Config(
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public record Issuer(String url, Map<String, Context> contexts) {
+    public record Issuer(String url, Map<String, Context> contexts,
+                         @JsonProperty("client-registration-context") String clientRegistrationContext) {
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
