@@ -1,5 +1,7 @@
 package org.keycloak.cli.commands.config;
 
+import com.nimbusds.openid.connect.sdk.rp.OIDCClientInformation;
+import com.nimbusds.openid.connect.sdk.rp.OIDCClientMetadata;
 import jakarta.inject.Inject;
 import org.keycloak.cli.commands.converter.CommaSeparatedListConverter;
 import org.keycloak.cli.commands.converter.FlowConverter;
@@ -8,7 +10,11 @@ import org.keycloak.cli.config.ConfigException;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.Messages;
 import org.keycloak.cli.enums.Flow;
+import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.interact.InteractService;
+import org.keycloak.cli.oidc.OIDCClientMetadataGenerator;
+import org.keycloak.cli.oidc.OidcService;
+import org.keycloak.cli.tokens.TokenManagerService;
 import picocli.CommandLine;
 
 import java.util.HashMap;
@@ -41,8 +47,17 @@ public class ContextCreateCommand implements Runnable {
     @CommandLine.Option(names = {"--user-password"})
     String userPassword;
 
+    @CommandLine.Option(names = {"--create-client"})
+    boolean createClient;
+
     @Inject
     ConfigService configService;
+
+    @Inject
+    OidcService oidcService;
+
+    @Inject
+    TokenManagerService tokens;
 
     @Inject
     InteractService interact;
@@ -59,7 +74,7 @@ public class ContextCreateCommand implements Runnable {
         if (iss.startsWith("http://") || iss.startsWith("https://")) {
             issuer = config.findIssuerByUrl(iss);
             if (issuer == null) {
-                issuer = new Config.Issuer(iss, new HashMap<>());
+                issuer = new Config.Issuer(iss, new HashMap<>(), null);
                 iss = iss.substring(iss.indexOf('/') + 1).replace(":", "-").replace('/', '-');
                 config.issuers().put(iss, issuer);
             }
@@ -68,6 +83,17 @@ public class ContextCreateCommand implements Runnable {
             if (issuer == null) {
                 throw ConfigException.notFound(Messages.Type.ISSUER, iss);
             }
+        }
+
+        if (createClient) {
+            configService.setCurrentContext(issuer.clientRegistrationContext());
+            String token = tokens.getToken(TokenType.ACCESS, null, false);
+
+            OIDCClientMetadata clientMetadata = OIDCClientMetadataGenerator.generate(flow, scope);
+            OIDCClientInformation oidcClientInformation = oidcService.registerClient(token, clientMetadata);
+
+            client = oidcClientInformation.getID().getValue();
+            clientSecret = oidcClientInformation.getSecret().getValue();
         }
 
         issuer.contexts().put(contextId, new Config.Context(

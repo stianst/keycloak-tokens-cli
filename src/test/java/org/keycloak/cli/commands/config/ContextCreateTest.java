@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.LauncherAssertions;
+import org.keycloak.cli.config.Config;
 import org.keycloak.cli.container.KeycloakTestResource;
 
 import java.io.IOException;
@@ -26,6 +27,19 @@ public class ContextCreateTest {
                 "--client=myclient");
         LauncherAssertions.assertSuccess(result, "Context 'mycontext3' created");
         Assertions.assertNotNull(ConfigTestProfile.getInstance().loadConfig().issuers().get("test-issuer").contexts().get("mycontext3"));
+    }
+
+    @Test
+    public void testCreateContextRegisterClient(QuarkusMainLauncher launcher) throws IOException {
+        LaunchResult result = launcher.launch("config", "context", "create", "-c=mycontext4",
+                "--iss=test-issuer",
+                "--flow=browser",
+                "--create-client");
+        LauncherAssertions.assertSuccess(result, "Context 'mycontext4' created");
+
+        Config.Context context = ConfigTestProfile.getInstance().loadConfig().findContext("mycontext4");
+        Assertions.assertNotNull(context.client().clientId());
+        Assertions.assertNotNull(context.client().secret());
     }
 
 }

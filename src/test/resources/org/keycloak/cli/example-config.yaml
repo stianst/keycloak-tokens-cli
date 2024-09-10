@@ -4,6 +4,7 @@ store-tokens: true
 issuers:
   test-issuer:
     url: ${keycloak.url}/realms/test
+    client-registration-context: register-client
     contexts:
       test-service-account:
         flow: client
@@ -27,3 +28,8 @@ issuers:
         flow: device
         client:
           client-id: test-device
+      register-client:
+        flow: client
+        client:
+          client-id: register-client
+          secret: q31hhVNmsOrXfbRqnjJbWN1qDqfF1HOb

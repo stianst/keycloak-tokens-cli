@@ -22,6 +22,9 @@ import com.nimbusds.oauth2.sdk.tokenexchange.TokenExchangeGrant;
 import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderConfigurationRequest;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
+import com.nimbusds.openid.connect.sdk.rp.OIDCClientInformation;
+import com.nimbusds.openid.connect.sdk.rp.OIDCClientMetadata;
+import com.nimbusds.openid.connect.sdk.rp.OIDCClientRegistrationRequest;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -63,6 +66,12 @@ public class OidcService {
             providerMetadata = send(oidcProviderConfigurationRequest.toHTTPRequest(), OIDCProviderMetadata.class);
         }
         return providerMetadata;
+    }
+
+    public OIDCClientInformation registerClient(String token, OIDCClientMetadata clientMetadata) {
+        BearerAccessToken accessToken = new BearerAccessToken(token);
+        OIDCClientRegistrationRequest request = new OIDCClientRegistrationRequest(providerMetadata().getRegistrationEndpointURI(), clientMetadata, accessToken);
+        return send(request.toHTTPRequest(), OIDCClientInformation.class);
     }
 
     public String keys() {
@@ -170,7 +179,7 @@ public class OidcService {
         }
     }
 
-    protected Scope toScope(Set<String> scope) {
+    public static Scope toScope(Set<String> scope) {
         return scope != null ? new Scope(scope.toArray(new String[0])) : null;
     }
 

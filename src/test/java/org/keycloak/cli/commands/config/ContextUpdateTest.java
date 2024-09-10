@@ -32,17 +32,5 @@ public class ContextUpdateTest {
         Assertions.assertNull(context.client().secret());
         Assertions.assertEquals(Flow.DEVICE, context.flow());
     }
-    @Test
-    public void testUpdateContext2(QuarkusMainLauncher launcher) throws IOException {
-        LaunchResult result = launcher.launch("config", "context", "update", "-c=test-service-account",
-                "--client-secret",
-                "--flow=device");
-
-        LauncherAssertions.assertSuccess(result, "Context 'test-service-account' updated");
-
-        Config.Context context = ConfigTestProfile.getInstance().loadConfig().issuers().get("test-issuer").contexts().get("test-service-account");
-        Assertions.assertNull(context.client().secret());
-        Assertions.assertEquals(Flow.DEVICE, context.flow());
-    }
 
 }

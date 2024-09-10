@@ -5,7 +5,8 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "issuer", description = "Manage issuers", subcommands = {
         IssuerCreateCommand.class,
         IssuerDeleteCommand.class,
-        IssuerViewCommand.class
+        IssuerViewCommand.class,
+        IssuerUpdateCommand.class
 })
 public class IssuerParentCommand {
 

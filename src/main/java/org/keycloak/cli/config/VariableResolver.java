@@ -37,7 +37,7 @@ public class VariableResolver {
     }
 
     public Config.Issuer resolve(Config.Issuer issuer) {
-        return new Config.Issuer(resolve(issuer.url()), issuer.contexts());
+        return new Config.Issuer(resolve(issuer.url()), issuer.contexts(), issuer.clientRegistrationContext());
     }
 
 }

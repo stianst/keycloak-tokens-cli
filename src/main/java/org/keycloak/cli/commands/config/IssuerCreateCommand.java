@@ -19,6 +19,9 @@ public class IssuerCreateCommand implements Runnable {
     @CommandLine.Option(names = {"--url"})
     String url;
 
+    @CommandLine.Option(names = {"--client-registration-context"})
+    String clientRegistrationContext;
+
     @Inject
     ConfigService configService;
 
@@ -28,7 +31,7 @@ public class IssuerCreateCommand implements Runnable {
     @Override
     public void run() {
         Config config = configService.loadConfig();
-        Config.Issuer issuer = new Config.Issuer(url, new HashMap<>());
+        Config.Issuer issuer = new Config.Issuer(url, new HashMap<>(), clientRegistrationContext);
         if (config.issuers().put(issuerId, issuer) != null) {
             throw ConfigException.exists(Messages.Type.ISSUER, issuerId);
         }

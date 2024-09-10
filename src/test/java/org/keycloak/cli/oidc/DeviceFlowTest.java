@@ -42,17 +42,6 @@ public class DeviceFlowTest {
 
         OpenIDAssertions.assertEncodedToken(accessToken);
     }
-    @Test
-    public void testDeviceFlow2() {
-        configService.setCurrentContext("test-device");
-
-        OpenLink openLink = new OpenLink();
-        openLink.start();
-
-        String accessToken = tokenManagerService.getToken(TokenType.ACCESS, null, false);
-
-        OpenIDAssertions.assertEncodedToken(accessToken);
-    }
 
     private class OpenLink extends Thread {
         @Override
