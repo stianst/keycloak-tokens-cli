@@ -15,55 +15,68 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
-public class ConfigTestProfile implements QuarkusTestProfile, BeforeAllCallback {
+public class ConfigTestProfile implements BeforeAllCallback {
 
-    public static File CONFIG_FILE;
-    public static File TOKENS_FILE;
-    public static ObjectMapper OBJECT_MAPPER;
-    public static TokenStore EMPTY_STORE;
-    public static Config DEFAULT_CONFIG;
+    private static final ConfigTestProfile instance = new ConfigTestProfile();
 
-    static {
-        CONFIG_FILE = createTempFile("kct-test-config.yaml");
-        TOKENS_FILE = createTempFile("kct-test-tokens.yaml");
-        OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
-        OBJECT_MAPPER.configOverride(Map.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
-        EMPTY_STORE = new TokenStore();
+    private File configFile;
+    private File tokensFile;
+    private ObjectMapper objectMapper;
+    private TokenStore emptyStore;
+    private Config defaultConfig;
+
+    public ConfigTestProfile() {
+        configFile = createTempFile("kct-test-config.yaml");
+        tokensFile = createTempFile("kct-test-tokens.yaml");
+        objectMapper = new ObjectMapper(new YAMLFactory());
+        objectMapper.configOverride(Map.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
         try {
-            DEFAULT_CONFIG = OBJECT_MAPPER.readValue(ConfigTestProfile.class.getResourceAsStream("example-config.yaml"), Config.class);
+            defaultConfig = objectMapper.readValue(ConfigTestProfile.class.getResourceAsStream("example-config.yaml"), Config.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public static ConfigTestProfile getInstance() {
+        return instance;
+    }
+
+    public Config getDefaultConfig() {
+        return defaultConfig;
+    }
+
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
-        OBJECT_MAPPER.writeValue(CONFIG_FILE, DEFAULT_CONFIG);
-        new FileOutputStream(TOKENS_FILE).close();
+        objectMapper.writeValue(configFile, defaultConfig);
+        new FileOutputStream(tokensFile).close();
     }
 
-    public static Config loadConfig() throws IOException {
-        return OBJECT_MAPPER.readValue(CONFIG_FILE, Config.class);
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
-    public static TokenStore loadTokens() throws IOException {
-        return OBJECT_MAPPER.readValue(TOKENS_FILE, TokenStore.class);
+    public File getConfigFile() {
+        return configFile;
     }
 
-    public static void updateConfig(Config config) throws IOException {
-        OBJECT_MAPPER.writeValue(CONFIG_FILE, config);
+    public File getTokensFile() {
+        return tokensFile;
     }
 
-    public static void updateTokens(TokenStore tokenStore) throws IOException {
-        OBJECT_MAPPER.writeValue(TOKENS_FILE, tokenStore);
+    public Config loadConfig() throws IOException {
+        return objectMapper.readValue(configFile, Config.class);
     }
 
-    @Override
-    public Map<String, String> getConfigOverrides() {
-        return Map.of(
-                "kct.config.file", CONFIG_FILE.getAbsolutePath(),
-                "kct.tokens.file", TOKENS_FILE.getAbsolutePath()
-        );
+    public TokenStore loadTokens() throws IOException {
+        return objectMapper.readValue(tokensFile, TokenStore.class);
+    }
+
+    public void updateConfig(Config config) throws IOException {
+        objectMapper.writeValue(configFile, config);
+    }
+
+    public void updateTokens(TokenStore tokenStore) throws IOException {
+        objectMapper.writeValue(tokensFile, tokenStore);
     }
 
     private static File createTempFile(String name) {

@@ -2,7 +2,6 @@ package org.keycloak.cli.oidc;
 
 import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +19,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 @QuarkusTest
 @WithTestResource(KeycloakTestResource.class)
-@TestProfile(ConfigTestProfile.class)
 @ExtendWith({ConfigTestProfile.class})
 public class DeviceFlowTest {
 
@@ -35,6 +33,17 @@ public class DeviceFlowTest {
 
     @Test
     public void testDeviceFlow() {
+        configService.setCurrentContext("test-device");
+
+        OpenLink openLink = new OpenLink();
+        openLink.start();
+
+        String accessToken = tokenManagerService.getToken(TokenType.ACCESS, null, false);
+
+        OpenIDAssertions.assertEncodedToken(accessToken);
+    }
+    @Test
+    public void testDeviceFlow2() {
         configService.setCurrentContext("test-device");
 
         OpenLink openLink = new OpenLink();

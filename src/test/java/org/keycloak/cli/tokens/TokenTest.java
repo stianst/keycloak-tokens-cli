@@ -2,7 +2,6 @@ package org.keycloak.cli.tokens;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.test.common.WithTestResource;
-import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
 import io.quarkus.test.junit.main.QuarkusMainTest;
@@ -21,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 
 @QuarkusMainTest
 @WithTestResource(KeycloakTestResource.class)
-@TestProfile(ConfigTestProfile.class)
 @ExtendWith({ConfigTestProfile.class})
 public class TokenTest {
 

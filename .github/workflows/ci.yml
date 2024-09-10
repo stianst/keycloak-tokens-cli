@@ -18,7 +18,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-      - run: ./kc-test-server.sh &>/dev/null &
+      - run: |
+          ./kc-test-server.sh &
+          sleep 10
       - run: ./wait-for-server.sh
       - run: ./mvnw verify
 

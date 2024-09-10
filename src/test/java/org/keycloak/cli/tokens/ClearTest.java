@@ -1,7 +1,6 @@
 package org.keycloak.cli.tokens;
 
 import io.quarkus.test.common.WithTestResource;
-import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
 import io.quarkus.test.junit.main.QuarkusMainTest;
@@ -20,7 +19,6 @@ import java.util.Set;
 
 @QuarkusMainTest
 @WithTestResource(KeycloakTestResource.class)
-@TestProfile(ConfigTestProfile.class)
 @ExtendWith({ConfigTestProfile.class})
 public class ClearTest {
 
@@ -30,7 +28,7 @@ public class ClearTest {
         for (String i : List.of("test-service-account", "test-password")) {
             tokenStore.getTokens().put(i, new Tokens("refresh-" + i, Set.of("ref-scope-" + i), "access-" + i, "id-" + i, Set.of("tok-scope-" + i), 1L));
         }
-        ConfigTestProfile.updateTokens(tokenStore);
+        ConfigTestProfile.getInstance().updateTokens(tokenStore);
     }
 
     @Test
@@ -51,11 +49,11 @@ public class ClearTest {
     public void clearAll(QuarkusMainLauncher launcher) {
         LaunchResult result = launcher.launch("clear", "--all");
         LauncherAssertions.assertSuccess(result, "Cleared all stored tokens");
-        Assertions.assertEquals(0, ConfigTestProfile.TOKENS_FILE.length());
+        Assertions.assertEquals(0, ConfigTestProfile.getInstance().getTokensFile().length());
     }
 
     private void assertStoredContexts(Set<String> expectedStoredContexts) throws IOException {
-        Assertions.assertEquals(expectedStoredContexts, ConfigTestProfile.loadTokens().getTokens().keySet());
+        Assertions.assertEquals(expectedStoredContexts, ConfigTestProfile.getInstance().loadTokens().getTokens().keySet());
     }
 
 }

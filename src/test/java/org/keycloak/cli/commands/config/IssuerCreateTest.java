@@ -1,7 +1,6 @@
 package org.keycloak.cli.commands.config;
 
 import io.quarkus.test.common.WithTestResource;
-import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
 import io.quarkus.test.junit.main.QuarkusMainTest;
@@ -16,7 +15,6 @@ import java.io.IOException;
 
 @QuarkusMainTest
 @WithTestResource(KeycloakTestResource.class)
-@TestProfile(ConfigTestProfile.class)
 @ExtendWith(ConfigTestProfile.class)
 public class IssuerCreateTest {
 
@@ -25,7 +23,7 @@ public class IssuerCreateTest {
         LaunchResult result = launcher.launch("config", "issuer", "create", "-i=issuer3",
                 "--url=http://localhost3");
         LauncherAssertions.assertSuccess(result, "Issuer 'issuer3' created");
-        Assertions.assertNotNull(ConfigTestProfile.loadConfig().issuers().get("issuer3"));
+        Assertions.assertNotNull(ConfigTestProfile.getInstance().loadConfig().issuers().get("issuer3"));
     }
 
 }

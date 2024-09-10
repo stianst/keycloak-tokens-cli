@@ -2,7 +2,6 @@ package org.keycloak.cli.tokens;
 
 import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import java.util.Set;
 
 @QuarkusTest
 @WithTestResource(KeycloakTestResource.class)
-@TestProfile(ConfigTestProfile.class)
 @ExtendWith({ConfigTestProfile.class})
 public class TokenStoreServiceTest {
 
@@ -29,12 +27,12 @@ public class TokenStoreServiceTest {
 
     @Test
     public void token() throws IOException {
-        Assertions.assertEquals(0, ConfigTestProfile.TOKENS_FILE.length());
+        Assertions.assertEquals(0, ConfigTestProfile.getInstance().getTokensFile().length());
 
         Tokens token = new Tokens("refresh", Set.of("refresh"), "access", "id", Set.of("token"), 123456L);
         tokens.updateCurrent(token);
 
-        TokenStore tokenStore = ConfigTestProfile.loadTokens();
+        TokenStore tokenStore = ConfigTestProfile.getInstance().loadTokens();
         Assertions.assertNotNull(tokenStore.getTokens().get("test-service-account"));
 
         tokens.getAll().clear();
@@ -51,7 +49,7 @@ public class TokenStoreServiceTest {
         tokens.clearCurrent();
 
         Assertions.assertNull(tokens.getCurrent());
-        Assertions.assertEquals(0, ConfigTestProfile.TOKENS_FILE.length());
+        Assertions.assertEquals(0, ConfigTestProfile.getInstance().getTokensFile().length());
     }
 
 }

@@ -22,7 +22,7 @@ public class LauncherAssertions {
     public static void assertYamlOutput(LaunchResult result, String header, Object value) {
         String expectedOutput;
         try {
-            expectedOutput = ConfigTestProfile.OBJECT_MAPPER.writeValueAsString(value);
+            expectedOutput = ConfigTestProfile.getInstance().getObjectMapper().writeValueAsString(value);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
