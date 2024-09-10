@@ -22,7 +22,7 @@ public class KeycloakTestResource implements QuarkusTestResourceLifecycleManager
     @Override
     public Map<String, String> start() {
         Config config = ConfigProvider.getConfig();
-        ContainerMode containerMode = config.getOptionalValue("kc.container.mode", ContainerMode.class).orElse(ContainerMode.DEFAULT);
+        ContainerMode containerMode = config.getOptionalValue("kc.container.mode", ContainerMode.class).orElse(ContainerMode.MANUAL);
         boolean containerLog = config.getOptionalValue("kc.container.log", Boolean.class).orElse(false);
 
         logger.infov("Starting Keycloak: mode={0}", containerMode);

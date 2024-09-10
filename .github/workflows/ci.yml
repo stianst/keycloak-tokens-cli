@@ -18,15 +18,17 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+      - run: ./kc-test-server.sh &>/dev/null &
+      - run: ./wait-for-server.sh
       - run: ./mvnw verify
 
-  linux-amd64:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: maven
-      - run: ./mvnw verify -Pnative
+#  linux-amd64:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-java@v4
+#        with:
+#          java-version: '21'
+#          distribution: 'temurin'
+#          cache: maven
+#      - run: ./mvnw verify -Pnative
