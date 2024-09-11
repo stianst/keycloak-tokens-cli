@@ -12,9 +12,13 @@ import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.TokenRevocationRequest;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.client.ClientDeleteRequest;
+import com.nimbusds.oauth2.sdk.client.ClientReadRequest;
+import com.nimbusds.oauth2.sdk.client.ClientUpdateRequest;
 import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.Audience;
+import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.nimbusds.oauth2.sdk.token.TokenTypeURI;
@@ -25,6 +29,7 @@ import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import com.nimbusds.openid.connect.sdk.rp.OIDCClientInformation;
 import com.nimbusds.openid.connect.sdk.rp.OIDCClientMetadata;
 import com.nimbusds.openid.connect.sdk.rp.OIDCClientRegistrationRequest;
+import com.nimbusds.openid.connect.sdk.rp.OIDCClientUpdateRequest;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -34,6 +39,7 @@ import org.keycloak.cli.config.Context;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
 
@@ -72,6 +78,34 @@ public class OidcService {
         BearerAccessToken accessToken = new BearerAccessToken(token);
         OIDCClientRegistrationRequest request = new OIDCClientRegistrationRequest(providerMetadata().getRegistrationEndpointURI(), clientMetadata, accessToken);
         return send(request.toHTTPRequest(), OIDCClientInformation.class);
+    }
+
+    public OIDCClientInformation queryClient(String registrationToken, String registrationUrl) {
+        try {
+            ClientReadRequest clientReadRequest = new ClientReadRequest(new URI(registrationUrl), new BearerAccessToken(registrationToken));
+            return send(clientReadRequest.toHTTPRequest(), OIDCClientInformation.class);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public OIDCClientInformation updateClient(OIDCClientInformation clientInformation, OIDCClientMetadata clientMetadata) {
+        ClientUpdateRequest clientUpdateRequest = new ClientUpdateRequest(
+                clientInformation.getRegistrationURI(),
+                clientInformation.getID(),
+                clientInformation.getRegistrationAccessToken(),
+                clientMetadata,
+                clientInformation.getSecret());
+        return send(clientUpdateRequest.toHTTPRequest(), OIDCClientInformation.class);
+    }
+
+    public boolean deleteClient(String registrationToken, String registrationUrl) {
+        try {
+            ClientDeleteRequest clientDeleteRequest = new ClientDeleteRequest(new URI(registrationUrl), new BearerAccessToken(registrationToken));
+            return send(clientDeleteRequest.toHTTPRequest(), Boolean.class);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String keys() {

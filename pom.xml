@@ -11,6 +11,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <keycloak.version>25.0.5</keycloak.version>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>3.14.2</quarkus.platform.version>
@@ -81,6 +82,12 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-apache-httpclient</artifactId>
             <version>${quarkus.platform.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
