@@ -40,8 +40,7 @@ import org.keycloak.cli.config.Context;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @ApplicationScoped
 public class OidcService {
@@ -152,11 +151,23 @@ public class OidcService {
         return send(tokenRevocationRequest.toHTTPRequest(), Boolean.class);
     }
 
-    public String exchange(String subjectToken, Set<String> audience, Set<String> scope) {
-        List<Audience> audiences = audience != null ? audience.stream().map(Audience::new).toList() : null;
-        TokenExchangeGrant tokenExchangeGrant = new TokenExchangeGrant(new BearerAccessToken(subjectToken), TokenTypeURI.ACCESS_TOKEN, null, null, null, audiences);
+    public String exchange(Set<String> audience, Set<String> scope, String requestedTokenType, String subjectToken, String subjectTokenType, String actorToken, String actorTokenType, Map<String, String> customParams) {
         try {
-            return tokenRequest(tokenExchangeGrant, scope).getAccessToken();
+            TokenTypeURI requestedTokenTypeWrapper = requestedTokenType != null ? TokenTypeURI.parse(requestedTokenType) : null;
+            List<Audience> audienceWrapper = audience != null ? audience.stream().map(Audience::new).toList() : null;
+            BearerAccessToken subjectTokenWrapper = new BearerAccessToken(subjectToken);
+            TokenTypeURI subjectTokenTypeWrapper = TokenTypeURI.parse(subjectTokenType);
+            BearerAccessToken actorTokenWrapper = actorToken != null ? new BearerAccessToken(actorToken) : null;
+            TokenTypeURI actorTokenTypeWrapper = actorTokenType != null ? TokenTypeURI.parse(actorTokenType) : null;
+
+            TokenExchangeGrant tokenExchangeGrant = new TokenExchangeGrant(
+                    subjectTokenWrapper,
+                    subjectTokenTypeWrapper,
+                    actorTokenWrapper,
+                    actorTokenTypeWrapper,
+                    requestedTokenTypeWrapper,
+                    audienceWrapper);
+            return tokenRequest(tokenExchangeGrant, scope, customParams).getAccessToken();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -175,14 +186,26 @@ public class OidcService {
     }
 
     public Tokens tokenRequest(AuthorizationGrant grant, Set<String> requestScope) {
+        return tokenRequest(grant, requestScope, null);
+    }
+
+    public Tokens tokenRequest(AuthorizationGrant grant, Set<String> requestScope, Map<String, String> customParams) {
+        TokenRequest.Builder builder;
         ClientAuthentication clientAuthentication = context.getClientAuthentication();
-        TokenRequest tokenRequest;
         if (clientAuthentication != null) {
-            tokenRequest = new TokenRequest(providerMetadata().getTokenEndpointURI(), context.getClientAuthentication(), grant, toScope(requestScope));
+            builder = new TokenRequest.Builder(providerMetadata().getTokenEndpointURI(), context.getClientAuthentication(), grant);
         } else {
-            tokenRequest = new TokenRequest(providerMetadata().getTokenEndpointURI(), context.getClientId(), grant, toScope(requestScope));
+            builder = new TokenRequest.Builder(providerMetadata().getTokenEndpointURI(), context.getClientId(), grant);
         }
-        OIDCTokens tokens = send(tokenRequest.toHTTPRequest(), OIDCTokens.class);
+        builder.scope(toScope(requestScope));
+
+        if (customParams != null && !customParams.isEmpty()) {
+            for (Map.Entry<String, String> e : customParams.entrySet()) {
+                builder.customParameter(e.getKey(), e.getValue());
+            }
+        }
+
+        OIDCTokens tokens = send(builder.build().toHTTPRequest(), OIDCTokens.class);
         return new Tokens(tokens);
     }
 
