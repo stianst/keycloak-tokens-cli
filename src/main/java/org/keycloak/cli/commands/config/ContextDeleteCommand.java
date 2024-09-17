@@ -4,8 +4,10 @@ import jakarta.inject.Inject;
 import org.keycloak.cli.config.Config;
 import org.keycloak.cli.config.ConfigException;
 import org.keycloak.cli.config.ConfigService;
+import org.keycloak.cli.config.Context;
 import org.keycloak.cli.config.Messages;
 import org.keycloak.cli.interact.InteractService;
+import org.keycloak.cli.oidc.OidcService;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "delete", description = "Delete config context", mixinStandardHelpOptions = true)
@@ -18,21 +20,32 @@ public class ContextDeleteCommand implements Runnable {
     ConfigService configService;
 
     @Inject
+    OidcService oidcService;
+
+    @Inject
     InteractService interact;
 
     @Override
     public void run() {
         Config config = configService.loadConfig();
-        boolean removed = false;
-        for (Config.Issuer issuer : config.issuers().values()) {
-            if (issuer.contexts().remove(contextId) != null) {
-                removed = true;
+        Config.Issuer issuer = null;
+        Config.Context removedContext = null;
+        for (Config.Issuer i : config.issuers().values()) {
+            removedContext = i.contexts().remove(contextId);
+            if (removedContext != null) {
+                issuer = i;
                 break;
             }
         }
 
-        if (!removed) {
+        if (removedContext == null) {
             throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
+        }
+
+        Config.Client client = removedContext.client();
+        if (client != null && client.registrationToken() != null && client.registrationUrl() != null) {
+            configService.setCurrentContext(issuer.clientRegistrationContext());
+            oidcService.deleteClient(client.registrationToken(), client.registrationUrl());
         }
 
         configService.saveConfig(config);

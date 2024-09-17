@@ -26,7 +26,7 @@ public class ContextCreateCommand implements Runnable {
     @CommandLine.Option(names = {"-c", "--context"}, description = "Context to create", required = true)
     String contextId;
 
-    @CommandLine.Option(names = {"--iss"})
+    @CommandLine.Option(names = {"--iss"}, required = true)
     String iss;
 
     @CommandLine.Option(names = {"--flow"}, converter = FlowConverter.class, required = true)
@@ -85,6 +85,8 @@ public class ContextCreateCommand implements Runnable {
             }
         }
 
+        String registrationToken = null;
+        String registrationUrl = null;
         if (createClient) {
             configService.setCurrentContext(issuer.clientRegistrationContext());
             String token = tokens.getToken(TokenType.ACCESS, null, false);
@@ -94,11 +96,13 @@ public class ContextCreateCommand implements Runnable {
 
             client = oidcClientInformation.getID().getValue();
             clientSecret = oidcClientInformation.getSecret().getValue();
+            registrationToken = oidcClientInformation.getRegistrationAccessToken().getValue();
+            registrationUrl = oidcClientInformation.getRegistrationURI().toString();
         }
 
         issuer.contexts().put(contextId, new Config.Context(
                 flow,
-                client != null ? new Config.Client(client, clientSecret) : null,
+                client != null ? new Config.Client(client, clientSecret, registrationToken, registrationUrl) : null,
                 user != null ? new Config.User(user, userPassword) : null,
                 scope
         ));

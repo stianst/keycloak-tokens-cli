@@ -49,7 +49,7 @@ public record Config(
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public record Client(@JsonProperty("client-id") String clientId, String secret) {
+    public record Client(@JsonProperty("client-id") String clientId, String secret, String registrationToken, String registrationUrl) {
     }
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
