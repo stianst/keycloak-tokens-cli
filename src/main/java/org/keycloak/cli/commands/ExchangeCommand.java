@@ -72,6 +72,7 @@ public class ExchangeCommand implements Runnable {
 
         if (subjectToken == null) {
             subjectToken = tokens.getToken(TokenType.ACCESS, null, false);
+            subjectTokenType = "urn:ietf:params:oauth:token-type:access_token";
         }
 
         String exchangedToken = oidcService.exchange(audience, scope, requestedTokenType, subjectToken, subjectTokenType, actorToken, actorTokenType, params);
