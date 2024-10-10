@@ -26,7 +26,7 @@ public class TokenCommand implements Runnable {
     @CommandLine.Option(names = {"-s", "--scope"}, description = "Scope to request", converter = CommaSeparatedListConverter.class)
     Set<String> scope;
 
-    @CommandLine.Option(names = {"-r", "--refresh"}, description = "Force refresh", defaultValue = "false")
+    @CommandLine.Option(names = {"-u", "--update"}, description = "Force tokens to be updated", defaultValue = "false")
     boolean refresh;
 
     @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token", defaultValue = "false")
