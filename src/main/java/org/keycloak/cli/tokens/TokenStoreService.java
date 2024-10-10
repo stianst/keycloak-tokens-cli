@@ -7,7 +7,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
+import org.keycloak.cli.config.ConfigException;
 import org.keycloak.cli.config.ConfigService;
+import org.keycloak.cli.config.FileUtils;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.oidc.Tokens;
 
@@ -91,6 +93,16 @@ public class TokenStoreService {
     }
 
     private void save() {
+        boolean creatingFile = !tokensFile.isFile();
+        if (creatingFile) {
+            File configDir = tokensFile.getParentFile();
+            if (!configDir.isDirectory()) {
+                if (!configDir.mkdirs()) {
+                    throw new ConfigException("Failed to create config directory");
+                }
+            }
+        }
+
         if (!tokenStore.getTokens().isEmpty()) {
             try {
                 boolean newFile = !tokensFile.isFile();
@@ -112,6 +124,10 @@ public class TokenStoreService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        if (creatingFile) {
+            FileUtils.userOnlyPermissions(tokensFile);
         }
     }
 

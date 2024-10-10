@@ -92,12 +92,27 @@ public class ConfigService {
     }
 
     public void saveConfig(Config config) {
+        boolean creatingFile = !configFile.isFile();
+
+        if (creatingFile) {
+            File configDir = configFile.getParentFile();
+            if (!configDir.isDirectory()) {
+                if (!configDir.mkdirs()) {
+                    throw new ConfigException("Failed to create config directory");
+                }
+            }
+        }
+
         ConfigVerifier.verify(config, variableResolver);
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         try {
             objectMapper.writeValue(configFile, config);
         } catch (IOException e) {
             throw new ConfigException("Failed to save config file", e);
+        }
+
+        if (creatingFile) {
+            FileUtils.userOnlyPermissions(configFile);
         }
     }
 
