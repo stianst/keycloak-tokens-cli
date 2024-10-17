@@ -18,7 +18,7 @@ public class IssuerViewTest {
     @Test
     public void testViewSpecified(QuarkusMainLauncher launcher) {
         LaunchResult result = launcher.launch("config", "issuer", "view", "--iss=test-issuer");
-        LauncherAssertions.assertYamlOutput(result, "test-issuer", ConfigTestProfile.getInstance().getDefaultConfig().issuers().get("test-issuer"));
+        LauncherAssertions.assertYamlOutput(result, "test-issuer", ConfigTestProfile.getInstance().getDefaultConfig().getIssuers().get("test-issuer"));
     }
 
 }

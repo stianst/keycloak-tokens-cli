@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class Context {
 
-    private boolean storeTokens;
+    private final boolean storeTokens;
     private final Config.Context config;
     private final String issuerUrl;
 
@@ -30,7 +30,7 @@ public class Context {
     }
 
     public Flow getFlow() {
-        return config.flow();
+        return config.getFlow();
     }
 
     public ClientAuthentication getClientAuthentication() {
@@ -39,23 +39,23 @@ public class Context {
     }
 
     public ClientID getClientId() {
-        return new ClientID(config.client().clientId());
+        return new ClientID(config.getClient().getClientId());
     }
 
     public Secret getClientSecret() {
-        return config.client().secret() != null ? new Secret(config.client().secret()) : null;
+        return config.getClient().getSecret() != null ? new Secret(config.getClient().getSecret()) : null;
     }
 
     public String getUsername() {
-        return config.user().username();
+        return config.getUser().getUsername();
     }
 
     public String getUserPassword() {
-        return config.user().password();
+        return config.getUser().getPassword();
     }
 
     public Set<String> getScope() {
-        return config.scope();
+        return config.getScope();
     }
 
 }

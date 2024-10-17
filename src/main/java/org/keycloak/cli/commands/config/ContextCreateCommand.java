@@ -76,10 +76,10 @@ public class ContextCreateCommand implements Runnable {
             if (issuer == null) {
                 issuer = new Config.Issuer(iss, new HashMap<>(), null);
                 iss = iss.substring(iss.indexOf('/') + 1).replace(":", "-").replace('/', '-');
-                config.issuers().put(iss, issuer);
+                config.getIssuers().put(iss, issuer);
             }
         } else {
-            issuer = config.issuers().get(iss);
+            issuer = config.getIssuers().get(iss);
             if (issuer == null) {
                 throw ConfigException.notFound(Messages.Type.ISSUER, iss);
             }
@@ -88,7 +88,7 @@ public class ContextCreateCommand implements Runnable {
         String registrationToken = null;
         String registrationUrl = null;
         if (createClient) {
-            configService.setCurrentContext(issuer.clientRegistrationContext());
+            configService.setCurrentContext(issuer.getClientRegistrationContext());
             String token = tokens.getToken(TokenType.ACCESS, null, false);
 
             OIDCClientMetadata clientMetadata = OIDCClientMetadataGenerator.generate(flow, scope);
@@ -100,7 +100,7 @@ public class ContextCreateCommand implements Runnable {
             registrationUrl = oidcClientInformation.getRegistrationURI().toString();
         }
 
-        issuer.contexts().put(contextId, new Config.Context(
+        issuer.getContexts().put(contextId, new Config.Context(
                 flow,
                 client != null ? new Config.Client(client, clientSecret, registrationToken, registrationUrl) : null,
                 user != null ? new Config.User(user, userPassword) : null,

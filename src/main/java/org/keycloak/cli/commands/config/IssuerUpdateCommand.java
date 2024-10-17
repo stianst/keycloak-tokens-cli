@@ -29,20 +29,20 @@ public class IssuerUpdateCommand implements Runnable {
     @Override
     public void run() {
         Config config = configService.loadConfig();
-        Config.Issuer issuer = config.issuers().get(issuerId);
+        Config.Issuer issuer = config.getIssuers().get(issuerId);
         if (issuer == null) {
             throw ConfigException.notFound(Messages.Type.CONTEXT, issuerId);
         }
 
         if (url == null) {
-            url = issuer.url();
+            url = issuer.getUrl();
         }
         if (clientRegistrationContext == null) {
-            clientRegistrationContext = issuer.clientRegistrationContext();
+            clientRegistrationContext = issuer.getClientRegistrationContext();
         }
 
-        config.issuers().remove(issuerId);
-        config.issuers().put(issuerId, new Config.Issuer(url, issuer.contexts(), clientRegistrationContext));
+        config.getIssuers().remove(issuerId);
+        config.getIssuers().put(issuerId, new Config.Issuer(url, issuer.getContexts(), clientRegistrationContext));
 
         configService.saveConfig(config);
         interact.printUpdated(Messages.Type.ISSUER, issuerId);

@@ -56,46 +56,46 @@ public class ContextUpdateCommand implements Runnable {
     public void run() {
         Config config = configService.loadConfig();
         if (contextId == null) {
-            contextId = config.defaultContext();
+            contextId = config.getDefaultContext();
         }
 
-        Config.Issuer issuer = config.issuers().values().stream().filter(i -> i.contexts().containsKey(contextId)).findFirst().orElse(null);
+        Config.Issuer issuer = config.getIssuers().values().stream().filter(i -> i.getContexts().containsKey(contextId)).findFirst().orElse(null);
         if (issuer == null) {
             throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
         }
-        Config.Context context = issuer.contexts().get(contextId);
+        Config.Context context = issuer.getContexts().get(contextId);
 
         if (flow == null) {
-            flow = context.flow();
+            flow = context.getFlow();
         }
         if (scope == null) {
-            scope = context.scope();
+            scope = context.getScope();
         }
         if (client == null) {
-            client = context.client() != null ? context.client().clientId() : null;
+            client = context.getClient() != null ? context.getClient().getClientId() : null;
         }
         if (clientSecret == null) {
-            clientSecret = context.client() != null ? context.client().secret() : null;
+            clientSecret = context.getClient() != null ? context.getClient().getSecret() : null;
         }
         if (user == null) {
-            user = context.user() != null ? context.user().username() : null;
+            user = context.getUser() != null ? context.getUser().getUsername() : null;
         }
         if (userPassword != null) {
-            userPassword = context.user() != null ? context.user().password() : null;
+            userPassword = context.getUser() != null ? context.getUser().getPassword() : null;
         }
 
-        Config.Context removed = issuer.contexts().remove(contextId);
+        Config.Context removed = issuer.getContexts().remove(contextId);
 
         if (iss != null) {
-            issuer = config.issuers().get(iss);
+            issuer = config.getIssuers().get(iss);
         }
 
-        Config.Client client = removed.client();
+        Config.Client client = removed.getClient();
         String registrationUrl = null;
         String registrationToken = null;
-        if (client != null && client.registrationUrl() != null && client.registrationToken() != null) {
-            configService.setCurrentContext(issuer.clientRegistrationContext());
-            OIDCClientInformation oidcClientInformation = oidcService.queryClient(client.registrationToken(), client.registrationUrl());
+        if (client != null && client.getRegistrationUrl() != null && client.getRegistrationToken() != null) {
+            configService.setCurrentContext(issuer.getClientRegistrationContext());
+            OIDCClientInformation oidcClientInformation = oidcService.queryClient(client.getRegistrationToken(), client.getRegistrationUrl());
 
             OIDCClientMetadata oidcMetadata = oidcClientInformation.getOIDCMetadata();
             oidcMetadata.setScope(OidcService.toScope(scope));
@@ -106,7 +106,7 @@ public class ContextUpdateCommand implements Runnable {
             registrationToken = oidcClientInformation.getRegistrationAccessToken().getValue();
         }
 
-        issuer.contexts().put(contextId, new Config.Context(
+        issuer.getContexts().put(contextId, new Config.Context(
                 flow,
                 this.client != null ? new Config.Client(this.client, clientSecret, registrationToken, registrationUrl) : null,
                 user != null ? new Config.User(user, userPassword) : null,
