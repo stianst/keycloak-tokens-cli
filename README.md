@@ -44,7 +44,7 @@ contexts to make it easy to switch between different issuers, flows, or clients.
 Creating a context with `kct`:
 
 ```
-kct config context create --iss=http://localhost:8080/realms/myrealm --client=myclient --client-secret=secret --flow=client
+kct config context create --iss=http://localhost:8080/realms/myrealm --context=mycontext --client=myclient --client-secret=secret --flow=client
 ```
 
 For more details see `kct config -h`.
