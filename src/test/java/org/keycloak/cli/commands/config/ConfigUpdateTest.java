@@ -33,4 +33,14 @@ public class ConfigUpdateTest {
         Assertions.assertEquals("test-password", config.getDefaultContext());
     }
 
+    @Test
+    public void testUpdateTruststore(QuarkusMainLauncher launcher) throws IOException {
+        LaunchResult result = launcher.launch("config", "update", "--truststore-path=/mypath", "--truststore-password=test-password");
+        LauncherAssertions.assertSuccess(result, "Config updated");
+
+        Config config = ConfigTestProfile.getInstance().loadConfig();
+        Assertions.assertEquals("/mypath", config.getTruststore().getPath());
+        Assertions.assertEquals("test-password", config.getTruststore().getPassword());
+    }
+
 }

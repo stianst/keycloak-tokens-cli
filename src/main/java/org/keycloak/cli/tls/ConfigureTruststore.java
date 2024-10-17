@@ -30,6 +30,8 @@ public class ConfigureTruststore {
                 logger.debug("Configured truststore without password");
             }
         } else {
+            System.getProperties().remove("javax.net.ssl.trustStore");
+            System.getProperties().remove("javax.net.ssl.trustStorePassword");
             logger.debug("Truststore not configured");
         }
     }
