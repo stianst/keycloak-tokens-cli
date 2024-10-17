@@ -33,6 +33,18 @@ public class ContextCreateTest {
     }
 
     @Test
+    public void testCreateContextWithNewIssuer(QuarkusMainLauncher launcher) throws IOException {
+        LaunchResult result = launcher.launch("config", "context", "create", "-c=mycontext5",
+                "--iss=http://localhost:8080/realms/something",
+                "--flow=device",
+                "--client=myclient");
+        LauncherAssertions.assertSuccess(result, "Context 'mycontext5' created");
+
+        Config config = ConfigTestProfile.getInstance().loadConfig();
+        Assertions.assertNotNull(config.getIssuers().get("localhost-8080-realms-something").getContexts().get("mycontext5"));
+    }
+
+    @Test
     public void testCreateDefaultContext(QuarkusMainLauncher launcher) throws IOException {
         LaunchResult result = launcher.launch("config", "context", "create", "-c=mycontext4",
                 "--iss=test-issuer",

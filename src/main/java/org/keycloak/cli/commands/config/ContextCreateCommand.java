@@ -78,7 +78,7 @@ public class ContextCreateCommand implements Runnable {
             issuer = config.findIssuerByUrl(iss);
             if (issuer == null) {
                 issuer = new Config.Issuer(iss, new HashMap<>(), null);
-                iss = iss.substring(iss.indexOf('/') + 1).replace(":", "-").replace('/', '-');
+                iss = iss.substring(iss.indexOf('/') + 2).replace(":", "-").replace('/', '-');
                 config.getIssuers().put(iss, issuer);
             }
         } else {
