@@ -29,7 +29,7 @@ public class TokenCommand implements Runnable {
     @CommandLine.Option(names = {"-u", "--update"}, description = "Force tokens to be updated", defaultValue = "false")
     boolean refresh;
 
-    @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token", defaultValue = "false")
+    @CommandLine.Option(names = {"-d", "--decode"}, description = "Decode the token payload", defaultValue = "false")
     boolean decode;
 
     @CommandLine.Option(names = {"--kubectl"}, description = "Kubectl mode", defaultValue = "false")
