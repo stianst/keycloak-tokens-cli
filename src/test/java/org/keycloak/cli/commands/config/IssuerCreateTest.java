@@ -23,7 +23,7 @@ public class IssuerCreateTest {
         LaunchResult result = launcher.launch("config", "issuer", "create", "-i=issuer3",
                 "--url=http://localhost3");
         LauncherAssertions.assertSuccess(result, "Issuer 'issuer3' created");
-        Assertions.assertNotNull(ConfigTestProfile.getInstance().loadConfig().issuers().get("issuer3"));
+        Assertions.assertNotNull(ConfigTestProfile.getInstance().loadConfig().getIssuers().get("issuer3"));
     }
 
 }

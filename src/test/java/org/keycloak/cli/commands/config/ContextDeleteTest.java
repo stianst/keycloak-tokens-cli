@@ -22,7 +22,7 @@ public class ContextDeleteTest {
     public void testDeleteContext(QuarkusMainLauncher launcher) throws IOException {
         LaunchResult result = launcher.launch("config", "context", "delete", "--context=test-password");
         LauncherAssertions.assertSuccess(result, "Context 'test-password' deleted");
-        Assertions.assertNull(ConfigTestProfile.getInstance().loadConfig().issuers().get("test-issuer").contexts().get("test-password"));
+        Assertions.assertNull(ConfigTestProfile.getInstance().loadConfig().getIssuers().get("test-issuer").getContexts().get("test-password"));
     }
 
 }

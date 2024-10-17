@@ -35,7 +35,7 @@ public class ConfigService {
             loadConfig();
         }
 
-        String contextId = currentContext != null ? currentContext : config.defaultContext();
+        String contextId = currentContext != null ? currentContext : config.getDefaultContext();
         if (contextId == null) {
             throw new ConfigException("No context specified, and no default context set");
         }
@@ -51,8 +51,8 @@ public class ConfigService {
             String contextId = getContextId();
             Config.Issuer issuer = null;
             Config.Context context = null;
-            for (Config.Issuer i : config.issuers().values()) {
-                context = i.contexts().get(contextId);
+            for (Config.Issuer i : config.getIssuers().values()) {
+                context = i.getContexts().get(contextId);
                 if (context != null) {
                     issuer = i;
                     break;
@@ -63,8 +63,8 @@ public class ConfigService {
                 throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
             }
 
-            String issuerUrl = variableResolver.resolve(issuer.url());
-            this.context = new Context(config.storeTokens(), context, issuerUrl);
+            String issuerUrl = variableResolver.resolve(issuer.getUrl());
+            this.context = new Context(config.getStoreTokens(), context, issuerUrl);
         }
 
         return context;

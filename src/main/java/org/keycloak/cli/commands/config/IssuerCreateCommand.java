@@ -32,7 +32,7 @@ public class IssuerCreateCommand implements Runnable {
     public void run() {
         Config config = configService.loadConfig();
         Config.Issuer issuer = new Config.Issuer(url, new HashMap<>(), clientRegistrationContext);
-        if (config.issuers().put(issuerId, issuer) != null) {
+        if (config.getIssuers().put(issuerId, issuer) != null) {
             throw ConfigException.exists(Messages.Type.ISSUER, issuerId);
         }
 

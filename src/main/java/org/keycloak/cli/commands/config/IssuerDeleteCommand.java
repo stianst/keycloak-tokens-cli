@@ -23,12 +23,12 @@ public class IssuerDeleteCommand implements Runnable {
     @Override
     public void run() {
         Config config = configService.loadConfig();
-        Config.Issuer removed = config.issuers().remove(issuerId);
+        Config.Issuer removed = config.getIssuers().remove(issuerId);
         if (removed == null) {
             throw ConfigException.notFound(Messages.Type.ISSUER, issuerId);
         }
-        if (config.defaultContext() != null && removed.contexts().containsKey(config.defaultContext())) {
-            config = new Config(null, config.storeTokens(), config.issuers(), config.truststore());
+        if (config.getDefaultContext() != null && removed.getContexts().containsKey(config.getDefaultContext())) {
+            config = new Config(null, config.getStoreTokens(), config.getIssuers(), config.getTruststore());
         }
 
         configService.saveConfig(config);

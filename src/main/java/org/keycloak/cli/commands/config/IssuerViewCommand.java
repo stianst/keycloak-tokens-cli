@@ -34,7 +34,7 @@ public class IssuerViewCommand implements Runnable {
             config = variableResolver.resolve(config);
         }
 
-        Config.Issuer issuer = config.issuers().get(issuerId);
+        Config.Issuer issuer = config.getIssuers().get(issuerId);
         if (issuer == null) {
             throw ConfigException.notFound(Messages.Type.ISSUER, issuerId);
         }

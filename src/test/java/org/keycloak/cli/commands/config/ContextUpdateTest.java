@@ -28,9 +28,9 @@ public class ContextUpdateTest {
 
         LauncherAssertions.assertSuccess(result, "Context 'test-service-account' updated");
 
-        Config.Context context = ConfigTestProfile.getInstance().loadConfig().issuers().get("test-issuer").contexts().get("test-service-account");
-        Assertions.assertNull(context.client().secret());
-        Assertions.assertEquals(Flow.DEVICE, context.flow());
+        Config.Context context = ConfigTestProfile.getInstance().loadConfig().getIssuers().get("test-issuer").getContexts().get("test-service-account");
+        Assertions.assertNull(context.getClient().getSecret());
+        Assertions.assertEquals(Flow.DEVICE, context.getFlow());
     }
 
 }

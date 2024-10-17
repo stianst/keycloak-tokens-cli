@@ -25,7 +25,7 @@ public class ContextCreateTest {
                 "--flow=device",
                 "--client=myclient");
         LauncherAssertions.assertSuccess(result, "Context 'mycontext3' created");
-        Assertions.assertNotNull(ConfigTestProfile.getInstance().loadConfig().issuers().get("test-issuer").contexts().get("mycontext3"));
+        Assertions.assertNotNull(ConfigTestProfile.getInstance().loadConfig().getIssuers().get("test-issuer").getContexts().get("mycontext3"));
     }
 
 }

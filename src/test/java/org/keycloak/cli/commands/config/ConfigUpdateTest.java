@@ -22,15 +22,15 @@ public class ConfigUpdateTest {
     @Test
     public void testUpdate(QuarkusMainLauncher launcher) throws IOException {
         Config config = ConfigTestProfile.getInstance().loadConfig();
-        Assertions.assertTrue(config.storeTokens());
-        Assertions.assertNotEquals("test-password", config.defaultContext());
+        Assertions.assertTrue(config.getStoreTokens());
+        Assertions.assertNotEquals("test-password", config.getDefaultContext());
 
         LaunchResult result = launcher.launch("config", "update", "--store-tokens=false", "--default-context=test-password");
         LauncherAssertions.assertSuccess(result, "Config updated");
 
         config = ConfigTestProfile.getInstance().loadConfig();
-        Assertions.assertFalse(config.storeTokens());
-        Assertions.assertEquals("test-password", config.defaultContext());
+        Assertions.assertFalse(config.getStoreTokens());
+        Assertions.assertEquals("test-password", config.getDefaultContext());
     }
 
 }

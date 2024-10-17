@@ -18,13 +18,13 @@ public class ContextViewTest {
     @Test
     public void testViewDefaultContext(QuarkusMainLauncher launcher) {
         LaunchResult result = launcher.launch("config", "context", "view");
-        LauncherAssertions.assertYamlOutput(result, "test-service-account", ConfigTestProfile.getInstance().getDefaultConfig().issuers().get("test-issuer").contexts().get("test-service-account"));
+        LauncherAssertions.assertYamlOutput(result, "test-service-account", ConfigTestProfile.getInstance().getDefaultConfig().getIssuers().get("test-issuer").getContexts().get("test-service-account"));
     }
 
     @Test
     public void testViewSpecifiedContext(QuarkusMainLauncher launcher) {
         LaunchResult result = launcher.launch("config", "context", "view", "-c=test-password");
-        LauncherAssertions.assertYamlOutput(result, "test-password", ConfigTestProfile.getInstance().getDefaultConfig().issuers().get("test-issuer").contexts().get("test-password"));
+        LauncherAssertions.assertYamlOutput(result, "test-password", ConfigTestProfile.getInstance().getDefaultConfig().getIssuers().get("test-issuer").getContexts().get("test-password"));
     }
 
 }

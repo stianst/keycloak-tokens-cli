@@ -30,8 +30,8 @@ public class ContextDeleteCommand implements Runnable {
         Config config = configService.loadConfig();
         Config.Issuer issuer = null;
         Config.Context removedContext = null;
-        for (Config.Issuer i : config.issuers().values()) {
-            removedContext = i.contexts().remove(contextId);
+        for (Config.Issuer i : config.getIssuers().values()) {
+            removedContext = i.getContexts().remove(contextId);
             if (removedContext != null) {
                 issuer = i;
                 break;
@@ -42,10 +42,10 @@ public class ContextDeleteCommand implements Runnable {
             throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
         }
 
-        Config.Client client = removedContext.client();
-        if (client != null && client.registrationToken() != null && client.registrationUrl() != null) {
-            configService.setCurrentContext(issuer.clientRegistrationContext());
-            oidcService.deleteClient(client.registrationToken(), client.registrationUrl());
+        Config.Client client = removedContext.getClient();
+        if (client != null && client.getRegistrationToken() != null && client.getRegistrationUrl() != null) {
+            configService.setCurrentContext(issuer.getClientRegistrationContext());
+            oidcService.deleteClient(client.getRegistrationToken(), client.getRegistrationUrl());
         }
 
         configService.saveConfig(config);

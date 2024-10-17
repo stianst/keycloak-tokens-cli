@@ -35,7 +35,7 @@ public class ContextViewCommand implements Runnable {
         }
 
         if (contextId == null) {
-            contextId = config.defaultContext();
+            contextId = config.getDefaultContext();
         }
 
         Config.Context context = config.findContext(contextId);

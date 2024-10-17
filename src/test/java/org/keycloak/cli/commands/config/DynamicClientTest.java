@@ -46,10 +46,10 @@ public class DynamicClientTest {
         LauncherAssertions.assertSuccess(createContext, "Context 'mycontext4' created");
 
         Config.Context context = ConfigTestProfile.getInstance().loadConfig().findContext("mycontext4");
-        Assertions.assertNotNull(context.client().clientId());
-        Assertions.assertNotNull(context.client().secret());
-        Assertions.assertNotNull(context.client().registrationToken());
-        Assertions.assertNotNull(context.client().registrationUrl());
+        Assertions.assertNotNull(context.getClient().getClientId());
+        Assertions.assertNotNull(context.getClient().getSecret());
+        Assertions.assertNotNull(context.getClient().getRegistrationToken());
+        Assertions.assertNotNull(context.getClient().getRegistrationUrl());
 
         ClientRepresentation client = getClient(context);
         Assertions.assertNotNull(client);
@@ -60,18 +60,18 @@ public class DynamicClientTest {
         LauncherAssertions.assertSuccess(updateContext, "Context 'mycontext4' updated");
 
         Config.Context updatedContext = ConfigTestProfile.getInstance().loadConfig().findContext("mycontext4");
-        Assertions.assertNotEquals(context.client().registrationToken(), updatedContext.client().registrationToken());
+        Assertions.assertNotEquals(context.getClient().getRegistrationToken(), updatedContext.getClient().getRegistrationToken());
 
         assertScope(getClient(context).getOptionalClientScopes(), "email");
 
         LaunchResult deleteContext = launcher.launch("config", "context", "delete", "-c=mycontext4");
         LauncherAssertions.assertSuccess(deleteContext, "Context 'mycontext4' deleted");
 
-        Assertions.assertEquals(0, adminClient.realms().realm("test").clients().findByClientId(context.client().clientId()).size());
+        Assertions.assertEquals(0, adminClient.realms().realm("test").clients().findByClientId(context.getClient().getClientId()).size());
     }
 
     private ClientRepresentation getClient(Config.Context context) {
-        List<ClientRepresentation> clients = adminClient.realms().realm("test").clients().findByClientId(context.client().clientId());
+        List<ClientRepresentation> clients = adminClient.realms().realm("test").clients().findByClientId(context.getClient().getClientId());
         if (clients.size() == 1) {
             return clients.get(0);
         } else if (clients.isEmpty()) {
