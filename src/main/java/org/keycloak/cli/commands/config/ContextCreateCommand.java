@@ -47,6 +47,9 @@ public class ContextCreateCommand implements Runnable {
     @CommandLine.Option(names = {"--user-password"})
     String userPassword;
 
+    @CommandLine.Option(names = {"--default"}, description = "Set as default context")
+    boolean defaultContext;
+
     @CommandLine.Option(names = {"--create-client"})
     boolean createClient;
 
@@ -106,6 +109,10 @@ public class ContextCreateCommand implements Runnable {
                 user != null ? new Config.User(user, userPassword) : null,
                 scope
         ));
+
+        if (defaultContext) {
+            config.setDefaultContext(contextId);
+        }
 
         configService.saveConfig(config);
         interact.printCreated(Messages.Type.CONTEXT, contextId);

@@ -36,6 +36,10 @@ public class Config {
         return defaultContext;
     }
 
+    public void setDefaultContext(String defaultContext) {
+        this.defaultContext = defaultContext;
+    }
+
     public Boolean getStoreTokens() {
         return storeTokens;
     }

@@ -33,4 +33,12 @@ public class ContextUpdateTest {
         Assertions.assertEquals(Flow.DEVICE, context.getFlow());
     }
 
+    @Test
+    public void testUpdateDefaultContext(QuarkusMainLauncher launcher) throws IOException {
+        LaunchResult result = launcher.launch("config", "context", "update", "-c=test-password",
+                "--default");
+        LauncherAssertions.assertSuccess(result, "Context 'test-password' updated");
+        Assertions.assertEquals("test-password", ConfigTestProfile.getInstance().loadConfig().getDefaultContext());
+    }
+
 }
