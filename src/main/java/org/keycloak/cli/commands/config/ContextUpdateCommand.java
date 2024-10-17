@@ -43,6 +43,9 @@ public class ContextUpdateCommand implements Runnable {
     @CommandLine.Option(names = {"--user-password"}, arity = "0..1")
     String userPassword;
 
+    @CommandLine.Option(names = {"--default"}, description = "Set as default context")
+    boolean defaultContext;
+
     @Inject
     ConfigService configService;
 
@@ -80,7 +83,7 @@ public class ContextUpdateCommand implements Runnable {
         if (user == null) {
             user = context.getUser() != null ? context.getUser().getUsername() : null;
         }
-        if (userPassword != null) {
+        if (userPassword == null) {
             userPassword = context.getUser() != null ? context.getUser().getPassword() : null;
         }
 
@@ -112,6 +115,10 @@ public class ContextUpdateCommand implements Runnable {
                 user != null ? new Config.User(user, userPassword) : null,
                 scope
         ));
+
+        if (defaultContext) {
+            config.setDefaultContext(contextId);
+        }
 
         configService.saveConfig(config);
         interact.printUpdated(Messages.Type.CONTEXT, contextId);
