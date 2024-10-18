@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.keycloak.cli.enums.Flow;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ public class Config {
     @JsonProperty("store-tokens")
     private Boolean storeTokens;
 
-    private Map<String, Issuer> issuers;
+    private Map<String, Issuer> issuers = new HashMap<>();
 
     private Truststore truststore;
 
@@ -109,7 +110,7 @@ public class Config {
 
         private String url;
 
-        private Map<String, Context> contexts;
+        private Map<String, Context> contexts = new HashMap<>();
 
         @JsonProperty("client-registration-context")
         private String clientRegistrationContext;
@@ -129,6 +130,10 @@ public class Config {
 
         public Map<String, Context> getContexts() {
             return contexts;
+        }
+
+        public void setContexts(Map<String, Context> contexts) {
+            this.contexts = contexts;
         }
 
         public String getClientRegistrationContext() {
