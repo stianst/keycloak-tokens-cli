@@ -40,8 +40,10 @@ public class ConfigVerifier {
         checkNotEmpty(issuer.getUrl(), "{0} ''{1}'' invalid: missing issuer url", type, id);
         checkUrl(variableResolver.resolve(issuer.getUrl()), "{0} ''{1}'' invalid: invalid issuer url", type, id);
 
-        for (Map.Entry<String, Config.Context> e : issuer.getContexts().entrySet()) {
-            verifyContext(e.getKey(), e.getValue());
+        if (issuer.getContexts() != null) {
+            for (Map.Entry<String, Config.Context> e : issuer.getContexts().entrySet()) {
+                verifyContext(e.getKey(), e.getValue());
+            }
         }
     }
 

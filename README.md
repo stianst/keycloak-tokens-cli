@@ -1,26 +1,28 @@
 # Keycloak Token CLI
 
-Keycloak Token CLI (`kct`) provides a CLI interface to obtain tokens from an OpenID Connect provider.
+Keycloak Token CLI (`kct`) is a tool to interact with an OAuth 2.0 Authorization Server or OpenID Connect provider. The
+main use-case is to obtain tokens used by other commands. It can also be a great tool to learn and experiement with 
+OAuth 2.0 and OpenID Connect.
 
 Features include:
 
-* Multiple configuration contexts to easily switch between different issuers, flows, or clients
-* Several OAuth flows
-    * Authorization Code + PKCE
-    * Device Code
-    * Password Grant
-    * Client Credentials Grant
+* Multiple configuration context to switch between different Identity Providers, Clients, or User accounts
+* Persist token and automatically refresh tokens on demand
+* Several authentication flows
+    * Browser - leverages the system browser to authenticate the user ([Authorization Code + PKCE](https://oauth.net/2/grant-types/authorization-code/))
+    * Device - login via the system browser on a separate computer ([Device Code](https://oauth.net/2/grant-types/device-code/))
+    * Password - login directly via username and password ([Password Grant](https://oauth.net/2/grant-types/password/))
+    * Client - login as a service account ([Client Credentials](https://oauth.net/2/grant-types/client-credentials/))
+* Retrieve and refresh tokens
 * Decode tokens
-* UserInfo endpoint
-* Token store
-* Single sign-on through retrieving scoped tokens from a refresh token with a larger scope
-
-Additional features that are coming soon:
-
-* Token Introspection Endpoint
+* [Userinfo endpoint](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
+* [Token revocation](https://oauth.net/2/token-revocation/)
+* [Token exchange](https://oauth.net/2/token-exchange/)
+* [Dynamic Client Registration](https://openid.net/specs/openid-connect-registration-1_0.html) to automatically register clients with an OpenID Connect provider
+* `kubectl` plugin to seamlessly authenticate with Kubernetes clusters secured with a OpenID Connect provider
 
 Tested with [Keycloak](https://www.keycloak.org/), but should work with any OpenID Connect provider or
-OAuth Authorization Server.
+OAuth 2.0 Authorization Server.
 
 ## Installing
 
@@ -36,85 +38,63 @@ chmod +x kct
 
 ## Configuring
 
-`kct` provides a few different ways for configuration depending on the use-case, and supports multiple configuration
-contexts to make it easy to switch between different issuers, flows, or clients.
+`kct` stores it's configuration in `.kct/config.yaml`, but you don't need to edit this file yourself as `kct` provides
+commands to update the configuration.
 
-### Configuring with `kct`
+### Creating a configuration context
 
-Creating a context with `kct`:
+First step to using `kct` is to create a configuration context.
 
-```
-kct config context create --iss=http://localhost:8080/realms/myrealm --context=mycontext --client=myclient --client-secret=secret --flow=client
-```
-
-For more details see `kct config -h`.
-
-### Configuration file
-
-The standard way to configure `kct` is through `~/.kct/config.yaml`. This configuration approach supports multiple
-configuration contexts. An example config file looks like:
+For example to create a context for a service account run:
 
 ```
-default-context: test-password
-contexts:
-    test-password:
-        issuer: 
-          url: http://localhost:8080/realms/test
-        client: 
-          client-id: test-password
-        flow: password
-        user: 
-          username: test-user
-          password: test-user-password
-    test-device:
-        issuer: 
-          url: http://localhost:8080/realms/test
-        client: 
-          client-id: test-device
-        flow: device
+kct config context create --iss=http://localhost:8080/realms/myrealm --context=mycontext --client=myclient --client-secret=secret --flow=client --default
 ```
 
-The default context to use is specified with the `default` field, but can be overwritten in most commands with
-`--context=another-context`.
+For more details see `kct config context -h`.
 
-If multiple contexts are using the same issuer a global issuer can be defined, for example:
+### Creating an identity provider
+
+Configuration context are associated with an identity provider. This makes it easier to delete all context for a given
+identity provider, or to update the URL for example.
+
+When creating a configuration context an identity provider is automatically created, but you can also specify the
+identity provider first:
 
 ```
-default: test-password
-issuers:
-    local-test:
-        url: http://localhost:8080/realms/test
-contexts:
-    test-password:
-        issuer-ref: local-test
-        ...
-    test-device:
-        issuer-ref: local-test
-        ...
+kct config issuer create --iss=myissuer --url=http://localhost:8080/realms/myrealm
 ```
 
-It is also possible to specify an alternative location to the file with the `KCT_CONFIG_FILE` environment variable.
+Now when creating a configuration context you can refer to the provider by the alias, rather than the url:
+
+```
+kct config context create --iss=myissuer --context=mycontext --client=myclient --client-secret=secret --flow=client --default
+```
+
+You can also use environment variables to set the URL for example:
+
+```
+export ISSUER_URL=http://localhost:8080/realms/myrealm
+kct config issuer create --iss=myissuer --url='${issuer.url}'
+```
 
 ### Configuring a truststore
 
-If the identity provider is using self-signed certificates, or certificates signed by a certificate authority not
+If the Identity Provider is using self-signed certificates, or a certificate signed by a certificate authority not
 trusted by the operating system, the certificate needs to be added to a truststore.
 
-First create a Java truststore with the certificate imported:
+`kct` supports truststores in PKCS#12 or Java KeyStore formats.
+
+To create a Java Keystore you need Java installed, then run:
 
 ```
-keytool -import -file <path to certificate> -keystore myTrustStore
+keytool -import -alias your-alias -keystore <truststore.jks> -file <cert.pem> -storepass mypassword -noprompt
 ```
 
-Then configure `truststore-path` and `truststore-password` in the `config.yaml` file, for example:
+Then configure `truststore-path` and `truststore-password` options:
 
 ```
----
-default-context: "tls"
-store-tokens: true
-truststore
-  path: /path/myTrustStore
-  password: <truststore password>
+kct config update --truststore-path=<truststore.jks> --truststore-password=mypassword
 ```
 
 ## Using
@@ -131,6 +111,41 @@ to an environment variable or another process, for example:
 ```
 mycommand --token $(kct token)
 ```
+
+## Switching between contexts
+
+`kct` has the concept of a default context, which can be set either as part of the configuration or when creating/updating
+contexts.
+
+For example to swith the default context:
+```
+kct config update --default=context=myothercontext
+```
+
+Or, to set a context as the default when creating:
+```
+kct config context create --context myothercontext ... --default
+```
+
+To use the non-default context use the `-c` or `--context` option, for example:
+```
+kct token -c=myothercontext
+```
+
+## Dynamic client registration
+
+To enable dynamic client registration you first need to create an identity provider and a context that can be used
+to obtain tokens to create the clients.
+
+For example:
+```
+kct config issuer create --iss=myissuer --url=http://localhost:8080/realms/myrealm
+kct config context create --context=client-registration --iss=myissuer --client=client-registration --client-secret=mysecret --flow=client
+kct config issuer update --iss=myissuer --client-registration-context=client-registration
+```
+
+Now when creating a context you can include the `--create-client` option which will dynamically register the client
+with the identity provider.
 
 ## Kubernetes command line tool (`kubectl`)
 
