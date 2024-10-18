@@ -24,4 +24,10 @@ public class UserInfoTest {
         OpenIDAssertions.assertUserInfoResponse(result.getOutput());
     }
 
+    @Test
+    public void userinfoMissingOpenidScope(QuarkusMainLauncher launcher) {
+        LaunchResult result = launcher.launch("userinfo");
+        LauncherAssertions.assertFailure(result, "Request failed: status=403, error=insufficient_scope, description='Missing openid scope', url=http://localhost:8080/realms/test/protocol/openid-connect/userinfo");
+    }
+
 }

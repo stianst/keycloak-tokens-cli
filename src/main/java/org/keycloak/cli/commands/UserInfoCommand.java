@@ -44,11 +44,6 @@ public class UserInfoCommand implements Runnable {
     public void run() {
         config.setCurrentContext(context);
 
-        Set<String> scope = this.scope != null ? new LinkedHashSet<>(this.scope) : new LinkedHashSet<>();
-        if (!scope.contains("openid")) {
-            scope.add("openid");
-        }
-
         if (accessToken == null) {
             accessToken = tokens.getToken(TokenType.ACCESS, scope, false);
         }

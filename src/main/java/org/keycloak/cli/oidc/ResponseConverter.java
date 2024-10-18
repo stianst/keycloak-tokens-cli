@@ -1,11 +1,17 @@
 package org.keycloak.cli.oidc;
 
+import com.nimbusds.oauth2.sdk.ErrorObject;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.TokenResponse;
 import com.nimbusds.oauth2.sdk.client.ClientRegistrationResponse;
 import com.nimbusds.oauth2.sdk.device.DeviceAuthorizationResponse;
 import com.nimbusds.oauth2.sdk.device.DeviceAuthorizationSuccessResponse;
+import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
+import com.nimbusds.oauth2.sdk.token.AccessTokenType;
+import com.nimbusds.oauth2.sdk.token.BearerTokenError;
+import com.nimbusds.oauth2.sdk.token.TokenSchemeError;
+import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
@@ -15,31 +21,63 @@ import com.nimbusds.openid.connect.sdk.rp.OIDCClientInformationResponse;
 import com.nimbusds.openid.connect.sdk.rp.OIDCClientRegistrationResponseParser;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 
-public class ResponseConverter {
+public class ResponseConverter<T> {
 
-    public static <T> Object convert(HTTPResponse response, Class<T> clazz) throws ParseException {
-        boolean success = response.indicatesSuccess();
+    private final HTTPRequest request;
+    private final HTTPResponse response;
+    private final Class<T> clazz;
 
+    public ResponseConverter(HTTPRequest request, HTTPResponse response, Class<T> clazz) {
+        this.request = request;
+        this.response = response;
+        this.clazz = clazz;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T convert() {
+        try {
+            if (response.indicatesSuccess()) {
+                return (T) toResponse();
+            } else {
+                throw toException();
+            }
+        } catch (ParseException e) {
+            throw new OidcException(request, e);
+        }
+    }
+
+    private Object toResponse() throws ParseException {
         if (String.class.equals(clazz)) {
-            return success ? response.getBody() : null;
+            return response.getBody();
         } else if (Boolean.class.equals(clazz)) {
-            return success ? Boolean.TRUE : Boolean.FALSE;
+            return Boolean.TRUE;
         } else if (OIDCProviderMetadata.class.equals(clazz)) {
-            return success ? OIDCProviderMetadata.parse(response.getBodyAsJSONObject()) : null;
+            return OIDCProviderMetadata.parse(response.getBodyAsJSONObject());
         } else if (UserInfo.class.equals(clazz)) {
-            UserInfoResponse userInfoResponse = UserInfoResponse.parse(response);
-            return success ? userInfoResponse.toSuccessResponse().getUserInfo() : userInfoResponse.toErrorResponse();
+            return UserInfoResponse.parse(response).toSuccessResponse().getUserInfo();
         } else if (OIDCTokens.class.equals(clazz)) {
-            return success ? OIDCTokenResponse.parse(response).getOIDCTokens() : TokenResponse.parse(response).toErrorResponse();
+            return OIDCTokenResponse.parse(response).getOIDCTokens();
         } else if (DeviceAuthorizationSuccessResponse.class.equals(clazz)) {
-            DeviceAuthorizationResponse deviceAuthorizationResponse = DeviceAuthorizationResponse.parse(response);
-            return success ? deviceAuthorizationResponse.toSuccessResponse() : deviceAuthorizationResponse.toErrorResponse();
+            return DeviceAuthorizationResponse.parse(response).toSuccessResponse();
         } else if (OIDCClientInformation.class.equals(clazz)) {
-            ClientRegistrationResponse clientRegistrationResponse = OIDCClientRegistrationResponseParser.parse(response);
-            return success ? ((OIDCClientInformationResponse) clientRegistrationResponse.toSuccessResponse()).getOIDCClientInformation() : clientRegistrationResponse.toErrorResponse();
+            return ((OIDCClientInformationResponse) OIDCClientRegistrationResponseParser.parse(response).toSuccessResponse()).getOIDCClientInformation();
         } else {
             throw new RuntimeException("Unknown response type '" + clazz.getSimpleName() + "'");
         }
+    }
+
+    private OidcException toException() {
+        String wwwAuth = response.getWWWAuthenticate();
+        if (StringUtils.isNotBlank(wwwAuth)) {
+            try {
+                BearerTokenError tokenError = BearerTokenError.parse(response.getWWWAuthenticate());
+                return new OidcException(request, response, tokenError.getCode(), tokenError.getDescription());
+            } catch (ParseException e) {
+            }
+        }
+
+        ErrorObject errorObject = ErrorObject.parse(response);
+        return new OidcException(request, response, errorObject.getCode(), errorObject.getDescription());
     }
 
 }

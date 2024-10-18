@@ -209,31 +209,16 @@ public class OidcService {
         return new Tokens(tokens);
     }
 
-    @SuppressWarnings("unchecked")
     protected <T> T send(HTTPRequest httpRequest, Class<T> responseClazz) {
         HTTPResponse httpResponse;
         try {
             httpResponse = httpRequest.send(httpClient);
         } catch (IOException e) {
-            throw new OidcException(httpRequest, e.getMessage());
+            throw new OidcException(httpRequest, e);
         }
 
-        boolean success = httpResponse.indicatesSuccess();
-
-        try {
-            Object response = ResponseConverter.convert(httpResponse, responseClazz);
-
-            if (success) {
-                return (T) response;
-            } else if (response != null) {
-                ErrorResponse errorResponse = (ErrorResponse) response;
-                throw new OidcException(httpRequest, errorResponse);
-            } else {
-                throw new OidcException(httpRequest, httpResponse.getStatusCode());
-            }
-        } catch (ParseException e) {
-            throw new OidcException(httpRequest, e.getMessage());
-        }
+        ResponseConverter<T> responseConverter = new ResponseConverter<>(httpRequest, httpResponse, responseClazz);
+        return responseConverter.convert();
     }
 
     public static Scope toScope(Set<String> scope) {

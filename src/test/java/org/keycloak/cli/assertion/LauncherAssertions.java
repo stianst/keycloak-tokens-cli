@@ -19,6 +19,13 @@ public class LauncherAssertions {
         Assertions.assertEquals(expectedOutput, result.getOutput());
     }
 
+    public static void assertFailure(LaunchResult result, String expectedOutput) {
+        if (result.exitCode() == 0) {
+            Assertions.fail("Expected failure");
+        }
+        Assertions.assertEquals(expectedOutput, result.getErrorOutput());
+    }
+
     public static void assertYamlOutput(LaunchResult result, String header, Object value) {
         String expectedOutput;
         try {
