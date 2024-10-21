@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.keycloak.cli.config.Config;
@@ -14,7 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
-public class ConfigTestProfile implements BeforeAllCallback {
+public class ConfigTestProfile implements BeforeAllCallback, AfterAllCallback {
 
     private static final ConfigTestProfile instance = new ConfigTestProfile();
 
@@ -25,8 +26,9 @@ public class ConfigTestProfile implements BeforeAllCallback {
     private Config defaultConfig;
 
     public ConfigTestProfile() {
-        configFile = createTempFile("kct-test-config.yaml");
-        tokensFile = createTempFile("kct-test-tokens.yaml");
+        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        configFile = new File(tmpDir, "kct-test-config.yaml");
+        tokensFile = new File(tmpDir, "kct-test-tokens.yaml");
         objectMapper = new ObjectMapper(new YAMLFactory());
         objectMapper.configOverride(Map.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
         try {
@@ -47,7 +49,12 @@ public class ConfigTestProfile implements BeforeAllCallback {
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
         objectMapper.writeValue(configFile, defaultConfig);
-        new FileOutputStream(tokensFile).close();
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        configFile.delete();
+        tokensFile.delete();
     }
 
     public ObjectMapper getObjectMapper() {
@@ -77,12 +84,4 @@ public class ConfigTestProfile implements BeforeAllCallback {
     public void updateTokens(TokenStore tokenStore) throws IOException {
         objectMapper.writeValue(tokensFile, tokenStore);
     }
-
-    private static File createTempFile(String name) {
-        String tmpdir = System.getProperty("java.io.tmpdir");
-        File file = new File(tmpdir, name);
-        file.deleteOnExit();
-        return file;
-    }
-
 }

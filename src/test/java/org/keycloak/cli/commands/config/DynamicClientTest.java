@@ -1,10 +1,8 @@
 package org.keycloak.cli.commands.config;
 
-import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
 import io.quarkus.test.junit.main.QuarkusMainTest;
-import org.eclipse.microprofile.config.ConfigProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +12,6 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.LauncherAssertions;
 import org.keycloak.cli.config.Config;
-import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.testcontainers.shaded.org.hamcrest.CoreMatchers;
 import org.testcontainers.shaded.org.hamcrest.MatcherAssert;
@@ -25,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 
 @QuarkusMainTest
-@WithTestResource(KeycloakTestResource.class)
 @ExtendWith(ConfigTestProfile.class)
 public class DynamicClientTest {
 

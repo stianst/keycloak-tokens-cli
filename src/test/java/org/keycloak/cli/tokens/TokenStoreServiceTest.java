@@ -1,6 +1,5 @@
 package org.keycloak.cli.tokens;
 
-import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
@@ -8,14 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.config.ConfigService;
-import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.oidc.Tokens;
 
 import java.io.IOException;
 import java.util.Set;
 
 @QuarkusTest
-@WithTestResource(KeycloakTestResource.class)
 @ExtendWith({ConfigTestProfile.class})
 public class TokenStoreServiceTest {
 
@@ -27,7 +24,7 @@ public class TokenStoreServiceTest {
 
     @Test
     public void token() throws IOException {
-        Assertions.assertEquals(0, ConfigTestProfile.getInstance().getTokensFile().length());
+        Assertions.assertFalse(ConfigTestProfile.getInstance().getTokensFile().isFile());
 
         Tokens token = new Tokens("refresh", Set.of("refresh"), "access", "id", Set.of("token"), 123456L);
         tokens.updateCurrent(token);

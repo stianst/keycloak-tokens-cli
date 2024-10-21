@@ -1,7 +1,6 @@
 package org.keycloak.cli.tokens;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.main.LaunchResult;
 import io.quarkus.test.junit.main.QuarkusMainLauncher;
 import io.quarkus.test.junit.main.QuarkusMainTest;
@@ -12,14 +11,12 @@ import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.KubeCtlAssertions;
 import org.keycloak.cli.assertion.LauncherAssertions;
 import org.keycloak.cli.assertion.OpenIDAssertions;
-import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.kubectl.ExecCredentialRepresentation;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @QuarkusMainTest
-@WithTestResource(KeycloakTestResource.class)
 @ExtendWith({ConfigTestProfile.class})
 public class TokenTest {
 

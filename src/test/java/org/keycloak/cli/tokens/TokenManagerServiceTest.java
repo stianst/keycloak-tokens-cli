@@ -1,7 +1,6 @@
 package org.keycloak.cli.tokens;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterEach;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.OpenIDAssertions;
 import org.keycloak.cli.config.ConfigService;
-import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.oidc.Tokens;
 
@@ -20,7 +18,6 @@ import java.time.Instant;
 import java.util.Set;
 
 @QuarkusTest
-@WithTestResource(KeycloakTestResource.class)
 @ExtendWith({ConfigTestProfile.class})
 public class TokenManagerServiceTest {
 
@@ -36,6 +33,11 @@ public class TokenManagerServiceTest {
     @BeforeEach
     public void setContext() {
         configService.setCurrentContext("test-password");
+    }
+
+    @AfterEach
+    public void resetContext() {
+        configService.setCurrentContext("test-service-account");
     }
 
     @AfterEach
