@@ -8,6 +8,7 @@ import org.keycloak.cli.config.Context;
 import org.keycloak.cli.config.Messages;
 import org.keycloak.cli.interact.InteractService;
 import org.keycloak.cli.oidc.OidcService;
+import org.keycloak.cli.tokens.TokenStoreService;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "delete", description = "Delete config context", mixinStandardHelpOptions = true)
@@ -25,6 +26,9 @@ public class ContextDeleteCommand implements Runnable {
     @Inject
     InteractService interact;
 
+    @Inject
+    TokenStoreService tokenStoreService;
+
     @Override
     public void run() {
         Config config = configService.loadConfig();
@@ -41,6 +45,8 @@ public class ContextDeleteCommand implements Runnable {
         if (removedContext == null) {
             throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
         }
+
+        tokenStoreService.clear(contextId);
 
         Config.Client client = removedContext.getClient();
         if (client != null && client.getRegistrationToken() != null && client.getRegistrationUrl() != null) {

@@ -64,6 +64,12 @@ public class TokenStoreService {
         save();
     }
 
+    public void clear(String contextId) {
+        logger.debugv("Deleting stored tokens for {0}", contextId);
+        tokenStore.getTokens().remove(contextId);
+        save();
+    }
+
     public void clearCurrent(TokenType tokenType) {
         logger.debugv("Deleting stored {0} token for {1}", tokenType.name().toLowerCase(Locale.ENGLISH), config.getContextId());
         switch (tokenType) {
