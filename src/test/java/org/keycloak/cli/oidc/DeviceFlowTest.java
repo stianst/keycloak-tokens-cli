@@ -1,6 +1,5 @@
 package org.keycloak.cli.oidc;
 
-import io.quarkus.test.common.WithTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
@@ -8,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.cli.ConfigTestProfile;
 import org.keycloak.cli.assertion.OpenIDAssertions;
 import org.keycloak.cli.config.ConfigService;
-import org.keycloak.cli.container.KeycloakTestResource;
 import org.keycloak.cli.enums.TokenType;
 import org.keycloak.cli.mock.MockInteractService;
 import org.keycloak.cli.tokens.TokenManagerService;
@@ -18,7 +16,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 @QuarkusTest
-@WithTestResource(KeycloakTestResource.class)
 @ExtendWith({ConfigTestProfile.class})
 public class DeviceFlowTest {
 

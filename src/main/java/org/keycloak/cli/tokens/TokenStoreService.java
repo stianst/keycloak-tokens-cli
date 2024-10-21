@@ -119,11 +119,7 @@ public class TokenStoreService {
                 throw new RuntimeException(e);
             }
         } else {
-            try {
-                new FileOutputStream(tokensFile).close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            tokensFile.delete();
         }
 
         if (creatingFile) {
