@@ -12,6 +12,9 @@ public class ClearCommand implements Runnable {
     @CommandLine.Option(names = {"-c", "--context"}, description = "Context to use")
     String contextId;
 
+    @CommandLine.Option(names = {"-i", "--iss"}, description = "Clear cached provider metadata for issuer")
+    String issuerId;
+
     @CommandLine.Option(names = {"-a", "--all"}, description = "Clear all stored tokens", defaultValue = "false")
     boolean all;
 
@@ -30,6 +33,9 @@ public class ClearCommand implements Runnable {
             tokenStoreService.clearAll();
 
             interactService.println("Cleared all stored tokens");
+        } else if (issuerId != null) {
+            tokenStoreService.clearProviderMetadata(issuerId);
+            interactService.println("Cleared provider metadata for issuer '" + issuerId + "'");
         } else {
             config.setCurrentContext(contextId);
 

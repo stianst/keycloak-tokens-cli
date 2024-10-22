@@ -36,6 +36,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.Context;
+import org.keycloak.cli.tokens.TokenStoreService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -57,6 +58,9 @@ public class OidcService {
     @Inject
     DeviceAuthorizationService deviceAuthorizationService;
 
+    @Inject
+    TokenStoreService tokenStoreService;
+
     private Context context;
     private OIDCProviderMetadata providerMetadata;
 
@@ -67,9 +71,15 @@ public class OidcService {
 
     public OIDCProviderMetadata providerMetadata() {
         if (providerMetadata == null) {
-            OIDCProviderConfigurationRequest oidcProviderConfigurationRequest = new OIDCProviderConfigurationRequest(context.getIssuer());
-            providerMetadata = send(oidcProviderConfigurationRequest.toHTTPRequest(), OIDCProviderMetadata.class);
+            providerMetadata = tokenStoreService.getProviderMetadata();
+
+            if (providerMetadata == null) {
+                OIDCProviderConfigurationRequest oidcProviderConfigurationRequest = new OIDCProviderConfigurationRequest(context.getIssuer());
+                providerMetadata = send(oidcProviderConfigurationRequest.toHTTPRequest(), OIDCProviderMetadata.class);
+                tokenStoreService.updateProviderMetadata(providerMetadata);
+            }
         }
+
         return providerMetadata;
     }
 
