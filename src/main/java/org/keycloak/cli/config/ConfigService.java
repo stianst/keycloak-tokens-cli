@@ -26,7 +26,7 @@ public class ConfigService {
 
     private String currentContext;
 
-    private String issuerUrl;
+    private String issuer;
 
     private Context context;
 
@@ -42,6 +42,11 @@ public class ConfigService {
         return contextId;
     }
 
+    public String getIssuer() {
+        getContext();
+        return issuer;
+    }
+
     public Context getContext() {
         if (context == null) {
             if (config == null) {
@@ -51,10 +56,11 @@ public class ConfigService {
             String contextId = getContextId();
             Config.Issuer issuer = null;
             Config.Context context = null;
-            for (Config.Issuer i : config.getIssuers().values()) {
-                context = i.getContexts().get(contextId);
+            for (Map.Entry<String, Config.Issuer> i : config.getIssuers().entrySet()) {
+                context = i.getValue().getContexts().get(contextId);
                 if (context != null) {
-                    issuer = i;
+                    issuer = i.getValue();
+                    this.issuer = i.getKey();
                     break;
                 }
             }
@@ -112,7 +118,7 @@ public class ConfigService {
         }
 
         if (creatingFile) {
-            FileUtils.userOnlyPermissions(configFile);
+            FilePermissionUtils.userOnlyPermissions(configFile);
         }
     }
 

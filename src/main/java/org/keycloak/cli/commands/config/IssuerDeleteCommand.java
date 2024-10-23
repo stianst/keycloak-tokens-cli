@@ -6,6 +6,7 @@ import org.keycloak.cli.config.ConfigException;
 import org.keycloak.cli.config.ConfigService;
 import org.keycloak.cli.config.Messages;
 import org.keycloak.cli.interact.InteractService;
+import org.keycloak.cli.tokens.TokenStoreService;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "delete", description = "Create config context", mixinStandardHelpOptions = true)
@@ -20,6 +21,9 @@ public class IssuerDeleteCommand implements Runnable {
     @Inject
     InteractService interact;
 
+    @Inject
+    TokenStoreService tokenStoreService;
+
     @Override
     public void run() {
         Config config = configService.loadConfig();
@@ -30,6 +34,8 @@ public class IssuerDeleteCommand implements Runnable {
         if (config.getDefaultContext() != null && removed.getContexts().containsKey(config.getDefaultContext())) {
             config = new Config(null, config.getStoreTokens(), config.getIssuers(), config.getTruststore());
         }
+
+        tokenStoreService.clearProviderMetadata(issuerId);
 
         configService.saveConfig(config);
         interact.printDeleted(Messages.Type.ISSUER, issuerId);
