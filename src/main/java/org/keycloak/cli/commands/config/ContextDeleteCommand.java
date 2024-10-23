@@ -46,6 +46,10 @@ public class ContextDeleteCommand implements Runnable {
             throw ConfigException.notFound(Messages.Type.CONTEXT, contextId);
         }
 
+        if (contextId.equals(config.getDefaultContext())) {
+            config.setDefaultContext(null);
+        }
+
         tokenStoreService.clear(contextId);
 
         Config.Client client = removedContext.getClient();

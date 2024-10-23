@@ -15,6 +15,9 @@ public class IssuerDeleteCommand implements Runnable {
     @CommandLine.Option(names = {"-i", "--iss"}, description = "Issuer to delete", required = true)
     String issuerId;
 
+    @CommandLine.Option(names = {"--force"}, description = "Delete issuer and contexts")
+    boolean force;
+
     @Inject
     ConfigService configService;
 
@@ -31,8 +34,13 @@ public class IssuerDeleteCommand implements Runnable {
         if (removed == null) {
             throw ConfigException.notFound(Messages.Type.ISSUER, issuerId);
         }
+
+        if (!force && !removed.getContexts().isEmpty()) {
+            throw new ConfigException(Messages.format("Issuer ''{0}'' contains contexts, please delete contexts first or use --force", issuerId));
+        }
+
         if (config.getDefaultContext() != null && removed.getContexts().containsKey(config.getDefaultContext())) {
-            config = new Config(null, config.getStoreTokens(), config.getIssuers(), config.getTruststore());
+            config.setDefaultContext(null);
         }
 
         tokenStoreService.clearProviderMetadata(issuerId);
