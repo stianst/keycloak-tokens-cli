@@ -40,3 +40,11 @@ To redirect log output from the Keycloak container use `kc.container.log`:
 ```
 ./mvnw test -Dkc.container.log
 ```
+
+# Misc
+
+## Checking for updated dependencies
+
+```
+mvn versions:display-dependency-updates
+```

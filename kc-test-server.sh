@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-VERSION=26.0.1
+VERSION=$(mvn help:evaluate -Dexpression=keycloak.version -q -DforceStdout)
 
 rm -rf test-server/keycloak
 rm -rf test-server/cert

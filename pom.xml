@@ -11,19 +11,24 @@
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <keycloak.version>25.0.5</keycloak.version>
-        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-        <quarkus.platform.version>3.14.2</quarkus.platform.version>
-        <skipITs>true</skipITs>
+
+        <keycloak.version>26.0.1</keycloak.version>
+        <quarkus.version>3.15.1</quarkus.version>
+        <nimbus.version>11.20.1</nimbus.version>
+        <jose4j.version>0.9.6</jose4j.version>
+        <commons-text.version>1.12.0</commons-text.version>
+        <selenium.version>4.25.0</selenium.version>
+
+        <failsafe-plugin.version>3.2.5</failsafe-plugin.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
+        <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>${quarkus.platform.group-id}</groupId>
-                <artifactId>${quarkus.platform.artifact-id}</artifactId>
-                <version>${quarkus.platform.version}</version>
+                <groupId>io.quarkus.platform</groupId>
+                <artifactId>quarkus-bom</artifactId>
+                <version>${quarkus.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -43,14 +48,24 @@
             <artifactId>quarkus-rest-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-apache-httpclient</artifactId>
+            <version>${quarkus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>oauth2-oidc-sdk</artifactId>
+            <version>${nimbus.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.bitbucket.b_c</groupId>
             <artifactId>jose4j</artifactId>
-            <version>0.9.6</version>
+            <version>${jose4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.12.0</version>
+            <version>${commons-text.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -62,26 +77,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>1.20.1</version>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.22.0</version>
+            <version>${selenium.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.nimbusds</groupId>
-            <artifactId>oauth2-oidc-sdk</artifactId>
-            <version>11.18</version>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-apache-httpclient</artifactId>
-            <version>${quarkus.platform.version}</version>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
@@ -94,9 +98,9 @@
         <finalName>kct</finalName>
         <plugins>
             <plugin>
-                <groupId>${quarkus.platform.group-id}</groupId>
+                <groupId>io.quarkus.platform</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
-                <version>${quarkus.platform.version}</version>
+                <version>${quarkus.version}</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>
@@ -130,7 +134,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.2.5</version>
+                <version>${failsafe-plugin.version}</version>
                 <configuration>
                     <systemPropertyVariables>
                         <native.image.path>${project.build.directory}/${project.build.finalName}</native.image.path>
@@ -148,6 +152,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <ignoredVersions>.*CR.*</ignoredVersions>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -161,7 +173,8 @@
             <properties>
                 <skipITs>false</skipITs>
                 <quarkus.native.enabled>true</quarkus.native.enabled>
-                <quarkus.native.additional-build-args>--initialize-at-run-time=com.nimbusds</quarkus.native.additional-build-args>
+                <quarkus.native.additional-build-args>--initialize-at-run-time=com.nimbusds
+                </quarkus.native.additional-build-args>
             </properties>
         </profile>
     </profiles>
