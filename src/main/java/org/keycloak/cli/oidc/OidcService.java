@@ -177,7 +177,14 @@ public class OidcService {
                     actorTokenTypeWrapper,
                     requestedTokenTypeWrapper,
                     audienceWrapper);
-            return tokenRequest(tokenExchangeGrant, scope, customParams).getAccessToken();
+
+            Tokens tokens = tokenRequest(tokenExchangeGrant, scope, customParams);
+            switch (requestedTokenType) {
+                case "urn:ietf:params:oauth:token-type:access_token": return tokens.getAccessToken();
+                case "urn:ietf:params:oauth:token-type:refresh_token": return tokens.getRefreshToken();
+                case "urn:ietf:params:oauth:token-type:id_token": return tokens.getIdToken();
+                default: throw new RuntimeException("Unsupported requested token type");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
