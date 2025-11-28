@@ -22,7 +22,7 @@ import java.security.Key;
 @CommandLine.Command(name = "decode", description = "Decode token", mixinStandardHelpOptions = true)
 public class DecodeCommand implements Runnable {
 
-    @CommandLine.Option(names = {"--verify"}, description = "Verify token signature")
+    @CommandLine.Option(names = {"--verify"}, description = "Verify token signature", defaultValue = "false")
     boolean verify;
 
     @CommandLine.Parameters(index = "0", description = "Token to decode", arity = "0..1")
@@ -59,25 +59,28 @@ public class DecodeCommand implements Runnable {
     }
 
     private void decode(String token) throws JoseException, IOException {
-        JsonWebKeySet jsonWebKeySet;
-        if (uri != null) {
-            if (uri.getScheme().equals("file")) {
-                jsonWebKeySet = new JsonWebKeySet(new String(uri.toURL().openStream().readAllBytes(), StandardCharsets.UTF_8));
-            } else {
-                jsonWebKeySet = new JsonWebKeySet(oidcService.keys(uri));
-            }
-        } else {
-            jsonWebKeySet = new JsonWebKeySet(oidcService.keys());
-        }
-        JwksVerificationKeyResolver jwksVerificationKeyResolver = new JwksVerificationKeyResolver(jsonWebKeySet.getJsonWebKeys());
-
         JsonWebSignature jws = new JsonWebSignature();
         jws.setCompactSerialization(token);
 
-        try {
-            Key key = jwksVerificationKeyResolver.resolveKey(jws, null);
-            jws.setKey(key);
-        } catch (UnresolvableKeyException e) {
+        if (verify) {
+            JsonWebKeySet jsonWebKeySet;
+            if (uri != null) {
+                if (uri.getScheme().equals("file")) {
+                    jsonWebKeySet = new JsonWebKeySet(new String(uri.toURL().openStream().readAllBytes(), StandardCharsets.UTF_8));
+                } else {
+                    jsonWebKeySet = new JsonWebKeySet(oidcService.keys(uri));
+                }
+            } else {
+                jsonWebKeySet = new JsonWebKeySet(oidcService.keys());
+            }
+            JwksVerificationKeyResolver jwksVerificationKeyResolver = new JwksVerificationKeyResolver(jsonWebKeySet.getJsonWebKeys());
+
+
+            try {
+                Key key = jwksVerificationKeyResolver.resolveKey(jws, null);
+                jws.setKey(key);
+            } catch (UnresolvableKeyException e) {
+            }
         }
 
         interact.println("Header");
